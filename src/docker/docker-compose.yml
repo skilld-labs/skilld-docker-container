@@ -1,0 +1,75 @@
+version: "2"
+
+services:
+
+  php:
+    image: wodby/drupal-php:7.0 # Allowed: 7.0, 5.6.
+    container_name: "${COMPOSE_PROJECT_NAME}_php"
+    environment:
+      PHP_SITE_NAME: dev
+      PHP_HOST_NAME: localhost:8000
+#      PHP_DOCROOT: public # Relative path inside the /var/www/html/ directory.
+      PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S mailhog:1025
+      PHP_XDEBUG_ENABLED: 0 # Set 1 to enable.
+    links:
+      - mysql:mysql
+    depends_on:
+      - mysql
+    volumes:
+      - ./build:/var/www/html
+    networks:
+      - back
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: "${COMPOSE_PROJECT_NAME}_mail"
+    restart: always
+    networks:
+      - back
+
+  nginx:
+    image: wodby/drupal-nginx
+    container_name: "${COMPOSE_PROJECT_NAME}_web"
+    environment:
+#      NGINX_SERVER_NAME: localhost
+      NGINX_UPSTREAM_NAME: php
+#      NGINX_DOCROOT: public # Relative path inside the /var/www/html/ directory.
+#      DRUPAL_VERSION: 8 # Allowed: 7, 8.
+    links:
+      - mysql:mysql
+    depends_on:
+      - php
+    volumes_from:
+      - php
+#    volumes:
+# Replace nginx config with our values
+#      - ./src/docker/nginx/drupal8.conf:/opt/drupal8.conf
+# Add keys for ssl if needed
+#     - ./src/docker/nginx/ssl:/etc/nginx/ssl
+# Change 8081 and 443 to your needs.
+#    ports:
+#      - "8081:80"
+#      - "443:443"
+    networks:
+      - back
+      - front
+
+  mysql:
+    image: percona:5.7
+    container_name: "${COMPOSE_PROJECT_NAME}_mysql"
+    volumes:
+      - /dev/shm/mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: d8
+      MYSQL_USER: d8
+      MYSQL_PASSWORD: d8
+      MYSQL_ROOT_PASSWORD: d8root
+    restart: always
+    networks:
+      - back
+
+networks:
+  back:
+    driver: bridge
+  front:
+    driver: bridge

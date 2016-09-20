@@ -1,0 +1,10 @@
+api: 2
+
+core: "8.x"
+
+projects:
+  drupal:
+    type: "core"
+    version: "8.1.9"
+    patch:
+      - "https://www.drupal.org/files/issues/add_a_startup-1543858-58.patch"
