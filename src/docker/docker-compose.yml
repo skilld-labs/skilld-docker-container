@@ -16,16 +16,16 @@ services:
     depends_on:
       - mysql
     volumes:
-      - ./build:/var/www/html
+      - ../../build:/var/www/html
     networks:
-      - back
+      - front
 
   mailhog:
     image: mailhog/mailhog
     container_name: "${COMPOSE_PROJECT_NAME}_mail"
     restart: always
     networks:
-      - back
+      - front
 
   nginx:
     image: wodby/drupal-nginx
@@ -51,7 +51,6 @@ services:
 #      - "8081:80"
 #      - "443:443"
     networks:
-      - back
       - front
 
   mysql:
@@ -66,10 +65,8 @@ services:
       MYSQL_ROOT_PASSWORD: d8root
     restart: always
     networks:
-      - back
+      - front
 
 networks:
-  back:
-    driver: bridge
   front:
     driver: bridge
