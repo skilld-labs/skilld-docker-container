@@ -3,13 +3,14 @@ version: "2"
 services:
 
   php:
-    image: wodby/drupal-php:7.0 # Allowed: 7.0, 5.6.
+    image: skilldlabs/php:7-fpm # Allowed: 7.0, 5.6.
+#    image: wodby/drupal-php:7.0 # Allowed: 7.0, 5.6.
     container_name: "${COMPOSE_PROJECT_NAME}_php"
     environment:
       PHP_SITE_NAME: dev
       PHP_HOST_NAME: localhost:8000
 #      PHP_DOCROOT: public # Relative path inside the /var/www/html/ directory.
-      PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S mailhog:1025
+#      PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S mailhog:1025
       PHP_XDEBUG_ENABLED: 0 # Set 1 to enable.
     links:
       - mysql:mysql
@@ -17,6 +18,7 @@ services:
       - mysql
     volumes:
       - ../../build:/var/www/html
+      - ../${PROFILE_NAME}:/var/www/html/profiles/${PROFILE_NAME}
     networks:
       - front
 
@@ -31,10 +33,10 @@ services:
     image: wodby/drupal-nginx
     container_name: "${COMPOSE_PROJECT_NAME}_web"
     environment:
-#      NGINX_SERVER_NAME: localhost
+      NGINX_SERVER_NAME: localhost
       NGINX_UPSTREAM_NAME: php
 #      NGINX_DOCROOT: public # Relative path inside the /var/www/html/ directory.
-#      DRUPAL_VERSION: 8 # Allowed: 7, 8.
+      DRUPAL_VERSION: 8 # Allowed: 7, 8.
     links:
       - mysql:mysql
     depends_on:
@@ -46,10 +48,6 @@ services:
 #      - ./src/docker/nginx/drupal8.conf:/opt/drupal8.conf
 # Add keys for ssl if needed
 #     - ./src/docker/nginx/ssl:/etc/nginx/ssl
-# Change 8081 and 443 to your needs.
-#    ports:
-#      - "8081:80"
-#      - "443:443"
     networks:
       - front
 
@@ -57,7 +55,7 @@ services:
     image: percona:5.7
     container_name: "${COMPOSE_PROJECT_NAME}_mysql"
     volumes:
-      - /dev/shm/mysql:/var/lib/mysql
+      - /dev/shm/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql
     environment:
       MYSQL_DATABASE: d8
       MYSQL_USER: d8
@@ -70,3 +68,7 @@ services:
 networks:
   front:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "${IPRANGE}"

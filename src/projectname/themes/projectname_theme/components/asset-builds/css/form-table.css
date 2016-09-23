@@ -1,0 +1,87 @@
+.form-table__sticky-header,
+.sticky-header {
+  position: fixed;
+  visibility: hidden;
+  margin-top: 0;
+  background-color: #fff;
+}
+
+.form-table__sticky-header.is-sticky, .form-table__sticky-header--is-sticky,
+.is-sticky.sticky-header {
+  visibility: visible;
+}
+
+.form-table__header,
+.form-table th,
+form table th {
+  border-bottom: 3px solid #cccccc;
+  padding-right: 1em;
+  text-align: left;
+}
+
+[dir="rtl"] .form-table__header,
+[dir="rtl"] .form-table th,
+.form-table [dir="rtl"] th,
+[dir="rtl"] form table th,
+form table [dir="rtl"] th {
+  text-align: right;
+  padding-left: 1em;
+  padding-right: 0;
+}
+
+.form-table__body,
+.form-table tbody,
+form table tbody {
+  border-top: 1px solid #cccccc;
+}
+
+.form-table__row,
+.form-table tbody tr,
+form table tbody tr {
+  padding: .1em .6em;
+  border-bottom: 1px solid #cccccc;
+  background-color: #eeeeee;
+}
+
+.form-table__row:nth-child(even),
+.form-table tbody tr:nth-child(even),
+form table tbody tr:nth-child(even) {
+  background-color: #fff;
+}
+
+.form-table__row.is-active, .form-table__row--is-active,
+.form-table tbody tr.is-active,
+form table tbody tr.is-active,
+td.active {
+  background-color: #dddddd;
+}
+
+.form-table__row.is-disabled, .form-table__row--is-disabled,
+.form-table tbody tr.is-disabled,
+form table tbody tr.is-disabled,
+td.menu-disabled {
+  background: #cccccc;
+}
+
+.form-table__row.is-selected, .form-table__row--is-selected,
+.form-table tbody tr.is-selected,
+form table tbody tr.is-selected,
+tr.selected td {
+  background: #fffdf0;
+}
+
+.form-table__list,
+.form-table ul,
+form table ul {
+  margin: 0;
+}
+
+.form-table__narrow-column,
+.form-table th.form-table__narrow-column,
+form table th.form-table__narrow-column,
+td .checkbox,
+th .checkbox {
+  width: -moz-min-content;
+  width: -webkit-min-content;
+  text-align: center;
+}

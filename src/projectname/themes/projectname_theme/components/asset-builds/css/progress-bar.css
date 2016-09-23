@@ -1,0 +1,41 @@
+.progress-bar,
+.progress {
+  font-weight: bold;
+}
+
+.progress-bar__bar,
+.progress .bar {
+  border-radius: 3px;
+  margin: 0 .2em;
+  border: 1px solid #666666;
+  background-color: #cccccc;
+}
+
+.progress-bar__fill,
+.progress .filled {
+  height: 1.5em;
+  width: 5px;
+  background: #0072b9 url(../..//forms/progress-bar/progress-bar.gif) repeat 0 0;
+}
+
+.progress-bar__percentage,
+.progress .percentage {
+  float: right;
+}
+
+[dir="rtl"] .progress-bar__percentage,
+[dir="rtl"] .progress .percentage,
+.progress [dir="rtl"] .percentage {
+  float: left;
+}
+
+.progress-bar--inline,
+.ajax-progress-bar {
+  width: 16em;
+  display: inline-block;
+}
+
+[dir="rtl"] .progress-bar--inline,
+[dir="rtl"] .ajax-progress-bar {
+  float: right;
+}

@@ -1,0 +1,47 @@
+.header__logo {
+  float: left;
+  margin: 0 10px 0 0;
+  padding: 0;
+}
+
+[dir="rtl"] .header__logo {
+  float: right;
+  margin: 0 0 0 10px;
+}
+
+.header__logo-image {
+  vertical-align: bottom;
+}
+
+.header__name-and-slogan {
+  float: left;
+}
+
+.header__site-name {
+  margin: 0;
+}
+
+.header__site-link:link, .header__site-link:visited {
+  color: #000;
+  text-decoration: none;
+}
+
+.header__site-link:hover, .header__site-link:focus {
+  text-decoration: underline;
+}
+
+.header__site-slogan {
+  margin: 0;
+}
+
+.header__secondary-menu {
+  float: right;
+}
+
+[dir="rtl"] .header__secondary-menu {
+  float: left;
+}
+
+.header__region {
+  clear: both;
+}

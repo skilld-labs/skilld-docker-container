@@ -1,0 +1,48 @@
+.autocomplete,
+.form-autocomplete {
+  background-image: url(../..//forms/autocomplete/throbber-inactive.png);
+  background-position: 100% center;
+  background-repeat: no-repeat;
+}
+
+[dir="rtl"] .autocomplete,
+[dir="rtl"] .form-autocomplete {
+  background-position: 0% center;
+}
+
+.autocomplete__list-wrapper,
+#autocomplete {
+  border: 1px solid;
+  overflow: hidden;
+  position: absolute;
+  z-index: 100;
+}
+
+.autocomplete__list,
+#autocomplete ul {
+  list-style: none;
+  list-style-image: none;
+  margin: 0;
+  padding: 0;
+}
+
+.autocomplete__list-item,
+#autocomplete li {
+  background: #fff;
+  color: #000;
+  cursor: default;
+  white-space: pre;
+}
+
+.autocomplete__list-item.is-selected, .autocomplete__list-item--is-selected,
+#autocomplete li.is-selected,
+#autocomplete .selected {
+  background: #0072b9;
+  color: #fff;
+}
+
+.autocomplete.is-throbbing, .autocomplete--is-throbbing,
+.is-throbbing.form-autocomplete,
+.form-autocomplete.throbbing {
+  background-image: url(../..//forms/autocomplete/throbber-active.gif);
+}

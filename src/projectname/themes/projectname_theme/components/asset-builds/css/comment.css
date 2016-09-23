@@ -1,0 +1,29 @@
+.comment__section,
+.comments {
+  margin: 1.5rem 0;
+}
+
+.comment__title {
+  margin: 0;
+}
+
+.comment__permalink {
+  text-transform: uppercase;
+  font-size: 75%;
+}
+
+.comment--preview,
+.comment-preview {
+  background-color: #fffadb;
+}
+
+.comment--nested,
+.indented {
+  margin-left: 32px;
+}
+
+[dir="rtl"] .comment--nested,
+[dir="rtl"] .indented {
+  margin-left: 0;
+  margin-right: 32px;
+}

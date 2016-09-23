@@ -1,0 +1,17 @@
+@media print {
+  .breadcrumb {
+    display: none;
+  }
+}
+
+.breadcrumb__list {
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumb__item {
+  display: inline;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}

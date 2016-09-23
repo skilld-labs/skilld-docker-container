@@ -9,3 +9,8 @@ defaults:
 includes:
   - "core.make.yml"
   - "modules.make.yml"
+
+projects:
+  zen:
+   type": "theme"
+   version: "7.0-alpha14"

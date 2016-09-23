@@ -1,0 +1,34 @@
+.progress-throbber,
+.ajax-progress {
+  display: inline-block;
+}
+
+[dir="rtl"] .progress-throbber,
+[dir="rtl"] .ajax-progress {
+  float: right;
+}
+
+.progress-throbber__widget,
+.ajax-progress .throbber {
+  background: url(../..//forms/progress-throbber/progress-throbber.gif) no-repeat 0 -18px transparent;
+  float: left;
+  height: 15px;
+  margin: 2px;
+  width: 15px;
+}
+
+[dir="rtl"] .progress-throbber__widget,
+[dir="rtl"] .ajax-progress .throbber,
+.ajax-progress [dir="rtl"] .throbber {
+  float: right;
+}
+
+.progress-throbber__widget-in-tr,
+tr .ajax-progress .throbber {
+  margin: 0 2px;
+}
+
+.progress-throbber__message,
+.ajax-progress .message {
+  padding-left: 20px;
+}

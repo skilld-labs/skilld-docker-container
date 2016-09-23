@@ -1,0 +1,115 @@
+.table-drag__wrapper,
+body.drag {
+  cursor: move;
+}
+
+.table-drag__item,
+tr.drag {
+  background-color: #fffadb;
+}
+
+.table-drag__item-previous,
+tr.drag-previous {
+  background-color: #fff7c2;
+}
+
+.table-drag__handle,
+.tabledrag-handle {
+  cursor: move;
+  float: left;
+  height: 1.7em;
+  margin-left: -1em;
+  overflow: hidden;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+[dir="rtl"] .table-drag__handle,
+[dir="rtl"] .tabledrag-handle {
+  float: right;
+  margin-right: -1em;
+  margin-left: 0;
+}
+
+.table-drag__handle:focus, .table-drag__handle:hover,
+.tabledrag-handle:focus,
+.tabledrag-handle:hover {
+  text-decoration: none;
+}
+
+.table-drag__handle-icon,
+.tabledrag-handle .handle {
+  box-sizing: content-box;
+  background: url(../..//forms/table-drag/handle-icon.png) no-repeat 6px 9px;
+  height: 13px;
+  margin: -.4em .5em;
+  padding: .42em .5em;
+  width: 13px;
+}
+
+.table-drag__handle.is-hover .table-drag__handle-icon, .table-drag__handle-icon--is-hover, .is-hover.tabledrag-handle .table-drag__handle-icon,
+.tabledrag-handle-hover .handle,
+.table-drag__handle.is-hover .tabledrag-handle .handle,
+.tabledrag-handle .table-drag__handle.is-hover .handle,
+.is-hover.tabledrag-handle .handle {
+  background-position: 6px -11px;
+}
+
+.table-drag__toggle-weight-wrapper,
+.tabledrag-toggle-weight-wrapper {
+  text-align: right;
+}
+
+[dir="rtl"] .table-drag__toggle-weight-wrapper,
+[dir="rtl"] .tabledrag-toggle-weight-wrapper {
+  text-align: left;
+}
+
+.table-drag__toggle-weight,
+.tabledrag-toggle-weight {
+  font-size: .9em;
+}
+
+.table-drag__indentation,
+.indentation {
+  float: left;
+  height: 1.7em;
+  margin: -.4em .2em -.4em -.4em;
+  padding: .42em 0 .42em .6em;
+  width: 20px;
+}
+
+[dir="rtl"] .table-drag__indentation,
+[dir="rtl"] .indentation {
+  float: right;
+  margin: -.4em -.4em -.4em .2em;
+  padding: .42em .6em .42em 0;
+}
+
+.table-drag__tree-child,
+.table-drag__tree-child-last,
+.tree-child-last,
+.table-drag__tree-child-horizontal,
+.tree-child-horizontal,
+.tree-child {
+  background: url(../..//forms/table-drag/tree-child.png) no-repeat 11px center;
+}
+
+[dir="rtl"] .table-drag__tree-child,
+[dir="rtl"] .table-drag__tree-child-last,
+[dir="rtl"] .tree-child-last,
+[dir="rtl"] .table-drag__tree-child-horizontal,
+[dir="rtl"] .tree-child-horizontal,
+[dir="rtl"] .tree-child {
+  background-position: -65px center;
+}
+
+.table-drag__tree-child-last,
+.tree-child-last {
+  background-image: url(../..//forms/table-drag/tree-child-last.png);
+}
+
+.table-drag__tree-child-horizontal,
+.tree-child-horizontal {
+  background-position: -11px center;
+}

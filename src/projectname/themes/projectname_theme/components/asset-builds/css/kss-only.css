@@ -1,0 +1,19 @@
+[id^='kssref-layouts-'] [class^='layout-'][class*='__'] {
+  outline: 1px dotted #999999;
+}
+
+#kssref-layouts-layout-3column .kss-modifier__example {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+@media (min-width: 777px) {
+  #kssref-layouts-layout-3column .kss-modifier__example {
+    padding-left: 12px;
+    padding-right: 13px;
+  }
+  [dir="rtl"] #kssref-layouts-layout-3column .kss-modifier__example {
+    padding-left: 13px;
+    padding-right: 12px;
+  }
+}

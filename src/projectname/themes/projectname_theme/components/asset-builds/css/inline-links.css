@@ -1,0 +1,29 @@
+.inline-links,
+.inline.links {
+  padding: 0;
+}
+
+.inline-links__item,
+.inline.links li {
+  display: inline;
+  list-style-type: none;
+  padding: 0 1em 0 0;
+}
+
+.inline-links__item:last-child,
+.inline.links li:last-child {
+  padding-right: 0;
+}
+
+[dir="rtl"] .inline-links__item,
+[dir="rtl"] .inline.links li,
+.inline.links [dir="rtl"] li {
+  display: inline-block;
+  padding: 0 0 0 1em;
+}
+
+[dir="rtl"] .inline-links__item:last-child,
+[dir="rtl"] .inline.links li:last-child,
+.inline.links [dir="rtl"] li:last-child {
+  padding-left: 0;
+}

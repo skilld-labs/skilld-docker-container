@@ -1,0 +1,23 @@
+.responsive-video,
+.media-youtube-video,
+.media-vimeo-preview-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  padding-top: 25px;
+  height: 0;
+}
+
+.responsive-video__embed,
+.responsive-video iframe,
+.media-youtube-video iframe,
+.media-vimeo-preview-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.responsive-video--4-3 {
+  padding-bottom: 75%;
+}

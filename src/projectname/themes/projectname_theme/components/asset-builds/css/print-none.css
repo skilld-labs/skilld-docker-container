@@ -1,0 +1,11 @@
+@media print {
+  .print-none,
+  .toolbar,
+  .action-links,
+  .links,
+  .book-navigation,
+  .forum-topic-navigation,
+  .feed-icons {
+    display: none;
+  }
+}

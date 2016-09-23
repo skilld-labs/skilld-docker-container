@@ -1,0 +1,16 @@
+.skip-link {
+  display: block;
+  padding: 2px 0 3px;
+  text-align: center;
+}
+
+.skip-link:link, .skip-link:visited {
+  background-color: #666666;
+  color: #fff;
+}
+
+@media print {
+  .skip-link {
+    display: none;
+  }
+}

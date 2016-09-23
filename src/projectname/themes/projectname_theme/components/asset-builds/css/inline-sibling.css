@@ -1,0 +1,31 @@
+.inline-sibling,
+.field-label-inline .field-label,
+span.field-label {
+  display: inline;
+  margin-right: 10px;
+}
+
+[dir="rtl"] .inline-sibling,
+[dir="rtl"] .field-label-inline .field-label,
+.field-label-inline [dir="rtl"] .field-label,
+[dir="rtl"] span.field-label {
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+.inline-sibling__child,
+.inline-sibling *, .field-label-inline .field-label *, span.field-label * {
+  display: inline;
+}
+
+.inline-sibling__adjacent,
+.inline-sibling + *,
+.inline-sibling + * > :first-child,
+.inline-sibling + * > :first-child > :first-child, .field-label-inline .field-label + *, span.field-label + *, .field-label-inline .field-label + * > :first-child, span.field-label + * > :first-child, .field-label-inline .field-label + * > :first-child > :first-child, span.field-label + * > :first-child > :first-child {
+  display: inline;
+}
+
+.field-label-inline .field-label,
+.field-label-inline .field-items {
+  float: none;
+}

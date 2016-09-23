@@ -1,0 +1,15 @@
+.resizable-textarea,
+.resizable-textarea textarea {
+  width: 100%;
+  vertical-align: bottom;
+}
+
+.resizable-textarea__grippie,
+.resizable-textarea .grippie {
+  background: url(../..//forms/resizable-textarea/grippie.png) no-repeat center 2px #eeeeee;
+  border: 1px solid #cccccc;
+  border-top-width: 0;
+  cursor: s-resize;
+  height: 9px;
+  overflow: hidden;
+}

@@ -1,0 +1,30 @@
+.nav-menu__item,
+.menu__item {
+  list-style-image: url(../..//navigation/nav-menu/leaf.svg);
+  list-style-type: square;
+}
+
+.nav-menu__item.is-expanded, .nav-menu__item--is-expanded,
+.is-expanded.menu__item,
+.menu__item.is-expanded {
+  list-style-image: url(../..//navigation/nav-menu/expanded.svg);
+  list-style-type: circle;
+}
+
+.nav-menu__item.is-collapsed, .nav-menu__item--is-collapsed,
+.is-collapsed.menu__item,
+.menu__item.is-collapsed {
+  list-style-image: url(../..//navigation/nav-menu/collapsed.svg);
+  list-style-type: disc;
+}
+
+[dir="rtl"] .nav-menu__item.is-collapsed, [dir="rtl"] .nav-menu__item--is-collapsed,
+[dir="rtl"] .is-collapsed.menu__item,
+[dir="rtl"] .menu__item.is-collapsed {
+  list-style-image: url(../..//navigation/nav-menu/collapsed-rtl.svg);
+}
+
+.nav-menu__link.is-active, .nav-menu__link--is-active,
+.menu a.active {
+  color: #000;
+}

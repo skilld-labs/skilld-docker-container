@@ -1,0 +1,61 @@
+.collapsible-fieldset,
+.collapsible {
+  position: relative;
+}
+
+.collapsible-fieldset__legend,
+.collapsible .fieldset-legend {
+  display: block;
+  padding-left: 15px;
+  background-image: url(../..//forms/collapsible-fieldset/expanded.svg);
+  background-position: 4px 50%;
+  background-repeat: no-repeat;
+}
+
+[dir="rtl"] .collapsible-fieldset__legend,
+[dir="rtl"] .collapsible .fieldset-legend,
+.collapsible [dir="rtl"] .fieldset-legend {
+  padding-left: 0;
+  padding-right: 15px;
+  background-position: right 4px top 50%;
+}
+
+.collapsible-fieldset__summary,
+.collapsible .fieldset-legend .summary {
+  color: #999999;
+  font-size: .9em;
+  margin-left: .5em;
+}
+
+.collapsible-fieldset.is-collapsed, .collapsible-fieldset--is-collapsed,
+.is-collapsed.collapsible,
+.collapsible.collapsed {
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+  height: 1em;
+}
+
+.collapsible-fieldset.is-collapsed .collapsible-fieldset__wrapper, .collapsible-fieldset--is-collapsed__wrapper, .is-collapsed.collapsible .collapsible-fieldset__wrapper,
+.collapsible.collapsed .fieldset-wrapper {
+  display: none;
+}
+
+.collapsible-fieldset.is-collapsed .collapsible-fieldset__legend, .collapsible-fieldset--is-collapsed__legend, .is-collapsed.collapsible .collapsible-fieldset__legend,
+.collapsible.collapsed .fieldset-legend,
+.collapsible-fieldset.is-collapsed .collapsible .fieldset-legend,
+.collapsible .collapsible-fieldset.is-collapsed .fieldset-legend,
+.is-collapsed.collapsible .fieldset-legend {
+  background-image: url(../..//forms/collapsible-fieldset/collapsed.svg);
+  background-position: 4px 50%;
+}
+
+[dir="rtl"] .collapsible-fieldset.is-collapsed .collapsible-fieldset__legend, [dir="rtl"] .collapsible-fieldset--is-collapsed__legend, [dir="rtl"] .is-collapsed.collapsible .collapsible-fieldset__legend,
+[dir="rtl"] .collapsible.collapsed .fieldset-legend,
+.collapsible.collapsed [dir="rtl"] .fieldset-legend,
+[dir="rtl"] .collapsible-fieldset.is-collapsed .collapsible .fieldset-legend,
+.collapsible [dir="rtl"] .collapsible-fieldset.is-collapsed .fieldset-legend,
+[dir="rtl"] .is-collapsed.collapsible .fieldset-legend {
+  background-image: url(../..//forms/collapsible-fieldset/collapsed-rtl.svg);
+  background-position: right 4px top 50%;
+}

@@ -1,0 +1,23 @@
+.navbar {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+[dir="rtl"] .navbar {
+  text-align: right;
+}
+
+.navbar__item,
+.navbar li {
+  float: left;
+  padding: 0 10px 0 0;
+  list-style-type: none;
+  list-style-image: none;
+}
+
+[dir="rtl"] .navbar__item, [dir="rtl"]
+.navbar li {
+  float: right;
+  padding: 0 0 0 10px;
+}

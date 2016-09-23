@@ -1,0 +1,67 @@
+.form-item {
+  margin: 1.5rem 0;
+}
+
+.form-item__required,
+.form-required {
+  color: #c00;
+}
+
+.form-item__description,
+.form-item .description {
+  font-size: 0.875rem;
+}
+
+.form-item--inline div,
+.form-item--inline label, .container-inline .form-item div, .container-inline .form-item label {
+  display: inline;
+}
+
+.form-item--inline__exception,
+.container-inline .fieldset-wrapper {
+  display: block;
+}
+
+.form-item--tight,
+.form-item--radio,
+.form-type-radio,
+.form-type-checkbox,
+.password-parent,
+.confirm-parent,
+table .form-item {
+  margin: 0;
+}
+
+.form-item--radio .form-item__label, .form-item--radio__label, .form-type-radio .form-item__label,
+.form-type-checkbox .form-item__label,
+label.option {
+  display: inline;
+  font-weight: normal;
+}
+
+.form-item--radio .form-item__description, .form-item--radio__description, .form-type-radio .form-item__description,
+.form-type-checkbox .form-item__description,
+.form-type-radio .description,
+.form-type-checkbox .description,
+.form-item--radio .form-item .description,
+.form-item .form-item--radio .description,
+.form-type-radio .form-item .description,
+.form-item .form-type-radio .description,
+.form-type-checkbox .form-item .description,
+.form-item
+.form-type-checkbox .description {
+  margin-left: 1.4em;
+}
+
+.form-item.is-error .form-item__widget, .form-item--is-error__widget,
+.form-item.is-error input,
+.form-item.is-error textarea,
+.form-item.is-error select,
+.form-item--is-error input,
+.form-item--is-error textarea,
+.form-item--is-error select,
+.form-item input.error,
+.form-item textarea.error,
+.form-item select.error {
+  border: 1px solid #c00;
+}

@@ -1,0 +1,17 @@
+.box {
+  margin-bottom: 1.5rem;
+  border: 5px solid #cccccc;
+  padding: 1em;
+}
+
+.box__title {
+  margin: 0;
+}
+
+.box:focus, .box:hover, .box.is-focus, .box--is-focus {
+  border-color: #000;
+}
+
+.box--highlight {
+  border-color: #0072b9;
+}

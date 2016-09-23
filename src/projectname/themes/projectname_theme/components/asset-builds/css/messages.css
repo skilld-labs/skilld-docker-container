@@ -1,0 +1,65 @@
+.messages,
+.messages--status {
+  margin: 1.5rem 0;
+  position: relative;
+  padding: 10px 10px 10px 44px;
+  border: 1px solid #0072b9;
+  background-color: #f6fcff;
+  color: #0072b9;
+}
+
+[dir="rtl"] .messages,
+[dir="rtl"] .messages--status {
+  padding: 10px 44px 10px 10px;
+}
+
+.messages__icon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  height: 24px;
+  width: 24px;
+  margin-top: -12px;
+  line-height: 1;
+}
+
+[dir="rtl"] .messages__icon {
+  left: auto;
+  right: 10px;
+}
+
+.messages__icon path {
+  fill: #0072b9;
+}
+
+.messages__highlight {
+  color: #000;
+}
+
+.messages__list {
+  margin: 0;
+}
+
+.messages__item {
+  list-style-image: none;
+}
+
+.messages--warning {
+  border-color: #fd0;
+  background-color: #fffce6;
+  color: #000;
+}
+
+.messages--warning path {
+  fill: #fd0;
+}
+
+.messages--error {
+  border-color: #c00;
+  background-color: #fff0f0;
+  color: #c00;
+}
+
+.messages--error path {
+  fill: #c00;
+}

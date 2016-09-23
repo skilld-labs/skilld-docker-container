@@ -1,0 +1,105 @@
+.tabs {
+  margin: 1.125rem 0 0;
+  line-height: 1.875rem;
+  border-bottom: 1px solid #cccccc \0/ie;
+  background-image: -webkit-linear-gradient(bottom, #cccccc 1px, transparent 1px);
+  background-image: linear-gradient(to top, #cccccc 1px, transparent 1px);
+  padding: 0 2px;
+  list-style: none;
+  white-space: nowrap;
+}
+
+@media print {
+  .tabs {
+    display: none;
+  }
+}
+
+.tabs__tab {
+  float: left;
+  margin: 0 3px;
+  border: 1px solid #cccccc;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-color: transparent;
+  border-bottom: 0 \0/ie;
+  overflow: hidden;
+  background: #dddddd;
+}
+
+[dir="rtl"] .tabs__tab {
+  float: right;
+}
+
+.tabs__tab.is-active {
+  border-bottom-color: #fff;
+}
+
+.tabs__tab-link {
+  padding: 0 1.5rem;
+  display: block;
+  text-decoration: none;
+  -webkit-transition: color .3s, background .3s, border .3s;
+  transition: color .3s, background .3s, border .3s;
+  text-shadow: #fff 0 1px 0;
+  color: #000;
+  background: #dddddd;
+  letter-spacing: 1px;
+}
+
+.tabs__tab-link:focus, .tabs__tab-link:hover {
+  background: #eaeaea;
+}
+
+.tabs__tab-link:active, .tabs__tab-link.is-active, .tabs__tab-link--is-active {
+  background: #fff;
+  text-shadow: none;
+}
+
+.tabs--secondary {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  background-image: none;
+}
+
+.tabs + .tabs--secondary,
+.tabs + h2 + .tabs--secondary {
+  margin-top: 0;
+  background-image: -webkit-linear-gradient(bottom, #cccccc 1px, transparent 1px);
+  background-image: linear-gradient(to top, #cccccc 1px, transparent 1px);
+}
+
+.tabs--secondary .tabs__tab {
+  margin: 0.5625rem 0.1875rem;
+  border: 0;
+  background: transparent;
+}
+
+[dir="rtl"] .tabs--secondary .tabs__tab {
+  float: right;
+}
+
+.tabs--secondary .tabs__tab.is-active {
+  border-bottom-color: transparent;
+}
+
+.tabs--secondary .tabs__tab-link {
+  border: 1px solid #cccccc;
+  border-radius: 24px;
+  color: #666666;
+  background: #f1f1f1;
+  letter-spacing: normal;
+}
+
+.tabs--secondary .tabs__tab-link:focus, .tabs--secondary .tabs__tab-link:hover {
+  color: #333333;
+  background: #dddddd;
+  border-color: #999999;
+}
+
+.tabs--secondary .tabs__tab-link:active, .tabs--secondary .tabs__tab-link.is-active, .tabs--secondary .tabs__tab-link--is-active {
+  color: white;
+  text-shadow: #333333 0 1px 0;
+  background: #666666;
+  border-color: black;
+}

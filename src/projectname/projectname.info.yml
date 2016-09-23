@@ -1,0 +1,62 @@
+name: Projectname
+type: profile
+description: 'Projectname application installation profile'
+core: 8.x
+
+dependencies:
+# Core
+  - automated_cron
+  - block
+  - breakpoint
+  - ckeditor
+#  - color
+#  - comment
+  - config
+#  - contact
+  - contextual
+  - block_content
+#  - menu_link_content
+  - dblog
+  - field
+  - field_ui #comment in prod
+  - filter
+  - help
+  - history
+#  - dynamic_page_cache
+#  - page_cache
+  - menu_ui
+  - node
+  - path
+#  - quickedit
+#  - rdf
+  - search
+  - shortcut
+  - system
+  - taxonomy
+  - editor
+  - toolbar
+#  - tour
+#  - update
+  - user
+  - views
+  - views_ui #comment in prod
+  - datetime
+  - file
+  - image
+  - locale
+  - link
+  - options
+#  - telephone
+  - text
+#  - rest
+#  - serialization
+
+# Contrib modules
+  - admin_toolbar
+
+# Custom modules
+#  - projectname_default_content
+
+themes:
+  - projectname_theme
+  - seven
