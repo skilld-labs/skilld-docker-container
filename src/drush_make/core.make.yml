@@ -5,7 +5,4 @@ core: "8.x"
 projects:
   drupal:
     type: "core"
-    version: "8.2.0-rc1"
-    patch:
-      - "https://www.drupal.org/files/issues/add_a_startup-1543858-58.patch"
-      - "https://www.drupal.org/files/issues/core-profile_unknown_module-2608408-45.patch"
+    version: "8.2.0-rc2"

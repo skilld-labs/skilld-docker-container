@@ -1,12 +1,14 @@
 # Read project name from .env file
 
+$(shell cp -n \.env.default \.env)
 include .env
 
+all: | config include net build install info
+
+include:
 ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
 $(error Project name can not be default, please edit ".env" and set COMPOSE_PROJECT_NAME variable.)
 endif
-
-all: | net build install info
 
 build: clean
 	mkdir -p build
@@ -17,6 +19,9 @@ install:
 	docker-compose pull
 	@echo "Build and run containers..."
 	docker-compose up -d
+	make reinstall
+
+reinstall:
 	docker-compose exec php drush make profile.make.yml --prepare-install --overwrite -y; \
 	docker-compose exec php composer require league/csv:^8.0 commerceguys/intl:~0.7 commerceguys/addressing:~0.8 commerceguys/zone:~0.7; \
 	docker-compose exec php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y; --site-name=$(COMPOSE_PROJECT_NAME)\
@@ -68,3 +73,4 @@ front:
 
 iprange:
 	$(shell grep "IPRANGE" .env && sed -i "s/^IPRANGE=.*/IPRANGE="$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}' | sed -e 's/\//\\\\\//')"/" .env || printf "\nIPRANGE=$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}')" >> .env)
+

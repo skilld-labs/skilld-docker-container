@@ -1,17 +1,23 @@
 # skilld-docker-container
 
+---
+
+* [Overview](#overview)
+* [Instructions](#instructions)
+
 ## Overview
 
-The Drupal bundle consist of the following containers:
+## Instructions
 
-| Container | Service name | Image | Public Port | Enabled by default |
-| --------- | ------------ | ----- | ----------- | ------------------ |
-| [Nginx](#nginx) | nginx | <a href="https://hub.docker.com/r/wodby/drupal-nginx/" target="_blank">wodby/drupal-nginx</a> | 8000 | ✓ |
-| [PHP 7 / 5.6](#php) | php | <a href="https://hub.docker.com/r/wodby/drupal-php/" target="_blank">wodby/drupal-php</a> |  | ✓ |
-| [MariaDB](#mariadb) | mariadb | <a href="https://hub.docker.com/r/wodby/drupal-mariadb/" target="_blank">wodby/drupal-mariadb</a> | | ✓ |
-| [phpMyAdmin](#phpmyadmin) | pma | <a href="https://hub.docker.com/r/phpmyadmin/phpmyadmin" target="_blank">phpmyadmin/phpmyadmin</a> | 8001 | ✓ |
-| [Mailhog](#mailhog) | mailhog | <a href="https://hub.docker.com/r/mailhog/mailhog" target="_blank">mailhog/mailhog</a> | 8002 | ✓ |
-| [Redis](#redis) | redis | <a href="https://hub.docker.com/_/redis/" target="_blank">redis/redis</a> |||
-| [Memcached](#memcached) | memcached | <a href="https://hub.docker.com/_/memcached/" target="_blank">_/memcached</a> |||
-| [Solr](#solr) | solr | <a href="https://hub.docker.com/_/solr" target="_blank">_/solr</a> | 8003 ||
-| [Varnish](#varnish) | varnish | <a href="https://hub.docker.com/r/wodby/drupal-varnish" target="_blank">wodby/drupal-varnish</a> | 8004 ||
+Supported PHP versions: 7.x and 5.6.x.
+
+1\. Install docker for <a href="https://docs.docker.com/engine/installation/" target="_blank">Linux</a>, <a href="https://docs.docker.com/engine/installation/mac" target="_blank">Mac OS X</a> or <a href="https://docs.docker.com/engine/installation/windows" target="_blank">Windows</a>. __For Mac and Windows make sure you're installing native docker app version 1.12, not docker toolbox.__
+
+For Linux additionally install <a href="https://docs.docker.com/compose/install/" target="_blank">docker compose</a>
+
+2\. Copy __.env.default__ to __.env__
+
+ 2.1. Set _COMPOSE_PROJECT_NAME_, _PROFILE_NAME_, _THEME_NAME_ variables.
+ 2.2. Change _PHP_IMAGE_ in case you need another one.
+
+3\. Run `make`
