@@ -33,22 +33,16 @@ services:
       - front
 
   nginx:
-    image: wodby/drupal-nginx
+    image: skilldlabs/nginx:1.10.1
     container_name: "${COMPOSE_PROJECT_NAME}_web"
-    environment:
-      NGINX_SERVER_NAME: localhost
-      NGINX_UPSTREAM_NAME: php
-#      NGINX_DOCROOT: public # Relative path inside the /var/www/html/ directory.
-      DRUPAL_VERSION: 8 # Allowed: 7, 8.
     links:
       - mysql:mysql
+      - php:php
     depends_on:
       - php
     volumes_from:
       - php
 #    volumes:
-# Replace nginx config with our values
-#      - ./src/docker/nginx/drupal8.conf:/opt/drupal8.conf
 # Add keys for ssl if needed
 #     - ./src/docker/nginx/ssl:/etc/nginx/ssl
     networks:
