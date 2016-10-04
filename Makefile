@@ -7,7 +7,7 @@ all: | include net build install info
 include:
 ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
 #todo: ask user to make a project name and mv folders.
-#$(error Project name can not be default, please edit ".env" and set COMPOSE_PROJECT_NAME variable.)
+$(error Project name can not be default, please edit ".env" and set COMPOSE_PROJECT_NAME variable.)
 endif
 
 build: clean
