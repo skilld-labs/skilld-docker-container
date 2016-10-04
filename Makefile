@@ -24,7 +24,7 @@ install:
 reinstall:
 	docker-compose exec php drush make profile.make.yml --prepare-install --overwrite -y; \
 	docker-compose exec php composer require $(COMPOSER_REQUIRE); \
-	docker-compose exec php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y; --site-name=$(COMPOSE_PROJECT_NAME)\
+	docker-compose exec php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y; --site-name=$(COMPOSE_PROJECT_NAME); \
 	rm build/*.make.yml; \
 	make -s chown; \
 	make -s front; \
