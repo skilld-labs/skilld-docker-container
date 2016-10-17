@@ -1,5 +1,6 @@
 # Read project name from .env file
 $(shell cp -n \.env.default \.env)
+$(shell cp -n \.\/src\/docker\/docker-compose\.override\.yml\.default \.\/src\/docker\/docker-compose\.override\.yml)
 include .env
 
 all: | include net build install info
@@ -7,7 +8,7 @@ all: | include net build install info
 include:
 ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
 #todo: ask user to make a project name and mv folders.
-$(error Project name can not be default, please edit ".env" and set COMPOSE_PROJECT_NAME variable.)
+#$(error Project name can not be default, please edit ".env" and set COMPOSE_PROJECT_NAME variable.)
 endif
 
 build: clean
@@ -23,15 +24,12 @@ install:
 
 reinstall:
 	docker-compose exec php drush make profile.make.yml --prepare-install --overwrite -y; \
+	docker-compose exec php composer config repositories.drupal composer https://packages.drupal.org/8; \
 	docker-compose exec php composer require $(COMPOSER_REQUIRE); \
-	docker-compose exec php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y; --site-name=$(COMPOSE_PROJECT_NAME); \
-	rm build/*.make.yml; \
+	docker-compose exec php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y --site-name="$(SITE_NAME)"; \
 	make -s chown; \
 	make -s front; \
 	make -s info
-
-# 3d party libraries should be installed from json file list
-# docker-compose -p mazars exec php composer requi re league/csv:^8.0
 
 info:
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_web 2> /dev/null),true)
@@ -53,10 +51,8 @@ exec:
 clean: info
 	@echo "Removing networks for $(COMPOSE_PROJECT_NAME)"
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_php 2> /dev/null),true)
-	docker-compose exec php /bin/sh -c "chown $(shell id -u):$(shell id -g) /var/www/html -R"; \
-	docker-compose exec php /bin/sh -c "chmod 0777 /var/www/html -R"; \
 	docker-compose down; \
-	rm -rf build
+	sudo rm -rf build
 endif
 
 net:
@@ -73,10 +69,3 @@ front:
 
 iprange:
 	$(shell grep "IPRANGE" .env && sed -i "s/^IPRANGE=.*/IPRANGE="$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}' | sed -e 's/\//\\\\\//')"/" .env || printf "\nIPRANGE=$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}')" >> .env)
-
-#.PHONY: question
-#question:
-#CONFIRMATION := $(shell if [ -z $(CONFIRMATION) ] ; then read -p "You will totally delete and rebuild project, are you sure? [Y/n] : " CONFIRMATION ; echo $$CONFIRMATION ; fi )
-#	ifneq ($(strip $(CONFIRMATION)),y)
-#		$(error Terminated)
-#	endif

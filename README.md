@@ -15,7 +15,7 @@ Supported PHP versions: 7.x and 5.6.x.
 
 1\. Install docker for <a href="https://docs.docker.com/engine/installation/" target="_blank">Linux</a>, <a href="https://docs.docker.com/engine/installation/mac" target="_blank">Mac OS X</a> or <a href="https://docs.docker.com/engine/installation/windows" target="_blank">Windows</a>. __For Mac and Windows make sure you're installing native docker app version 1.12, not docker toolbox.__
 
-For Linux additionally install <a href="https://docs.docker.com/compose/install/" target="_blank">docker compose</a>
+For Linux install <a href="https://docs.docker.com/compose/install/" target="_blank">docker compose</a>
 
 2\. Copy __\.env\.default__ to __\.env__
 
@@ -24,6 +24,10 @@ For Linux additionally install <a href="https://docs.docker.com/compose/install/
   2\.2\. Change _PHP_IMAGE_ in case you need another one
   
   2\.3. List all libraries you need using _COMPOSER_REQUIRE_ variable and space as delimiter
+  
+3\. Copy __docker-compose\.override\.yml\.default__ to __docker-compose\.override\.yml__
+  
+  This file is used to overwrite container settings and/or add your own. See https://docs.docker.com/compose/extends/#/understanding-multiple-compose-files for details.
   
 3\. Prepare your new Drupal site
 

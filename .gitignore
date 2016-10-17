@@ -1,3 +1,4 @@
 .env
+src/docker/docker-compose.override.yml
 .idea/
 build/

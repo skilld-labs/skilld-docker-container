@@ -10,24 +10,8 @@ services:
     depends_on:
       - mysql
     volumes:
-      - ../../build:/var/www/html
-      - ../${PROFILE_NAME}:/var/www/html/profiles/${PROFILE_NAME}
-    networks:
-      - front
-
-  adminer:
-    image: dockette/adminer:mysql-php7
-    container_name: "${COMPOSE_PROJECT_NAME}_adminer"
-    links:
-      - mysql:mysql
-    depends_on:
-      - mysql
-    networks:
-      - front
-
-  mailhog:
-    image: mailhog/mailhog
-    container_name: "${COMPOSE_PROJECT_NAME}_mail"
+      - ../../build:/var/www/html:z
+      - ../${PROFILE_NAME}:/var/www/html/profiles/${PROFILE_NAME}:z
     restart: always
     networks:
       - front
@@ -42,9 +26,7 @@ services:
       - php
     volumes_from:
       - php
-#    volumes:
-# Add keys for ssl if needed
-#     - ./src/docker/nginx/ssl:/etc/nginx/ssl
+    restart: always
     networks:
       - front
 
@@ -52,7 +34,7 @@ services:
     image: percona:5.7
     container_name: "${COMPOSE_PROJECT_NAME}_mysql"
     volumes:
-      - /dev/shm/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql
+      - /dev/shm/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:Z
     environment:
       MYSQL_DATABASE: d8
       MYSQL_USER: d8

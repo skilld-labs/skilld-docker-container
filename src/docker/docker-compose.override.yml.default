@@ -1,0 +1,29 @@
+version: "2"
+
+services:
+
+# Use alternative container.
+#  php:
+#    build: ./php7/.
+
+#  adminer:
+#    image: dockette/adminer:mysql-php7
+#    container_name: "${COMPOSE_PROJECT_NAME}_adminer"
+#    links:
+#      - mysql:mysql
+#    depends_on:
+#      - mysql
+#    networks:
+#      - front
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: "${COMPOSE_PROJECT_NAME}_mail"
+    restart: always
+    networks:
+      - front
+
+# Mount local folder with ssl keys.
+#  nginx:
+#    volumes:
+#     - ./nginx/ssl:/etc/nginx/ssl:Z
