@@ -29,23 +29,23 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
   
   This file is used to overwrite container settings and/or add your own. See https://docs.docker.com/compose/extends/#/understanding-multiple-compose-files for details.
   
-3\. Prepare your new Drupal site
+4\. Prepare your new Drupal site
 
-  3\.1\. Check _drush_make_ folder
+  4\.1\. Check _drush_make_ folder
   
-  3\.1\.1\. Change _*.make.yml_ and list your modules/profiles, etc
+  4\.1\.1\. Change _*.make.yml_ and list your modules/profiles, etc
   
-  3\.2\. Check _projectname_ folder
+  4\.2\. Check _projectname_ folder
   
-  3\.2\.1\. Rename _projectname_ folder to real project name
+  4\.2\.1\. Rename _projectname_ folder to real project name
   
-  3\.2\.2\. Rename and edit _projectname.info.yml_ and _projectname.install_
+  4\.2\.2\. Rename and edit _projectname.info.yml_ and _projectname.install_
    
-  3\.3\. Rename _projectname/projectname_theme_ to real project theme name
+  4\.3\. Rename _projectname/projectname_theme_ to real project theme name
   
-  3\.3\.1\. Setup your theme by renaming editing _projectname_theme.*_ files
+  4\.3\.1\. Setup your theme by renaming editing _projectname_theme.*_ files
   
-4\. Run `make`
+5\. Run `make`
 
 ## Usage
 
