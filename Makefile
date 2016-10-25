@@ -8,11 +8,12 @@ all: | include net build install info
 include:
 ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
 #todo: ask user to make a project name and mv folders.
-#$(error Project name can not be default, please edit ".env" and set COMPOSE_PROJECT_NAME variable.)
+$(error Project name can not be default, please edit ".env" and set COMPOSE_PROJECT_NAME variable.)
 endif
 
 build: clean
 	mkdir -p build
+	mkdir -p /dev/shm/${COMPOSE_PROJECT_NAME}_mysql
 	cp src/drush_make/*.make.yml build/
 
 install:
@@ -68,4 +69,4 @@ front:
 	make -s chown
 
 iprange:
-	$(shell grep "IPRANGE" .env && sed -i "s/^IPRANGE=.*/IPRANGE="$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}' | sed -e 's/\//\\\\\//')"/" .env || printf "\nIPRANGE=$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}')" >> .env)
+	$(shell grep -q -F 'IPRANGE=' .env || echo "\nIPRANGE=$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}')" >> .env)

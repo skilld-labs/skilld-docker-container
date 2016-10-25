@@ -51,6 +51,7 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 
 * `make` - Install project.
 * `make clean` - totally remove project build folder, docker containers and network.
-* `make info` - Show info project IP.
+* `make reinstall` - reinstall site.
+* `make info` - Show project info (IP).
 * `make chown` - Change permissions inside container. Use it in case you can not access files in _build_. folder from your machine.
 * `make exec` - docker exec into php container.
