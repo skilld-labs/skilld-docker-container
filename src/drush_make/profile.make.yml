@@ -12,5 +12,8 @@ includes:
 
 projects:
   zen:
-   type": "theme"
-   version: "7.0-alpha14"
+    type: theme
+    version: "7.0-alpha14"
+  components:
+    type: module
+    version: "1.0"

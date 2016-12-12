@@ -26,6 +26,7 @@ install:
 reinstall:
 	docker-compose exec php drush make profile.make.yml --prepare-install --overwrite -y; \
 	docker-compose exec php composer config repositories.drupal composer https://packages.drupal.org/8; \
+	docker-compose exec php composer global require "hirak/prestissimo:^0.3"; \
 	docker-compose exec php composer require $(COMPOSER_REQUIRE); \
 	docker-compose exec php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y --site-name="$(SITE_NAME)"; \
 	make -s chown; \

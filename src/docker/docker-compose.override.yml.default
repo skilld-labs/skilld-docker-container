@@ -3,8 +3,10 @@ version: "2"
 services:
 
 # Use alternative container.
-#  php:
+  php:
 #    build: ./php7/.
+# Uncomment next line if you need PHP XDebug.
+#    command: php-fpm7 -F -d zend_extension=xdebug.so
 
 #  adminer:
 #    image: dockette/adminer:mysql-php7

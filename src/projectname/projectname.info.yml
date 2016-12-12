@@ -53,6 +53,7 @@ dependencies:
 
 # Contrib modules
   - admin_toolbar
+  - components
 
 # Custom modules
 #  - projectname_default_content
