@@ -70,3 +70,10 @@ front:
 
 iprange:
 	$(shell grep -q -F 'IPRANGE=' .env || echo "\nIPRANGE=$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}')" >> .env)
+
+dev:
+	@echo "Enable dev mode..."
+	docker-compose exec php cp sites/example.settings.local.php sites/default/settings.local.php
+	docker-compose exec php chmod -R 755 sites/default/settings.php
+	docker-compose exec php sh -c 'echo "if (file_exists(__DIR__ . \"/settings.local.php\")) { include __DIR__ . \"/settings.local.php\"; }" >> sites/default/settings.php'
+	docker-compose exec php sh -c "echo \"$$TWIG_DEBUG\" >> sites/development.services.yml"
