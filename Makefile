@@ -24,7 +24,7 @@ install:
 
 reinstall:
 	cp src/drush_make/*.make.yml build/
-	docker-compose exec php drush make profile.make.yml --prepare-install --overwrite -y; \
+	docker-compose exec php drush make profile.make.yml --concurrency=$(shell nproc) --prepare-install --overwrite -y; \
 	rm build/*.make.yml; \
 	docker-compose exec php composer global require "hirak/prestissimo:^0.3"; \
 	docker-compose exec php composer config repositories.drupal composer https://packages.drupal.org/8; \
