@@ -75,3 +75,29 @@ front:
 
 iprange:
 	$(shell grep -q -F 'IPRANGE=' .env || echo "\nIPRANGE=$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}')" >> .env)
+
+devel:
+	@echo "Setting up permissions ..."
+	sudo find build/sites/default -type d -exec chmod 777 {} \;
+	sudo find build/sites/default -type f -exec chmod 666 {} \;
+
+	docker-compose -p farc exec php find sites/default -type d -exec chmod 777 {} \;
+	docker-compose -p farc exec php find sites/default -type f -exec chmod 666 {} \;
+
+	@echo "Setting up settings.yml ..."
+	docker-compose -p farc exec php cp sites/default/default.services.yml sites/default/services.yml
+
+	@echo "Setting up settings.local.yml ..."
+	docker-compose -p farc exec php cp sites/example.settings.local.php sites/default/settings.local.php
+
+	@echo "Setting up kint ..."
+	-docker-compose -p farc exec php drush en devel devel_generate kint -y
+	-docker-compose -p farc exec php drush pm-uninstall dynamic_page_cache internal_page_cache -y
+
+	@echo "Setting up Twig in debug mode ..."
+	docker-compose -p farc exec php sed -i "s:debug\: false:debug\: true:g" sites/default/services.yml
+	docker-compose -p farc exec php sed -i "s:auto_reload\: null:auto_reload\: false:g" sites/default/services.yml
+	docker-compose -p farc exec php sed -i "s:cache\: true:cache\: false:g" sites/default/services.yml
+
+	@echo "Finishing: clean up / cache rebuild ..."
+	-docker-compose -p farc exec php drush cr
