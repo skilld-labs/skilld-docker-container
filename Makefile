@@ -87,6 +87,7 @@ devel:
 	@echo "Setting up settings.local.yml ..."
 	docker-compose exec php cp sites/example.settings.local.php sites/default/settings.local.php
 	@echo "Setting up kint ..."
+	-docker-compose exec php composer require drupal/devel
 	-docker-compose exec php drush en devel devel_generate kint -y
 	-docker-compose exec php drush pm-uninstall dynamic_page_cache internal_page_cache -y
 
@@ -97,4 +98,5 @@ devel:
 
 	@echo "Finishing: clean up / cache rebuild ..."
 	-docker-compose exec php drush cr
+	@make -s chown
 
