@@ -52,8 +52,8 @@ exec:
 clean: info
 	@echo "Removing networks for $(COMPOSE_PROJECT_NAME)"
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_php 2> /dev/null),true)
-	docker-compose down; \
-	sudo rm -rf build
+	docker-compose exec php /bin/sh -c "find ! \( -path './profiles' -o -path './profiles/$(PROFILE_NAME)'  -o -path './profiles/$(PROFILE_NAME)/*' \) -delete"; \
+	docker-compose down
 endif
 
 net:
