@@ -100,3 +100,10 @@ devel:
 	-docker-compose exec php drush cr
 	@make -s chown
 
+phpcs:
+	docker run --rm -v $(shell pwd)/src/$(PROFILE_NAME):/work skilldlabs/docker-phpcs-drupal phpcs --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,info .
+	docker run --rm -v $(shell pwd)/src/$(PROFILE_NAME):/work skilldlabs/docker-phpcs-drupal phpcs --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme,info .
+
+phpcbf:
+	docker run --rm -v $(shell pwd)/src/$(PROFILE_NAME):/work skilldlabs/docker-phpcs-drupal phpcbf --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,info .
+	docker run --rm -v $(shell pwd)/src/$(PROFILE_NAME):/work skilldlabs/docker-phpcs-drupal phpcbf --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme,info .

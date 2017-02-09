@@ -57,3 +57,5 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 * `make chown` - Change permissions inside container. Use it in case you can not access files in _build_. folder from your machine.
 * `make exec` - docker exec into php container.
 * `make devel` - Devel + kint setup, and config for Twig debug mode.
+* `make phpcs` - check codebase with `phpcs` sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards.
+* `make phpcbf` - fix codebase according to Drupal standards https://www.drupal.org/docs/develop/standards.
