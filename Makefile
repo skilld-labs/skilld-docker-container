@@ -52,14 +52,14 @@ chown:
 	docker-compose exec php /bin/sh -c "chown www-data: /var/www/html/sites/default/files -R"
 
 exec:
-	docker exec -i -t $(COMPOSE_PROJECT_NAME)_php sh
+	docker-compose exec php ash
 
 clean: info
 	@echo "Removing networks for $(COMPOSE_PROJECT_NAME)"
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_php 2> /dev/null),true)
-	docker-compose exec php /bin/sh -c "find ! \( -path './profiles' -o -path './profiles/$(PROFILE_NAME)'  -o -path './profiles/$(PROFILE_NAME)/*' \) -delete"; \
 	docker-compose down
 endif
+	if [ -d "build" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(PHP_IMAGE) ash -c "rm -rf /mnt/build"; fi
 
 net:
 ifeq ($(strip $(shell docker network ls | grep $(COMPOSE_PROJECT_NAME))),)
