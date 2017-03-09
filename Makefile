@@ -20,6 +20,7 @@ install:
 	docker-compose pull
 	@echo "Build and run containers..."
 	docker-compose up -d
+	docker-compose exec php apk add --no-cache git
 	make -s reinstall
 
 reinstall:
@@ -33,7 +34,12 @@ reinstall:
 	make -s si
 
 si:
-	docker-compose exec php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y --site-name="$(SITE_NAME)"; \
+ifeq ($(PROJECT_INSTALL), config)
+	-docker-compose exec -T php time drush si config_installer --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y config_installer_sync_configure_form.sync_directory=sync
+else
+	docker-compose exec php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y --site-name="$(SITE_NAME)"
+	docker-compose exec php ash -c "drush locale-check && drush locale-update"
+endif
 	make -s chown; \
 	make -s info
 
@@ -110,3 +116,10 @@ phpcs:
 phpcbf:
 	docker run --rm -v $(shell pwd)/src/$(PROFILE_NAME):/work skilldlabs/docker-phpcs-drupal phpcbf --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,info .
 	docker run --rm -v $(shell pwd)/src/$(PROFILE_NAME):/work skilldlabs/docker-phpcs-drupal phpcbf --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme,info .
+
+cex:
+	docker-compose exec php ash -c "drush cex -y"
+ifneq ($(PROJECT_INSTALL), config)
+	rm -rf config/sync/*
+	cp -R build/$(shell docker-compose exec php drush ev 'echo substr(\Drupal::service("config.storage.sync")->getFilePath("drush"), 0, -10);')/* config/sync
+endif
