@@ -23,14 +23,14 @@ install:
 	make -s reinstall
 
 reinstall:
-	cp src/drush_make/*.make.yml build/
-	docker-compose exec php drush make profile.make.yml --concurrency=$(shell nproc) --prepare-install --overwrite -y; \
-	rm build/*.make.yml; \
-	docker-compose exec php composer global require "hirak/prestissimo:^0.3"; \
+	cp src/drush_make/*.make.yml build/; \
+	docker-compose exec php time drush make profile.make.yml --concurrency=$(shell nproc) --prepare-install --overwrite -y; \
+	rm build/*.make.yml
+	docker-compose exec php composer global require --prefer-dist "hirak/prestissimo:^0.3"; \
 	docker-compose exec php composer config repositories.drupal composer https://packages.drupal.org/8; \
-	docker-compose exec php composer require $(COMPOSER_REQUIRE); \
-	make -s front; \
-	make -s si;
+	docker-compose exec php time composer require -o --update-no-dev --no-suggest $(COMPOSER_REQUIRE); \
+	make -s front
+	make -s si
 
 si:
 	docker-compose exec php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y --site-name="$(SITE_NAME)"; \
@@ -69,8 +69,8 @@ endif
 
 front:
 	@echo "Building front tasks..."
-	docker run --rm -v $(shell pwd)/src/$(PROFILE_NAME)/themes/$(THEME_NAME):/work skilldlabs/frontend:zen; \
-	docker-compose exec php rm -rf profiles/$(PROFILE_NAME)/themes/$(THEME_NAME)/node_modules; \
+	docker run --rm -v $(shell pwd)/src/themes/$(THEME_NAME):/work skilldlabs/frontend:zen; \
+	docker-compose exec php rm -rf themes/custom/$(THEME_NAME)/node_modules
 	make -s chown
 
 iprange:

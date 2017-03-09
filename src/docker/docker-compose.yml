@@ -12,6 +12,8 @@ services:
     volumes:
       - ../../build:/var/www/html:z
       - ../${PROFILE_NAME}:/var/www/html/profiles/${PROFILE_NAME}:z
+      - ../modules:/var/www/html/modules/custom:z
+      - ../themes:/var/www/html/themes/custom:z
     restart: always
     networks:
       - front
