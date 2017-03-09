@@ -1,7 +1,8 @@
 <?php
+
 /**
  * @file
- * Install, update and uninstall functions for Project installation profile.
+ * Install, update and uninstall functions for Skilld installation profile.
  */
 
 use Drupal\shortcut\Entity\Shortcut;
@@ -15,7 +16,7 @@ use Drupal\user\RoleInterface;
  *
  * @see system_install()
  */
-function projectname_install() {
+function sddk_install() {
   $config_factory = \Drupal::configFactory();
   // Set front page to "node".
   $config_factory->getEditable('system.site')
@@ -54,5 +55,4 @@ function projectname_install() {
   $config_factory->getEditable('node.settings')
     ->set('use_admin_theme', TRUE)
     ->save(TRUE);
-
 }

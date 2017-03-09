@@ -1,6 +1,6 @@
-name: Projectname
+name: SDD
 type: profile
-description: 'Projectname application installation profile'
+description: 'Skill drupal development installation profile'
 core: 8.x
 
 dependencies:
@@ -78,12 +78,12 @@ dependencies:
   - admin_toolbar
   - components
 # Custom modules
-#  - projectname_default_content
+#  - sdd_default_content
 
 themes:
   - projectname_theme
   - seven
 
 keep_english: true
-'interface translation project': projectname
-'interface translation server pattern': 'profiles/projectname/%language_custom.po'
+'interface translation project': sdd
+'interface translation server pattern': 'profiles/sdd/%language_custom.po'
