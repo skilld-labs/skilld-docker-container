@@ -21,15 +21,15 @@ install:
 	@echo "Build and run containers..."
 	docker-compose up -d
 	docker-compose exec php apk add --no-cache git
-	make -s reinstall
+	docker-compose exec -T php composer global require --prefer-dist "hirak/prestissimo:^0.3"
+	make reinstall
 
 reinstall:
 	cp src/drush_make/*.make.yml build/; \
 	docker-compose exec php time drush make profile.make.yml --concurrency=$(shell nproc) --prepare-install --overwrite -y; \
 	rm build/*.make.yml
-	docker-compose exec php composer global require --prefer-dist "hirak/prestissimo:^0.3"; \
-	docker-compose exec php composer config repositories.drupal composer https://packages.drupal.org/8; \
-	docker-compose exec php time composer require -o --update-no-dev --no-suggest $(COMPOSER_REQUIRE); \
+	docker-compose exec -T php composer config repositories.drupal composer https://packages.drupal.org/8
+	docker-compose exec -T php time composer require -o --update-no-dev --no-suggest $(COMPOSER_REQUIRE)
 	make -s front
 	make -s si
 
@@ -37,10 +37,10 @@ si:
 ifeq ($(PROJECT_INSTALL), config)
 	-docker-compose exec -T php time drush si config_installer --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y config_installer_sync_configure_form.sync_directory=sync
 else
-	docker-compose exec php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y --site-name="$(SITE_NAME)"
+	docker-compose exec -T php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y --site-name="$(SITE_NAME)"
 	docker-compose exec php ash -c "drush locale-check && drush locale-update"
 endif
-	make -s chown; \
+	make -s chown
 	make -s info
 
 info:

@@ -17,3 +17,6 @@ projects:
   components:
     type: module
     version: "1.0"
+  config_installer:
+    type": "profile"
+    version: "1.4"

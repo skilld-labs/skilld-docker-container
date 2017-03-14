@@ -35,15 +35,11 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 
   4\.1\.1\. Change _*.make.yml_ and list your modules/profiles, etc
 
-  4\.2\. Check _projectname_ folder
+  4\.2\. Optionally rename _src/themes/projectname_theme_ to real project theme name
 
-  4\.2\.1\. Rename _projectname_ folder to real project name
+  4\.2\.1\. Setup your theme by renaming editing _projectname_theme.*_ files
 
-  4\.2\.2\. Rename and edit _projectname.info.yml_ and _projectname.install_
-
-  4\.3\. Rename _projectname/projectname_theme_ to real project theme name
-
-  4\.3\.1\. Setup your theme by renaming editing _projectname_theme.*_ files
+  4\.3\. Optionally add you custom modules to _src/modules_
 
 5\. Run `make`
 
@@ -53,10 +49,10 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 * `make clean` - totally remove project build folder, docker containers and network.
 * `make reinstall` - rebuild & reinstall site.
 * `make si` - reinstall site.
-* `make info` - Show project info (IP).
+* `make info` - Show project services IP addresses.
 * `make chown` - Change permissions inside container. Use it in case you can not access files in _build_. folder from your machine.
 * `make exec` - docker exec into php container.
 * `make devel` - Devel + kint setup, and config for Twig debug mode.
 * `make phpcs` - check codebase with `phpcs` sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards.
 * `make phpcbf` - fix codebase according to Drupal standards https://www.drupal.org/docs/develop/standards.
-* `make cex` - executes config export to `config/sync` directory
+* `make cex` - executes config export to `config/sync` directory.

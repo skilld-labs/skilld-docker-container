@@ -24,7 +24,7 @@ abbr[title] {
 
   @media print {
     // Add visible title after abbreviations.
-    &:after {
+    &::after {
       content: ' (' attr(title) ')';
     }
   }

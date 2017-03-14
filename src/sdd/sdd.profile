@@ -1,7 +1,10 @@
 <?php
+
 /**
  * @file
- * Enables modules and site configuration for a multilingual demo installation.
+ * Enables modules and site configuration for a multilingual installation.
+ *
+ * Copied from https://www.drupal.org/project/multilingual_demo project.
  */
 
 use Symfony\Component\Yaml\Parser;
@@ -9,27 +12,27 @@ use Symfony\Component\Yaml\Parser;
 /**
  * Implements hook_install_tasks().
  */
-function projectname_install_tasks(&$install_state) {
-  return array(
-    'projectname_install_import_language_config' => array(),
-  );
+function sdd_install_tasks(&$install_state) {
+  return [
+    'sdd_install_import_language_config' => [],
+  ];
 }
 
 /**
  * Implements hook_install_tasks_alter().
  */
-function projectname_install_tasks_alter(&$tasks, $install_state) {
+function sdd_install_tasks_alter(&$tasks, $install_state) {
   // Moves the language config import task to the end of the install tasks so
   // that it is run after the final import of languages.
-  $task = $tasks['projectname_install_import_language_config'];
-  unset($tasks['projectname_install_import_language_config']);
-  $tasks = array_merge($tasks, array('projectname_install_import_language_config' => $task));
+  $task = $tasks['sdd_install_import_language_config'];
+  unset($tasks['sdd_install_import_language_config']);
+  $tasks = array_merge($tasks, ['sdd_install_import_language_config' => $task]);
 }
 
 /**
  * Imports language configuration overrides.
  */
-function projectname_install_import_language_config() {
+function sdd_install_import_language_config() {
   $language_manager = \Drupal::languageManager();
   $yaml_parser = new Parser();
   // The language code of the default locale.
@@ -41,7 +44,11 @@ function projectname_install_import_language_config() {
   // chooses to install in Hungarian, French, or Spanish, the language config is
   // imported by core and the user has the chance to override it during the
   // installation process.
-  $langcodes = array_diff(scandir($language_config_directory), array('..', '.', $site_default_langcode));
+  $langcodes = array_diff(scandir($language_config_directory), [
+    '..',
+    '.',
+    $site_default_langcode,
+  ]);
 
   foreach ($langcodes as $langcode) {
     // All .yml files in the language's config subdirectory.

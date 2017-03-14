@@ -1,4 +1,10 @@
 .env
 src/docker/docker-compose.override.yml
 .idea/
+nbproject
+.buildpath
+.settings
+.project
 build/
+node_modules
+config/sync/.htaccess

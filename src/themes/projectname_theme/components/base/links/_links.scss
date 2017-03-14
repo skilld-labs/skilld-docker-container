@@ -58,7 +58,7 @@ a:hover {
   }
 
   // Add visible URL after links.
-  a[href]:after {
+  a[href]::after {
     content: ' (' attr(href) ')';
     font-weight: normal;
     font-size: $base-font-size;
@@ -66,8 +66,8 @@ a:hover {
   }
 
   // Only display useful links.
-  a[href^='javascript:']:after,
-  a[href^='#']:after {
+  a[href^='javascript:']::after,
+  a[href^='#']::after {
     content: '';
   }
 }

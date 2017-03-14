@@ -1,1 +1,5 @@
 node_modules
+*.map
+components/asset-builds/css
+components/asset-builds/twig
+styleguide
