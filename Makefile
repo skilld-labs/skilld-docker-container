@@ -3,6 +3,10 @@ $(shell cp -n \.env.default \.env)
 $(shell cp -n \.\/src\/docker\/docker-compose\.override\.yml\.default \.\/src\/docker\/docker-compose\.override\.yml)
 include .env
 
+# Setup PHP Variables based on package version
+PHP_IMAGE=php:$(shell printf '%s' "$(PHP_VERSION)" | sed -e 's/\.//')-fpm
+export PHP_IMAGE
+
 all: | include net build install info
 
 include:
