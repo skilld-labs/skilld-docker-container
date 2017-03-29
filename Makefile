@@ -104,6 +104,10 @@ devel:
 	-docker-compose exec php drush en devel devel_generate kint -y
 	-docker-compose exec php drush pm-uninstall dynamic_page_cache internal_page_cache -y
 
+	@echo "Disabling js/css aggregation"
+	docker-compose exec php drush -y config-set system.performance css.preprocess 0
+	docker-compose exec php drush -y config-set system.performance js.preprocess 0
+
 	@echo "Setting up Twig in debug mode ..."
 	docker-compose exec php sed -i "s:debug\: false:debug\: true:g" sites/default/services.yml
 	docker-compose exec php sed -i "s:auto_reload\: null:auto_reload\: false:g" sites/default/services.yml
