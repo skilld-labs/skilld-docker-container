@@ -82,7 +82,7 @@ endif
 
 front:
 	@echo "Building front tasks..."
-	docker run -ti --rm -v $(shell pwd)/src/themes/$(THEME_NAME):/work skilldlabs/frontend:zen; \
+	docker run -t --rm -v $(shell pwd)/src/themes/$(THEME_NAME):/work skilldlabs/frontend:zen; \
 	docker-compose exec php rm -rf themes/custom/$(THEME_NAME)/node_modules
 	make -s chown
 
