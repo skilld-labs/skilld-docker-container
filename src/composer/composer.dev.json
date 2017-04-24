@@ -1,0 +1,23 @@
+{
+  "name": "drupal-composer/project-dev",
+  "description": "Project template for Drupal 8 projects with composer",
+  "type": "project",
+  "license": "GPL-2.0+",
+  "authors": [
+    {
+      "name": "",
+      "role": ""
+    }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    }
+  ],
+  "require": {
+    "drupal/devel": "^1"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

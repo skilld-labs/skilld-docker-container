@@ -1,0 +1,17 @@
+# Include ENV file with variables.
+include Makefile.tools
+
+trans:
+	$(call execute,php,drush locale-check);
+	$(call execute,php,drush locale-update);
+	$(call execute,php,drush import-language-config profiles/$(PROFILE_NAME));
+	$(call execute,php,drush cr);
+
+cr:
+	$(call execute,php,drush cr)
+
+csex:
+	$(call execute,php,drush csex -y);
+
+csim:
+	$(call execute,php,drush csim -y);

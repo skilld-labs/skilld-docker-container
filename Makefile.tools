@@ -1,0 +1,84 @@
+# Include ENV file with variables.
+include .env
+# Get user id and group id of host machine.
+UID := $(shell id -u)
+GID := $(shell id -g)
+
+define execute
+	docker exec -u$(shell id -u):$(shell id -g) ${COMPOSE_PROJECT_NAME}_${1} ${2}
+endef
+
+# Show info about networks and containers IP
+info:
+	$(eval CONTAINERS := $(shell docker inspect --format="{{range .Containers}}{{.Name}} {{end}}" $(COMPOSE_PROJECT_NAME)_front))
+	$(foreach CONTAINER, $(CONTAINERS),$(info $(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_PROJECT_NAME)_front.IPAddress}}' $(CONTAINER)) : $(CONTAINER)))
+
+# In case host machine user uid != 1000 we need to setup permissions inside
+# container and set uid same as on host machine.
+build_users:
+ifeq ($(UID), 10001)
+	@echo 'No needs to modify users inside container.'
+else
+ifneq ($(shell docker-compose exec php grep -c $(UID) /etc/passwd),0)
+	@echo 'User with the same UId exists, need to change his stuff.'
+	$(eval CONTAINERS_GROUP_NAME := $(shell $(call execute,php,id -gn)))
+	$(eval CONTAINERS_USER_NAME := $(shell $(call execute,php,id -gn)))
+	docker-compose exec php usermod -u 1001 $(CONTAINERS_USER_NAME)
+	docker-compose exec php groupmod -g 1001 $(CONTAINERS_GROUP_NAME)
+	docker-compose exec php find / -user $(UID) -exec chown -h 1001 {} \;
+	docker-compose exec php find / -group $(GID) -exec chgrp -h 1001 {} \;
+endif
+	docker-compose exec php usermod -u $(UID) www-data
+	docker-compose exec php groupmod -g $(GID) www-data
+	docker-compose exec php find / -user 1000 -exec chown -h $(UID) {} \;
+	docker-compose exec php find / -group 1000 -exec chgrp -h $(GID) {} \;
+	docker-compose exec php chown -hR www-data:www-data /var/www/html
+endif
+
+rsync:
+# Use this goal to rsync static files
+	docker-compose exec -T php apk add --no-cache rsync;
+	docker-compose exec -T php apk add --no-cache inotify-tools;
+	cp src/composer/scripts/rsync.sh build/;
+	$(call execute,php,/bin/sh rsync.sh);
+
+exec:
+	docker exec -u$(UID):$(GID) -i -t $(COMPOSE_PROJECT_NAME)_php sh
+
+
+# Run sniffers.
+phpcs:
+	docker run --rm \
+		-v $(shell pwd)/src/$(PROFILE_NAME):/work/profile \
+		-v $(shell pwd)/src/modules:/work/modules \
+		-v $(shell pwd)/src/themes:/work/themes \
+		skilldlabs/docker-phpcs-drupal phpcs -s --colors \
+		--standard=Drupal,DrupalPractice \
+		--extensions=php,module,inc,install,profile,theme,yml \
+		--ignore=*.css,*.js,libraries/* .
+	docker run --rm \
+		-v $(shell pwd)/src/$(PROFILE_NAME):/work/profile \
+		-v $(shell pwd)/src/modules:/work/modules \
+		-v $(shell pwd)/src/themes:/work/themes \
+		skilldlabs/docker-phpcs-drupal phpcs -s --colors \
+		--standard=Drupal,DrupalPractice \
+		--extensions=js \
+		--ignore=*.css,gulpfile.js,jquery.validate.js,libraries/*,styleguide/* .
+
+phpcbf:
+	docker run --rm \
+		-v $(shell pwd)/src/$(PROFILE_NAME):/work/profile \
+		-v $(shell pwd)/src/modules:/work/modules \
+		-v $(shell pwd)/src/themes:/work/themes \
+		skilldlabs/docker-phpcs-drupal phpcbf -s --colors \
+		--standard=Drupal,DrupalPractice \
+		--extensions=php,module,inc,install,profile,theme,yml \
+		--ignore=*.css,*.js,libraries/* .
+	docker run --rm \
+		-v $(shell pwd)/src/$(PROFILE_NAME):/work/profile \
+		-v $(shell pwd)/src/modules:/work/modules \
+		-v $(shell pwd)/src/themes:/work/themes \
+		skilldlabs/docker-phpcs-drupal phpcbf -s --colors \
+		--standard=Drupal,DrupalPractice \
+		--extensions=js \
+		--ignore=*.css,gulpfile.js,jquery.validate.js,libraries/*,styleguide/* .

@@ -1,0 +1,6 @@
+# This local Makefile will be called from main Makefile when drupal will be
+# installed. Use this file to call command or modification related to
+# your local environment
+
+all:
+
