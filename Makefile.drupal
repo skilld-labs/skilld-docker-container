@@ -2,10 +2,11 @@
 include Makefile.tools
 
 trans:
+ifeq ($(shell docker exec -u1000:1000 -t $(COMPOSE_PROJECT_NAME)_php drush pm-list --pipe --type=module --status=enabled | grep locale)),)
 	$(call execute,php,drush locale-check);
 	$(call execute,php,drush locale-update);
-	$(call execute,php,drush import-language-config profiles/$(PROFILE_NAME));
 	$(call execute,php,drush cr);
+endif
 
 cr:
 	$(call execute,php,drush cr)

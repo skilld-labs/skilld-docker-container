@@ -19,39 +19,9 @@
     "composer/installers": "^1.2",
     "cweagans/composer-patches": "^1.6",
     "drupal-composer/drupal-scaffold": "^2.2",
-    "drupal/admin_toolbar": "^1",
-    "drupal/advagg": "^2",
-    "drupal/components": "^1",
     "drupal/config_update": "^1",
     "drupal/config_installer": "^1",
-    "drupal/ctools": "^3",
     "drupal/default_content": "^1",
-    "drupal/ds": "^3",
-    "drupal/email_registration": "^1",
-    "drupal/entity": "^1",
-    "drupal/entity_reference_revisions": "^1",
-    "drupal/eu_cookie_compliance": "^1",
-    "drupal/layouter": "^1",
-    "drupal/externalauth": "^1",
-    "drupal/legal": "^1",
-    "drupal/hms_field": "^1",
-    "drupal/machine_name": "^1",
-    "drupal/mailsystem": "^4",
-    "drupal/metatag": "^1",
-    "drupal/page_manager": "^1",
-    "drupal/panels": "^4",
-    "drupal/paragraphs": "^1",
-    "drupal/pathauto": "^1",
-    "drupal/prlp": "^1",
-    "drupal/profile": "^1",
-    "drupal/redirect": "^1",
-    "drupal/simple_sitemap": "^2",
-    "drupal/swiftmailer": "^1",
-    "drupal/token": "^1",
-    "drupal/token_filter": "^1",
-    "drupal/yamlform": "1.0-beta20",
-    "drupal/migrate_plus": "^3",
-    "drupal/migrate_tools": "^3",
     "drupal/config_filter": "^1",
     "drupal/config_split": "^1",
     "drupal/zen": "^7",
@@ -60,8 +30,6 @@
     "webmozart/path-util": "^2.3",
     "league/csv":"8.0",
     "swiftmailer/swiftmailer": "@stable",
-    "phpoffice/phpexcel": "@stable",
-    "drupal/commerce": "^2.0@beta",
     "wikimedia/composer-merge-plugin": "dev-master",
     "hirak/prestissimo": "^0.3"
   },
@@ -98,30 +66,8 @@
         "ajax.js insert command sometimes wraps content in a div, potentially producing invalid HTML and other bugs": "https://www.drupal.org/files/issues/ajax_js_insert_command-736066-116.patch",
         "HAL RelationLinkManager caches and returns entity type definition object instead of id": "https://www.drupal.org/files/issues/hal_relationlinkmanager-2868362-2.patch"
       },
-      "drupal/advagg": {
-        "PHP Fatal error on CacheCollector.php": "https://www.drupal.org/files/issues/2850263-drupal-8.3compatibility-11.patch"
-      },
-      "drupal/ctools": {
-        "Views exposed filters missing autosubmit option": "https://www.drupal.org/files/issues/2475595-ctools-autocomplete-fix-24.patch"
-      },
       "drupal/default_content": {
         "Default content core 8.3 compatibility": "https://www.drupal.org/files/issues/2867579-core83-2.patch"
-      },
-      "drupal/entity_reference_revisions": {
-        "Dependency on rest link_manager moved in 8.3": "https://www.drupal.org/files/issues/dependency_on_rest-2862543-2.patch"
-      },
-      "drupal/layouter": {
-        "Disposal of restrictions support only CT": "https://www.drupal.org/files/issues/2805159_layouter_disposal_of_restrictions.patch"
-      },
-      "drupal/legal": {
-        "Drupal 8 Version Of Legal Module": "https://www.drupal.org/files/issues/legal-d8-2394783-12.patch"
-      },
-      "drupal/page_manager": {
-        "Variants take entity label not the variant title": "https://www.drupal.org/files/issues/variants_take_entity-2665328-36.patch"
-      },
-      "drupal/yamlform": {
-        "Create yamlform_confirmation template": "https://www.drupal.org/files/issues/create-2820256-2.patch",
-        "Drush updb causes PHP Fatal error due to invalide schema version": "https://www.drupal.org/files/issues/drush_updb_causes_php-2813333-3.patch"
       }
     }
   }

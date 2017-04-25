@@ -8,15 +8,21 @@ define execute
 	docker exec -u$(shell id -u):$(shell id -g) ${COMPOSE_PROJECT_NAME}_${1} ${2}
 endef
 
+define executeroot
+	docker exec ${COMPOSE_PROJECT_NAME}_${1} ${2}
+endef
+
 # Show info about networks and containers IP
 info:
-	$(eval CONTAINERS := $(shell docker inspect --format="{{range .Containers}}{{.Name}} {{end}}" $(COMPOSE_PROJECT_NAME)_front))
-	$(foreach CONTAINER, $(CONTAINERS),$(info $(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_PROJECT_NAME)_front.IPAddress}}' $(CONTAINER)) : $(CONTAINER)))
+	$(info Containers for "$(COMPOSE_PROJECT_NAME)" info:)
+	$(eval CONTAINERS := $(shell docker ps -f name=$(COMPOSE_PROJECT_NAME) --format "{{ .ID }}"))
+	$(foreach CONTAINER, $(CONTAINERS),$(info $(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_PROJECT_NAME)_front.IPAddress}} : {{.Name}}' $(CONTAINER)) ))
+
 
 # In case host machine user uid != 1000 we need to setup permissions inside
 # container and set uid same as on host machine.
 build_users:
-ifeq ($(UID), 10001)
+ifeq ($(UID), 1000)
 	@echo 'No needs to modify users inside container.'
 else
 ifneq ($(shell docker-compose exec php grep -c $(UID) /etc/passwd),0)
@@ -49,7 +55,6 @@ exec:
 # Run sniffers.
 phpcs:
 	docker run --rm \
-		-v $(shell pwd)/src/$(PROFILE_NAME):/work/profile \
 		-v $(shell pwd)/src/modules:/work/modules \
 		-v $(shell pwd)/src/themes:/work/themes \
 		skilldlabs/docker-phpcs-drupal phpcs -s --colors \
@@ -57,7 +62,6 @@ phpcs:
 		--extensions=php,module,inc,install,profile,theme,yml \
 		--ignore=*.css,*.js,libraries/* .
 	docker run --rm \
-		-v $(shell pwd)/src/$(PROFILE_NAME):/work/profile \
 		-v $(shell pwd)/src/modules:/work/modules \
 		-v $(shell pwd)/src/themes:/work/themes \
 		skilldlabs/docker-phpcs-drupal phpcs -s --colors \
@@ -67,7 +71,6 @@ phpcs:
 
 phpcbf:
 	docker run --rm \
-		-v $(shell pwd)/src/$(PROFILE_NAME):/work/profile \
 		-v $(shell pwd)/src/modules:/work/modules \
 		-v $(shell pwd)/src/themes:/work/themes \
 		skilldlabs/docker-phpcs-drupal phpcbf -s --colors \
@@ -75,10 +78,18 @@ phpcbf:
 		--extensions=php,module,inc,install,profile,theme,yml \
 		--ignore=*.css,*.js,libraries/* .
 	docker run --rm \
-		-v $(shell pwd)/src/$(PROFILE_NAME):/work/profile \
 		-v $(shell pwd)/src/modules:/work/modules \
 		-v $(shell pwd)/src/themes:/work/themes \
 		skilldlabs/docker-phpcs-drupal phpcbf -s --colors \
 		--standard=Drupal,DrupalPractice \
 		--extensions=js \
 		--ignore=*.css,gulpfile.js,jquery.validate.js,libraries/*,styleguide/* .
+
+# Run simple watcher to rsync updated files
+watch:
+	docker exec -u$(UID):$(GID) -d $(COMPOSE_PROJECT_NAME)_php sh watch.sh sh rsync.sh;
+
+# Any custom postinstall actions
+postinstall:
+	make -s watch
+	$(MAKE) -s -f Makefile.local

@@ -5,7 +5,6 @@ services:
 # Override base service.
   php:
     volumes:
-      - "./90-mail.ini:/etc/php${PHP_VERSION}/conf.d/90-mail.ini:z"
       - ../../config/sync:/var/www/html/sync:z
 # Uncomment next line if you need PHP XDebug.
 #    command: php-fpm7 -F -d zend_extension=xdebug.so
