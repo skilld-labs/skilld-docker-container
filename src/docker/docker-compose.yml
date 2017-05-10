@@ -35,8 +35,6 @@ services:
   mysql:
     image: percona:5.7
     container_name: "${COMPOSE_PROJECT_NAME}_mysql"
-    volumes:
-      - /dev/shm/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:Z
     environment:
       MYSQL_DATABASE: d8
       MYSQL_USER: d8

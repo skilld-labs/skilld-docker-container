@@ -10,6 +10,15 @@ services:
 # Uncomment next line if you need PHP XDebug.
 #    command: php-fpm7 -F -d zend_extension=xdebug.so
 
+# Use local folder to not lose data on container crash.
+# CAUTION: Don't use this section on development machine because container
+# working speed will be decreased.
+  mysql:
+#    volumes:
+#    - ../../mysql:/var/lib/mysql:Z
+# On for linux machines use ramfs, make sure to create the directory first.
+#    - /dev/shm/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:Z
+
 #  adminer:
 #    image: dockette/adminer:mysql-php7
 #    container_name: "${COMPOSE_PROJECT_NAME}_adminer"
@@ -27,7 +36,10 @@ services:
     networks:
       - front
 
+  nginx:
+# Uncomment for MacOS.
+#    ports:
+#    - "8088:80"
 # Mount local folder with ssl keys.
-#  nginx:
 #    volumes:
 #     - ./nginx/ssl:/etc/nginx/ssl:Z
