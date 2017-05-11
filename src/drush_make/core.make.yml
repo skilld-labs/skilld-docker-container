@@ -5,7 +5,7 @@ core: "8.x"
 projects:
   drupal:
     type: "core"
-    version: "8.2.6"
+    version: "8.2.8"
     patch:
       - "https://www.drupal.org/files/issues/drupal-fix_number_widget_errorElement-2614250-25.patch"
       - "https://www.drupal.org/files/issues/drupal-states-required-options-2731991-5.patch"
