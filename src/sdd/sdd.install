@@ -34,6 +34,11 @@ function sddk_install() {
     ->set('features.node_user_picture', FALSE)
     ->save(TRUE);
 
+  // Disable field prefix.
+  $config_factory->getEditable('field_ui.settings')
+    ->set('field_prefix', '')
+    ->save(TRUE);
+
   // Assign user 1 the "administrator" role.
   $user = User::load(1);
   $user->roles[] = 'administrator';

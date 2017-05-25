@@ -9,4 +9,4 @@ defaults:
 projects:
   admin_toolbar:
     type: "module"
-    version: "1.18"
+    version: "1.19"

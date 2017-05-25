@@ -31,6 +31,7 @@ dependencies:
   - dynamic_page_cache
   - editor
   - field
+#  - field_layout
   - field_ui #comment in prod
   - file
   - filter
@@ -41,6 +42,7 @@ dependencies:
   - image
 #  - inline_form_errors
   - language
+  - layout_discovery
   - link
   - locale
   - menu_link_content
