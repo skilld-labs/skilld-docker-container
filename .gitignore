@@ -8,3 +8,4 @@ nbproject
 build/
 node_modules
 config/sync/.htaccess
+mysql/

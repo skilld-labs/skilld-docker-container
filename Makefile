@@ -30,7 +30,7 @@ install:
 
 reinstall:
 	cp src/drush_make/*.make.yml build/; \
-	docker-compose exec php time drush make profile.make.yml --concurrency=$(shell nproc) --prepare-install --overwrite -y; \
+	docker-compose exec php time drush make profile.make.yml --concurrency=4 --prepare-install --overwrite -y; \
 	rm build/*.make.yml
 	docker-compose exec -T php composer config repositories.drupal composer https://packages.drupal.org/8
 	docker-compose exec -T php time composer require -o --update-no-dev --no-suggest $(COMPOSER_REQUIRE)
