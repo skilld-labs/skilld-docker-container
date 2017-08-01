@@ -43,6 +43,12 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 
 5\. Run `make`
 
+Additional steps for MacOS install: (https://docs.docker.com/docker-for-mac/osxfs-caching/)
+
+  2\.4\. Set SHARED_FOLDER variable to any writable absolute path instead of /dev/shm (PROJECT_PATH/sql for example)
+
+3\. Copy __docker-compose\.override\.yml\.default_mac__ to __docker-compose\.override\.yml__
+
 ## Usage
 
 * `make` - Install project.
