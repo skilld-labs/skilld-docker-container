@@ -21,9 +21,7 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 
   2\.1\. Set _COMPOSE_PROJECT_NAME_, _PROFILE_NAME_, _THEME_NAME_ variables with values you need
 
-  2\.2\. Change _PHP_IMAGE_ in case you need another one
-
-  2\.3. List all libraries you need using _COMPOSER_REQUIRE_ variable and space as delimiter
+  2\.2\. Change _IMAGE_PHP_ in case you need another one
 
 3\. Copy __docker-compose\.override\.yml\.default__ to __docker-compose\.override\.yml__
 
@@ -31,15 +29,15 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 
 4\. Prepare your new Drupal site
 
-  4\.1\. Check _drush_make_ folder
+  4\.1\. Check _composer.json_ contents
 
-  4\.1\.1\. Change _*.make.yml_ and list your modules/profiles, etc
+  4\.1\.1\. Use `make exec` & `composer require` to add required extensions & libraries
 
-  4\.2\. Optionally rename _src/themes/projectname_theme_ to real project theme name
+  4\.2\. Optionally add custom theme to _web/themes/_
 
-  4\.2\.1\. Setup your theme by renaming editing _projectname_theme.*_ files
+  4\.2\.1\. Uncomment `make -s front` line to allow build of the theme
 
-  4\.3\. Optionally add you custom modules to _src/modules_
+  4\.3\. Optionally add you custom modules to _web/modules/custom_
 
 5\. Run `make`
 
@@ -52,7 +50,11 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 * `make info` - Show project services IP addresses.
 * `make chown` - Change permissions inside container. Use it in case you can not access files in _build_. folder from your machine.
 * `make exec` - docker exec into php container.
+* `make exec0` - docker exec into php container as root.
 * `make devel` - Devel + kint setup, and config for Twig debug mode.
 * `make phpcs` - check codebase with `phpcs` sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards.
 * `make phpcbf` - fix codebase according to Drupal standards https://www.drupal.org/docs/develop/standards.
 * `make cex` - executes config export to `config/sync` directory.
+* `make cim` - executes config import from `config/sync` directory.
+* `make front` - builds frontend tasks
+* `make lint` - runs frontend linters

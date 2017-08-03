@@ -1,0 +1,128 @@
+{
+  "name": "skilld-labs/drupal-project",
+  "description": "Project template for Drupal 8 projects with composer",
+  "type": "project",
+  "license": "GPL-2.0+",
+  "authors": [
+    {
+      "name": "",
+      "role": ""
+    }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "ckeditor/colorbutton",
+        "version": "4.6.1",
+        "type": "drupal-library",
+        "dist": {
+          "url": "http://download.ckeditor.com/colorbutton/releases/colorbutton_4.6.1.zip",
+          "type": "zip"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "ckeditor/panelbutton",
+        "version": "4.6.1",
+        "type": "drupal-library",
+        "dist": {
+          "url": "http://download.ckeditor.com/panelbutton/releases/panelbutton_4.6.1.zip",
+          "type": "zip"
+        }
+      }
+    }
+  ],
+  "require": {
+    "ckeditor/colorbutton": "^4.6",
+    "ckeditor/panelbutton": "^4.6",
+    "composer/installers": "^1.2",
+    "cweagans/composer-patches": "^1.6",
+    "drupal-composer/drupal-scaffold": "^2.2",
+    "drupal/admin_toolbar": "^1",
+    "drupal/colorbutton": "^1",
+    "drupal/components": "^1",
+    "drupal/config_installer": "^1",
+    "drupal/core": "~8.3",
+    "drupal/default_content": "^1",
+    "drupal/ds": "^3",
+    "drupal/file_entity": "dev-2.x#a34712c1f4ba87c616e0610a23000ea0c52313e3",
+    "drupal/panelbutton": "^1",
+    "drupal/styleguide": "^1",
+    "drupal/swiftmailer": "^1",
+    "drupal/token": "^1",
+    "neitanod/forceutf8": "2.0.*",
+    "webflo/drupal-finder": "^0.2.1",
+    "webmozart/path-util": "^2.3",
+    "wikimedia/composer-merge-plugin": "dev-master"
+  },
+  "require-dev": {
+    "behat/mink": "~1.7",
+    "behat/mink-goutte-driver": "~1.2",
+    "drupal/devel": "^1",
+    "jcalderonzumba/gastonjs": "~1.0.2",
+    "jcalderonzumba/mink-phantomjs-driver": "~0.3.1",
+    "mikey179/vfsstream": "~1.2",
+    "phpunit/phpunit": ">=4.8.28 <5",
+    "symfony/css-selector": "~2.8"
+  },
+  "conflict": {
+    "drupal/drupal": "*"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "config": {
+    "sort-packages": true
+  },
+  "autoload": {
+    "classmap": [
+      "scripts/composer/ScriptHandler.php"
+    ]
+  },
+  "scripts": {
+    "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
+    "pre-install-cmd": [
+      "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+    ],
+    "pre-update-cmd": [
+      "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+    ],
+    "post-install-cmd": [
+      "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
+    ],
+    "post-update-cmd": [
+      "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
+    ]
+  },
+  "extra": {
+    "installer-paths": {
+      "web/core": ["type:drupal-core"],
+      "web/libraries/{$name}": ["type:drupal-library"],
+      "web/modules/contrib/{$name}": ["type:drupal-module"],
+      "web/profiles/contrib/{$name}": ["type:drupal-profile"],
+      "web/themes/contrib/{$name}": ["type:drupal-theme"],
+      "drush/contrib/{$name}": ["type:drupal-drush"]
+    },
+    "patches": {
+      "drupal/core": {
+        "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/drupal-states-required-options-2731991-5.patch",
+        "Number widget validation can break AJAX actions": "https://www.drupal.org/files/issues/2614250-40.patch",
+        "Programmatically created translatable content type returns SQL error on content creation": "https://www.drupal.org/files/issues/2599228-31.patch",
+        "Clearing cache via UI in translated language resets config translation of field labels to default language": "https://www.drupal.org/files/issues/clearing_cache_via_ui-2650434-128.patch",
+        "ajax.js insert command sometimes wraps content in a div, potentially producing invalid HTML and other bugs": "https://www.drupal.org/files/issues/ajax_js_insert_command-736066-116.patch"
+      },
+      "drupal/default_content": {
+        "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
+      },
+      "drupal/file_entity": {
+        "Core 8.3 compatibility": "https://www.drupal.org/files/issues/2867574-file_entity-83-11.patch"
+      }
+    }
+  }
+}

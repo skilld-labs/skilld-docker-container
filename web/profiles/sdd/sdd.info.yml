@@ -1,0 +1,91 @@
+name: SDD
+type: profile
+description: 'Skill drupal development installation profile'
+core: 8.x
+
+dependencies:
+# Core
+#  - action
+#  - aggregator
+#  - automated_cron
+#  - ban
+#  - basic_auth
+#  - big_pipe
+  - block
+  - block_content
+#  - block_place
+#  - book
+  - breakpoint
+  - ckeditor
+#  - color
+#  - comment
+  - config #comment in prod
+#  - config_translation
+#  - contact
+#  - content_moderation
+#  - content_translation
+  - contextual
+  - datetime
+#  - datetime_range
+  - dblog
+  - dynamic_page_cache
+  - editor
+  - field
+#  - field_layout
+  - field_ui #comment in prod
+  - file
+  - filter
+#  - forum
+#  - hal
+  - help
+#  - history
+  - image
+#  - inline_form_errors
+#  - language
+  - layout_discovery
+  - link
+#  - locale
+  - menu_link_content
+  - menu_ui
+#  - migrate
+#  - migrate_drupal
+#  - migrate_drupal_ui
+  - node
+  - options
+#  - outside_in
+  - page_cache
+  - path
+  - quickedit
+  - rdf
+  - responsive_image
+#  - rest
+#  - search
+#  - serialization
+  - shortcut
+#  - simpletest
+#  - statistics
+#  - syslog
+  - system
+  - taxonomy
+#  - telephone
+  - text
+  - toolbar
+#  - tour
+#  - tracker
+  - update
+  - user
+  - views
+  - views_ui #comment in prod
+# Contrib modules
+  - admin_toolbar
+  - components
+# Custom modules
+#  - sdd_default_content
+
+themes:
+  - bartik
+  - seven
+
+keep_english: true
+'interface translation project': sdd
+'interface translation server pattern': 'profiles/sdd/%language_custom.po'
