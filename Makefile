@@ -1,11 +1,24 @@
 # Read project name from .env file
 $(shell cp -n \.env.default \.env)
-$(shell cp -n \.\/src\/docker\/docker-compose\.override\.yml\.default \.\/src\/docker\/docker-compose\.override\.yml)
+$(shell cp -n \.\/docker\/docker-compose\.override\.yml\.default \.\/docker\/docker-compose\.override\.yml)
 include .env
 
 # Setup PHP Variables based on package version
-PHP_IMAGE=php:$(shell printf '%s' "$(PHP_VERSION)" | sed -e 's/\.//')-fpm
-export PHP_IMAGE
+IMAGE_PHP := php:$(shell printf '%s' "$(PHP_VERSION)" | sed -e 's/\.//')-fpm
+
+IMAGE_FRONT := skilldlabs/frontend:zen
+
+# Get local values only once.
+LOCAL_UID := $(shell id -u)
+LOCAL_GID := $(shell id -g)
+
+# Evaluate recursively.
+CUID ?= $(LOCAL_UID)
+CGID ?= $(LOCAL_GID)
+
+php = docker-compose exec -T --user $(CUID):$(CGID) php time ${1}
+php-0 = docker-compose exec -T php time ${1}
+front = docker run --rm -u $(CUID):$(CGID) -v $(shell pwd)/web/themes/$(THEME_NAME):/work $(IMAGE_FRONT) ${1}
 
 all: | include net build install info
 
@@ -15,37 +28,71 @@ ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
 $(error Project name can not be default, please edit ".env" and set COMPOSE_PROJECT_NAME variable.)
 endif
 
-build: clean
-	mkdir -p build
+build: stop
 	mkdir -p /dev/shm/${COMPOSE_PROJECT_NAME}_mysql
 
 install:
 	@echo "Updating containers..."
-	docker-compose pull
+	docker-compose pull --parallel
 	@echo "Build and run containers..."
 	docker-compose up -d
-	docker-compose exec php apk add --no-cache git
-	docker-compose exec -T php composer global require --prefer-dist "hirak/prestissimo:^0.3"
-	make reinstall
+	$(call php-0, apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community git)
+	$(call php-0, kill -USR2 1)
+	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
+	make -s reinstall
 
 reinstall:
-	cp src/drush_make/*.make.yml build/; \
-	docker-compose exec php time drush make profile.make.yml --concurrency=$(shell nproc) --prepare-install --overwrite -y; \
-	rm build/*.make.yml
-	docker-compose exec -T php composer config repositories.drupal composer https://packages.drupal.org/8
-	docker-compose exec -T php time composer require -o --update-no-dev --no-suggest $(COMPOSER_REQUIRE)
-	make -s front
+	$(call php, composer install --prefer-dist -o)
+	$(call php, composer drupal-scaffold)
+	#make -s front
 	make -s si
 
 si:
-ifeq ($(PROJECT_INSTALL), config)
-	-docker-compose exec -T php time drush si config_installer --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y config_installer_sync_configure_form.sync_directory=sync
-else
-	docker-compose exec -T php drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y --site-name="$(SITE_NAME)"
-	docker-compose exec php ash -c "drush locale-check && drush locale-update"
+	$(call php, chmod +w web/sites/default)
+ifneq ("$(wildcard web/sites/default/settings.php)","")
+	$(call php, chmod +w web/sites/default/settings.php)
+	$(call php, rm web/sites/default/settings.php)
 endif
-	make -s chown
+	@echo "Installing from: $(PROJECT_INSTALL)"
+ifeq ($(PROJECT_INSTALL), config)
+	#$(call php, drush si config_installer --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y config_installer_sync_configure_form.sync_directory=../config/sync)
+	$(call php, drush si config_installer --db-url=sqlite:///dev/shm/d8.sqlite --account-pass=admin -y config_installer_sync_configure_form.sync_directory=../config/sync)
+else
+	#$(call php, drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
+	$(call php, drush si $(PROFILE_NAME) --db-url=sqlite:///dev/shm/d8.sqlite --account-pass=admin -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
+endif
+	#$(call php, drush en $(MODULES) -y)
+	#$(call php, drush pmu $(MODULES) -y)
+	#make -s locale-update
+	#make -s cim
+	#make -s update-alias
+	#make -s _local-settings
 	make -s info
+
+locale-update:
+	$(call php, drush locale-check)
+	$(call php, drush locale-update)
+
+_local-settings:
+	@echo "Turn on settings.local"
+	$(call php, chmod +w web/sites/default)
+	$(call php, cp settings/settings.local.php web/sites/default/settings.local.php)
+	$(call php-0, sed -i "/settings.local.php';/s/# //g" web/sites/default/settings.php)
+
+cex:
+	$(call php, drush cex -y)
+ifneq ($(PROJECT_INSTALL), config)
+	rm -rf config/sync/*
+	cp -R web/$(shell docker-compose exec -T --user $(CUID):$(CGID) php drush ev 'echo substr(\Drupal::service("config.storage.sync")->getFilePath("drush"), 0, -10);')/* config/sync
+endif
+
+cim:
+	$(call php, drush cr)
+	$(call php, drush cim -y)
+
+update-alias:
+	$(call php, drush pag canonical_entities:node update)
+	$(call php, drush cr)
 
 info:
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_web 2> /dev/null),true)
@@ -60,19 +107,29 @@ endif
 
 chown:
 # Use this goal to set permissions in docker container
-	docker-compose exec php /bin/sh -c "chown $(shell id -u):$(shell id -g) /var/www/html -R"
+	$(call php-0, /bin/sh -c "chown $(CUID):$(CGID) /var/www/html/web -R")
 # Need this to fix files folder
-	docker-compose exec php /bin/sh -c "chown www-data: /var/www/html/sites/default/files -R"
+	$(call php-0, /bin/sh -c "chown www-data: /var/www/html/web/sites/default/files -R")
 
 exec:
+	docker-compose exec --user $(CUID):$(CGID) php ash
+
+exec0:
 	docker-compose exec php ash
 
-clean: info
-	@echo "Removing networks for $(COMPOSE_PROJECT_NAME)"
+stop:
+	@echo "Removing containers for $(COMPOSE_PROJECT_NAME)"
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_php 2> /dev/null),true)
 	docker-compose down
 endif
-	if [ -d "build" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(PHP_IMAGE) ash -c "rm -rf /mnt/build"; fi
+
+clean: info stop
+	if [ -d "web/core" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/core"; fi
+	if [ -d "web/libraries" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/libraries"; fi
+	if [ -d "web/modules/contrib" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/modules/contrib"; fi
+	if [ -d "web/profiles/contrib" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/profiles/contrib"; fi
+	if [ -d "web/sites" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/sites"; fi
+	if [ -d "web/themes/contrib" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/themes/contrib"; fi
 
 net:
 ifeq ($(strip $(shell docker network ls | grep $(COMPOSE_PROJECT_NAME))),)
@@ -82,52 +139,59 @@ endif
 
 front:
 	@echo "Building front tasks..."
-	docker run -t --rm -v $(shell pwd)/src/themes/$(THEME_NAME):/work skilldlabs/frontend:zen; \
-	docker-compose exec php rm -rf themes/custom/$(THEME_NAME)/node_modules
-	make -s chown
+	docker pull $(IMAGE_FRONT)
+	$(call front, bower install)
+	$(call front)
+	$(call php-0, rm -rf web/themes/$(THEME_NAME)/node_modules)
+
+lint:
+	@echo "Running linters..."
+	$(call front, gulp lint)
+	$(call php-0, rm -rf web/themes/$(THEME_NAME)/node_modules)
+
+dev:
+	@echo "Dev tasks..."
+	$(call php, chmod -R 777 sites/default/files)
+	$(call php, cp sites/default/default.services.yml sites/default/services.yml)
+	$(call php, cp sites/example.settings.local.php sites/default/settings.local.php)
+	$(call php, drush en devel devel_generate webform_devel kint -y)
+	$(call php, drush pm-uninstall dynamic_page_cache page_cache -y)
 
 iprange:
 	$(shell grep -q -F 'IPRANGE=' .env || printf "\nIPRANGE=$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}')" >> .env)
 
-devel:
-	@echo "Setting up permissions ..."
-	docker-compose exec php find sites/default -type d -exec chmod 777 {} \;
-	docker-compose exec php find sites/default -type f -exec chmod 666 {} \;
-
-	@echo "Setting up settings.yml ..."
-	docker-compose exec php cp sites/default/default.services.yml sites/default/services.yml
-
-	@echo "Setting up settings.local.yml ..."
-	docker-compose exec php cp sites/example.settings.local.php sites/default/settings.local.php
-	@echo "Setting up kint ..."
-	-docker-compose exec php composer require drupal/devel
-	-docker-compose exec php drush en devel devel_generate kint -y
-	-docker-compose exec php drush pm-uninstall dynamic_page_cache internal_page_cache -y
-
-	@echo "Disabling js/css aggregation"
-	docker-compose exec php drush -y config-set system.performance css.preprocess 0
-	docker-compose exec php drush -y config-set system.performance js.preprocess 0
-
-	@echo "Setting up Twig in debug mode ..."
-	docker-compose exec php sed -i "s:debug\: false:debug\: true:g" sites/default/services.yml
-	docker-compose exec php sed -i "s:auto_reload\: null:auto_reload\: false:g" sites/default/services.yml
-	docker-compose exec php sed -i "s:cache\: true:cache\: false:g" sites/default/services.yml
-
-	@echo "Finishing: clean up / cache rebuild ..."
-	-docker-compose exec php drush cr
-	@make -s chown
-
 phpcs:
-	docker run --rm -v $(shell pwd)/src/$(PROFILE_NAME):/work skilldlabs/docker-phpcs-drupal phpcs --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,info .
-	docker run --rm -v $(shell pwd)/src/$(PROFILE_NAME):/work skilldlabs/docker-phpcs-drupal phpcs --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme,info .
+	docker run --rm \
+		-v $(shell pwd)/web/profiles/$(PROFILE_NAME):/work/profile \
+		-v $(shell pwd)/web/modules/custom:/work/modules \
+		-v $(shell pwd)/web/themes/$(THEME_NAME):/work/themes \
+		skilldlabs/docker-phpcs-drupal phpcs -s --colors \
+		--standard=Drupal,DrupalPractice \
+		--extensions=php,module,inc,install,profile,theme,yml \
+		--ignore=*.css,*.md,*.js .
+	docker run --rm \
+		-v $(shell pwd)/web/profiles/$(PROFILE_NAME):/work/profile \
+		-v $(shell pwd)/web/modules/custom:/work/modules \
+		-v $(shell pwd)/web/themes/$(THEME_NAME):/work/themes \
+		skilldlabs/docker-phpcs-drupal phpcs -s --colors \
+		--standard=Drupal,DrupalPractice \
+		--extensions=js \
+		--ignore=*.css,*.md,libraries/*,styleguide/* .
 
 phpcbf:
-	docker run --rm -v $(shell pwd)/src/$(PROFILE_NAME):/work skilldlabs/docker-phpcs-drupal phpcbf --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,info .
-	docker run --rm -v $(shell pwd)/src/$(PROFILE_NAME):/work skilldlabs/docker-phpcs-drupal phpcbf --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme,info .
-
-cex:
-	docker-compose exec php ash -c "drush cex -y"
-ifneq ($(PROJECT_INSTALL), config)
-	rm -rf config/sync/*
-	cp -R build/$(shell docker-compose exec php drush ev 'echo substr(\Drupal::service("config.storage.sync")->getFilePath("drush"), 0, -10);')/* config/sync
-endif
+	docker run --rm \
+		-v $(shell pwd)/web/profiles/$(PROFILE_NAME):/work/profile \
+		-v $(shell pwd)/web/modules/custom:/work/modules \
+		-v $(shell pwd)/web/themes/$(THEME_NAME):/work/themes \
+		skilldlabs/docker-phpcs-drupal phpcbf -s --colors \
+		--standard=Drupal,DrupalPractice \
+		--extensions=php,module,inc,install,profile,theme,yml,txt,md \
+		--ignore=*.css,*.md,*.js .
+	docker run --rm \
+		-v $(shell pwd)/web/profiles/$(PROFILE_NAME):/work/profile \
+		-v $(shell pwd)/web/modules/custom:/work/modules \
+		-v $(shell pwd)/web/themes/$(THEME_NAME):/work/themes \
+		skilldlabs/docker-phpcs-drupal phpcbf -s --colors \
+		--standard=Drupal,DrupalPractice \
+		--extensions=js \
+		--ignore=*.css,*.md,libraries/*,styleguide/* .
