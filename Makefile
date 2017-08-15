@@ -157,6 +157,15 @@ dev:
 	$(call php, drush en devel devel_generate webform_devel kint -y)
 	$(call php, drush pm-uninstall dynamic_page_cache page_cache -y)
 
+backup_name = $(COMPOSE_PROJECT_NAME).tar.gz
+mysql_dump_name = $(COMPOSE_PROJECT_NAME).sql
+files_dir = web/sites/default/files
+backup:
+	rm -f $(backup_name)
+	$(call php, drush sql-dump --database=default --result-file=../$(mysql_dump_name))
+	tar -czvf $(backup_name) $(files_dir) $(mysql_dump_name) --exclude=$(files_dir)/translations --exclude=$(files_dir)/js --exclude=$(files_dir)/css --exclude=$(files_dir)/styles --exclude=$(files_dir)/php
+	rm $(mysql_dump_name)
+
 iprange:
 	$(shell grep -q -F 'IPRANGE=' .env || printf "\nIPRANGE=$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}')" >> .env)
 

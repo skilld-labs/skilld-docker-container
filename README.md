@@ -56,5 +56,6 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 * `make phpcbf` - fix codebase according to Drupal standards https://www.drupal.org/docs/develop/standards.
 * `make cex` - executes config export to `config/sync` directory.
 * `make cim` - executes config import from `config/sync` directory.
+* `make backup` - creates archive with DB dump and files directory (excluding translations, css, js, php and image styles)
 * `make front` - builds frontend tasks
 * `make lint` - runs frontend linters
