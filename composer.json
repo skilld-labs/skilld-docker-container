@@ -52,13 +52,13 @@
     "drupal/core": "~8.3",
     "drupal/default_content": "^1",
     "drupal/ds": "^3",
-    "drupal/file_entity": "dev-2.x#a34712c1f4ba87c616e0610a23000ea0c52313e3",
+    "drupal/file_entity": "^2",
     "drupal/panelbutton": "^1",
     "drupal/styleguide": "^1",
     "drupal/swiftmailer": "^1",
     "drupal/token": "^1",
     "neitanod/forceutf8": "2.0.*",
-    "webflo/drupal-finder": "^0.2.1",
+    "webflo/drupal-finder": "^1.0.0",
     "webmozart/path-util": "^2.3",
     "wikimedia/composer-merge-plugin": "dev-master"
   },
@@ -119,9 +119,6 @@
       },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
-      },
-      "drupal/file_entity": {
-        "Core 8.3 compatibility": "https://www.drupal.org/files/issues/2867574-file_entity-83-11.patch"
       }
     }
   }
