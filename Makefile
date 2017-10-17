@@ -1,12 +1,9 @@
+.PHONY: all up down cex cim prepare install si exec info phpcs phpcbf
+
 # Read project name from .env file
 $(shell cp -n \.env.default \.env)
 $(shell cp -n \.\/docker\/docker-compose\.override\.yml\.default \.\/docker\/docker-compose\.override\.yml)
 include .env
-
-# Setup PHP Variables based on package version
-IMAGE_PHP := php:$(shell printf '%s' "$(PHP_VERSION)" | sed -e 's/\.//')-fpm
-
-IMAGE_FRONT := skilldlabs/frontend:zen
 
 # Get local values only once.
 LOCAL_UID := $(shell id -u)
@@ -16,11 +13,14 @@ LOCAL_GID := $(shell id -g)
 CUID ?= $(LOCAL_UID)
 CGID ?= $(LOCAL_GID)
 
+# Prepare network name https://github.com/docker/compose/issues/2923
+COMPOSE_NET_NAME := $(shell echo $(COMPOSE_PROJECT_NAME) | tr '[:upper:]' '[:lower:]'| sed -E 's/[^a-z0-9]+//g')_front
+
 php = docker-compose exec -T --user $(CUID):$(CGID) php time ${1}
 php-0 = docker-compose exec -T php time ${1}
 front = docker run --rm -u $(CUID):$(CGID) -v $(shell pwd)/web/themes/$(THEME_NAME):/work $(IMAGE_FRONT) ${1}
 
-all: | include net build install info
+all: | include prepare install si info
 
 include:
 ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
@@ -28,38 +28,28 @@ ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
 $(error Project name can not be default, please edit ".env" and set COMPOSE_PROJECT_NAME variable.)
 endif
 
-build: stop
+prepare:
 	mkdir -p /dev/shm/${COMPOSE_PROJECT_NAME}_mysql
-
-install:
-	@echo "Updating containers..."
-	docker-compose pull --parallel
-	@echo "Build and run containers..."
-	docker-compose up -d
+	make -s down
+	make -s up
 	$(call php-0, apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community git)
 	$(call php-0, kill -USR2 1)
 	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
-	make -s reinstall
 
-reinstall:
-	$(call php, composer install --prefer-dist -o)
+install:
+	$(call php, composer install --prefer-dist -o --no-dev)
 	$(call php, composer drupal-scaffold)
-	#make -s front
-	make -s si
 
 si:
-	$(call php, chmod +w web/sites/default)
+	$(call php-0, chmod +w web/sites/default)
 ifneq ("$(wildcard web/sites/default/settings.php)","")
-	$(call php, chmod +w web/sites/default/settings.php)
-	$(call php, rm web/sites/default/settings.php)
+	$(call php-0, rm -f web/sites/default/settings.php)
 endif
 	@echo "Installing from: $(PROJECT_INSTALL)"
 ifeq ($(PROJECT_INSTALL), config)
-	#$(call php, drush si config_installer --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y config_installer_sync_configure_form.sync_directory=../config/sync)
-	$(call php, drush si config_installer --db-url=sqlite:///dev/shm/d8.sqlite --account-pass=admin -y config_installer_sync_configure_form.sync_directory=../config/sync)
+	$(call php, drush si config_installer --db-url=$(DB_URL) --account-pass=admin -y config_installer_sync_configure_form.sync_directory=../config/sync)
 else
-	#$(call php, drush si $(PROFILE_NAME) --db-url=mysql://d8:d8@mysql/d8 --account-pass=admin -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
-	$(call php, drush si $(PROFILE_NAME) --db-url=sqlite:///dev/shm/d8.sqlite --account-pass=admin -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
+	$(call php, drush si $(PROFILE_NAME) --db-url=$(DB_URL) --account-pass=admin -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
 endif
 	#$(call php, drush en $(MODULES) -y)
 	#$(call php, drush pmu $(MODULES) -y)
@@ -96,13 +86,13 @@ update-alias:
 
 info:
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_web 2> /dev/null),true)
-	@echo Project IP: $(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_PROJECT_NAME)_front.IPAddress}}' $(COMPOSE_PROJECT_NAME)_web)
+	@echo Project http://$(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}' $(COMPOSE_PROJECT_NAME)_web)
 endif
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_mail 2> /dev/null),true)
-	@echo Mailhog IP: $(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_PROJECT_NAME)_front.IPAddress}}' $(COMPOSE_PROJECT_NAME)_mail)
+	@echo Mailhog http://$(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}' $(COMPOSE_PROJECT_NAME)_mail):8025
 endif
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_adminer 2> /dev/null),true)
-	@echo Adminer IP: $(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_PROJECT_NAME)_front.IPAddress}}' $(COMPOSE_PROJECT_NAME)_adminer)
+	@echo Adminer http://$(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}' $(COMPOSE_PROJECT_NAME)_adminer)
 endif
 
 chown:
@@ -117,25 +107,31 @@ exec:
 exec0:
 	docker-compose exec php ash
 
-stop:
-	@echo "Removing containers for $(COMPOSE_PROJECT_NAME)"
-ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_php 2> /dev/null),true)
-	docker-compose down
-endif
+up: net
+	@echo "Updating containers..."
+	docker-compose pull --parallel
+	@echo "Build and run containers..."
+	docker-compose up -d --remove-orphans
 
-clean: info stop
-	if [ -d "web/core" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/core"; fi
-	if [ -d "web/libraries" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/libraries"; fi
-	if [ -d "web/modules/contrib" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/modules/contrib"; fi
-	if [ -d "web/profiles/contrib" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/profiles/contrib"; fi
-	if [ -d "web/sites" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/sites"; fi
-	if [ -d "web/themes/contrib" ]; then docker run --rm -v $(shell pwd):/mnt skilldlabs/$(IMAGE_PHP) ash -c "rm -rf /mnt/web/themes/contrib"; fi
+down:
+	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
+	@docker-compose down -v --remove-orphans
+
+clean: DIRS := core libraries modules/contrib profiles/contrib sites themes/contrib
+clean: info down
+	@for i in $(DIRS); do if [ -d "web/$$i" ]; then echo "Removing web/$$i..."; docker run --rm -v $(shell pwd):/mnt $(IMAGE_PHP) sh -c "rm -rf /mnt/web/$$i"; fi; done
 
 net:
-ifeq ($(strip $(shell docker network ls | grep $(COMPOSE_PROJECT_NAME))),)
-	docker network create $(COMPOSE_PROJECT_NAME)_front
+ifeq ($(shell docker network ls -q -f Name=$(COMPOSE_NET_NAME)),)
+	docker network create $(COMPOSE_NET_NAME)
 endif
-	@make -s iprange
+ifeq ($(shell grep -c -F 'IPRANGE=' .env), 0)
+#	@echo Define IP range $(net-range)
+	@printf "\nIPRANGE=%s\n" $(shell docker network inspect $(COMPOSE_NET_NAME) --format '{{(index .IPAM.Config 0).Subnet}}') >> .env
+else
+	@if [ '$(IPRANGE)' != '$(shell docker network inspect $(COMPOSE_NET_NAME) --format '{{(index .IPAM.Config 0).Subnet}}')' ]; then echo "Replace IP range $(IPRANGE)"; sed -i "s#IPRANGE=.*#IPRANGE=$(shell docker network inspect $(COMPOSE_NET_NAME) --format '{{(index .IPAM.Config 0).Subnet}}')#" .env; fi;
+endif
+#	grep -q -F 'IPRANGE=' .env || printf "\nIPRANGE=$(shell docker network inspect $(COMPOSE_NET_NAME) --format '{{(index .IPAM.Config 0).Subnet}}')" >> .env
 
 front:
 	@echo "Building front tasks..."
@@ -156,9 +152,6 @@ dev:
 	$(call php, cp sites/example.settings.local.php sites/default/settings.local.php)
 	$(call php, drush en devel devel_generate webform_devel kint -y)
 	$(call php, drush pm-uninstall dynamic_page_cache page_cache -y)
-
-iprange:
-	$(shell grep -q -F 'IPRANGE=' .env || printf "\nIPRANGE=$(shell docker network inspect $(COMPOSE_PROJECT_NAME)_front --format '{{(index .IPAM.Config 0).Subnet}}')" >> .env)
 
 phpcs:
 	docker run --rm \

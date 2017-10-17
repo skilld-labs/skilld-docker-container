@@ -3,7 +3,7 @@ version: "2"
 services:
 
   php:
-    image: skilldlabs/${IMAGE_PHP} # Allowed: 7.0, 5.6.
+    image: ${IMAGE_PHP}
     container_name: "${COMPOSE_PROJECT_NAME}_php"
 #    depends_on:
 #      - mysql
