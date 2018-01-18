@@ -1,4 +1,4 @@
-# skilld-docker-container
+# skilld-docker-template
 
 ---
 
@@ -19,9 +19,9 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 
 2\. Copy __\.env\.default__ to __\.env__
 
-  2\.1\. Set _COMPOSE_PROJECT_NAME_, _PROFILE_NAME_, _THEME_NAME_ variables with values you need
+  2\.1\. Set _COMPOSE_PROJECT_NAME_, _PROFILE_NAME_, _THEME_NAME_ variables with values you need.
 
-  2\.2\. Change _IMAGE_PHP_ in case you need another one
+  2\.2\. Change _IMAGE_PHP_ in case you need another one.
 
 3\. Copy __docker-compose\.override\.yml\.default__ to __docker-compose\.override\.yml__
 
@@ -33,7 +33,7 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 
   4\.1\.1\. Use `make exec` & `composer require` to add required extensions & libraries
 
-  4\.2\. Optionally add custom theme to _web/themes/_
+  4\.2\. Optionally add custom theme to _web/themes/custom_
 
   4\.2\.1\. Uncomment `make -s front` line to allow build of the theme
 
