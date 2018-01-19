@@ -1,3 +1,0 @@
-<?php
-
-$options['r'] = 'web';
