@@ -1,3 +1,6 @@
+# Add utility functions and scripts to the container
+include scripts/makefile/*.mk
+
 .PHONY: all up down cex cim prepare install si exec info phpcs phpcbf
 
 # Read project name from .env file
@@ -20,6 +23,7 @@ php = docker-compose exec -T --user $(CUID):$(CGID) php time ${1}
 php-0 = docker-compose exec -T php time ${1}
 front = docker run --rm -u $(CUID):$(CGID) -v $(shell pwd)/web/themes/$(THEME_NAME):/work $(IMAGE_FRONT) ${1}
 
+## Full site install from the scratch
 all: | include prepare install si info
 
 include:
@@ -40,6 +44,7 @@ install:
 	$(call php, composer install --prefer-dist -o --no-dev)
 	$(call php, composer drupal-scaffold)
 
+## Reinstall site
 si:
 	$(call php-0, chmod +w web/sites/default)
 ifneq ("$(wildcard web/sites/default/settings.php)","")
@@ -59,6 +64,7 @@ endif
 	#make -s _local-settings
 	make -s info
 
+## Update locale
 locale-update:
 	$(call php, drush locale-check)
 	$(call php, drush locale-update)
@@ -69,6 +75,7 @@ _local-settings:
 	$(call php, cp settings/settings.local.php web/sites/default/settings.local.php)
 	$(call php-0, sed -i "/settings.local.php';/s/# //g" web/sites/default/settings.php)
 
+## Execute config export to config/sync directory
 cex:
 	$(call php, drush cex -y)
 ifneq ($(PROJECT_INSTALL), config)
@@ -76,6 +83,7 @@ ifneq ($(PROJECT_INSTALL), config)
 	cp -R web/$(shell docker-compose exec -T --user $(CUID):$(CGID) php drush ev 'echo substr(\Drupal::service("config.storage.sync")->getFilePath("drush"), 0, -10);')/* config/sync
 endif
 
+## Execute config import from config/sync directory
 cim:
 	$(call php, drush cr)
 	$(call php, drush cim -y)
@@ -84,6 +92,7 @@ update-alias:
 	$(call php, drush pag canonical_entities:node update)
 	$(call php, drush cr)
 
+## Project's containers information
 info:
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_web 2> /dev/null),true)
 	@echo Project http://$(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}' $(COMPOSE_PROJECT_NAME)_web)
@@ -101,9 +110,11 @@ chown:
 # Need this to fix files folder
 	$(call php-0, /bin/sh -c "chown www-data: /var/www/html/web/sites/default/files -R")
 
+## Run shell in PHP container as CUID:CGID user
 exec:
 	docker-compose exec --user $(CUID):$(CGID) php ash
 
+## Run shel in PHP container as root
 exec0:
 	docker-compose exec php ash
 
@@ -117,6 +128,7 @@ down:
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
 	@docker-compose down -v --remove-orphans
 
+## Totally remove project build folder, docker containers and network
 clean: DIRS := core libraries modules/contrib profiles/contrib sites themes/contrib
 clean: info down
 	@for i in $(DIRS); do if [ -d "web/$$i" ]; then echo "Removing web/$$i..."; docker run --rm -v $(shell pwd):/mnt $(IMAGE_PHP) sh -c "rm -rf /mnt/web/$$i"; fi; done
@@ -153,6 +165,7 @@ dev:
 	$(call php, drush en devel devel_generate webform_devel kint -y)
 	$(call php, drush pm-uninstall dynamic_page_cache page_cache -y)
 
+## Check codebase with phpcs sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards
 phpcs:
 	docker run --rm \
 		-v $(shell pwd)/web/profiles/$(PROFILE_NAME):/work/profile \
@@ -171,6 +184,7 @@ phpcs:
 		--extensions=js \
 		--ignore=*.css,*.md,libraries/*,styleguide/* .
 
+## Fix codebase according to Drupal standards https://www.drupal.org/docs/develop/standards
 phpcbf:
 	docker run --rm \
 		-v $(shell pwd)/web/profiles/$(PROFILE_NAME):/work/profile \
