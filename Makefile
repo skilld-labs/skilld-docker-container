@@ -32,6 +32,7 @@ prepare:
 	mkdir -p /dev/shm/${COMPOSE_PROJECT_NAME}_mysql
 	make -s down
 	make -s up
+	make -s fix-user
 	$(call php-0, apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community git)
 	$(call php-0, kill -USR2 1)
 	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
@@ -83,6 +84,10 @@ cim:
 update-alias:
 	$(call php, drush pag canonical_entities:node update)
 	$(call php, drush cr)
+
+## Set www-data user in PHP container to CUID:CGID, renaming existent user and group if necessary
+fix-user:
+	@scripts/fix-user.sh
 
 info:
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_web 2> /dev/null),true)
