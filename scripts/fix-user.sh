@@ -7,7 +7,9 @@ CGROUP=${4:-www-data}
 COMMAND_PREFIX=${5:-'docker-compose exec -T php '}
 echo Setting User ${CUSER} = ${CUID} and Group ${CGROUP} = ${CGID}
 
-if [[ $(${COMMAND_PREFIX} grep -c ${CUSER}:x:${CUID}:${CGID} /etc/passwd) == 1 ]]; then
+if [[ (${CUID} == 0) || (${CGID} == 0) ]]; then
+    echo It is prohibited to change UID or GID for user 0
+elif [[ $(${COMMAND_PREFIX} grep -c ${CUSER}:x:${CUID}:${CGID} /etc/passwd) == 1 ]]; then
     echo ${CUSER} already is ${CUID}:${CGID}. No needs to modify users inside container.
 else
     set -x
