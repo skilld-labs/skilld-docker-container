@@ -16,8 +16,7 @@ LOCAL_GID := $(shell id -g)
 CUID ?= $(LOCAL_UID)
 CGID ?= $(LOCAL_GID)
 
-# Prepare network name https://github.com/docker/compose/issues/2923
-COMPOSE_NET_NAME := $(shell echo $(COMPOSE_PROJECT_NAME) | tr '[:upper:]' '[:lower:]'| sed -E 's/[^a-z0-9]+//g')_front
+COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 
 php = docker-compose exec -T --user $(CUID):$(CGID) php time ${1}
 php-0 = docker-compose exec -T php time ${1}
@@ -95,13 +94,13 @@ update-alias:
 ## Project's containers information
 info:
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_web 2> /dev/null),true)
-	@echo Project http://$(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}' $(COMPOSE_PROJECT_NAME)_web)
+	@echo Project http://$(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}' $(COMPOSE_PROJECT_NAME)_web)
 endif
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_mail 2> /dev/null),true)
-	@echo Mailhog http://$(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}' $(COMPOSE_PROJECT_NAME)_mail):8025
+	@echo Mailhog http://$(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}' $(COMPOSE_PROJECT_NAME)_mail):8025
 endif
 ifeq ($(shell docker inspect --format="{{ .State.Running }}" $(COMPOSE_PROJECT_NAME)_adminer 2> /dev/null),true)
-	@echo Adminer http://$(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}' $(COMPOSE_PROJECT_NAME)_adminer)
+	@echo Adminer http://$(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}' $(COMPOSE_PROJECT_NAME)_adminer)
 endif
 
 chown:
@@ -120,7 +119,7 @@ exec0:
 
 up: net
 	@echo "Updating containers..."
-	docker-compose pull --parallel
+	docker-compose pull
 	@echo "Build and run containers..."
 	docker-compose up -d --remove-orphans
 
