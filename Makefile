@@ -4,8 +4,8 @@ include scripts/makefile/*.mk
 .PHONY: all up down cex cim prepare install si exec info phpcs phpcbf
 
 # Read project name from .env file
-$(shell cp -n \.env.default \.env)
-$(shell cp -n \.\/docker\/docker-compose\.override\.yml\.default \.\/docker\/docker-compose\.override\.yml)
+$(shell false | cp -i \.env.default \.env 2>/dev/null)
+$(shell false | cp -i \.\/docker\/docker-compose\.override\.yml\.default \.\/docker\/docker-compose\.override\.yml 2>/dev/null)
 include .env
 
 # Get local values only once.
