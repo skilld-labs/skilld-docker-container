@@ -33,7 +33,7 @@ services:
 
   mysql:
     volumes:
-      - ${SHARED_FOLDER}/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:cached
+      - ${MYSQL_DATA_DIR}/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:cached
 
 
   nginx:

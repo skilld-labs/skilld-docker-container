@@ -32,7 +32,7 @@ $(error Project name can not be default, please edit ".env" and set COMPOSE_PROJ
 endif
 
 prepare:
-	mkdir -p ${SHARED_FOLDER}/${COMPOSE_PROJECT_NAME}_mysql
+	mkdir -p ${MYSQL_DATA_DIR}/${COMPOSE_PROJECT_NAME}_mysql
 	make -s down
 	make -s up
 	$(call php-0, apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community git)
