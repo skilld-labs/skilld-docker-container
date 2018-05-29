@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for Skilld installation profile.
+ */
+
+use Drupal\shortcut\Entity\Shortcut;
+use Drupal\user\Entity\User;
+use Drupal\user\RoleInterface;
+
+/**
+ * Implements hook_install().
+ *
+ * Performs actions to set up the site for this profile.
+ *
+ * @see system_install()
+ */
+function sdd_install() {
+  $config_factory = \Drupal::configFactory();
+  // Set front page to "node".
+  $config_factory->getEditable('system.site')
+    ->set('page.front', '/node')
+    ->save(TRUE);
+
+  // Allow visitor account creation with administrative approval.
+  $user_settings = $config_factory->getEditable('user.settings');
+  $user_settings
+    ->set('register', USER_REGISTER_VISITORS)
+    ->save(TRUE);
+
+  // Disable the user pictures on nodes.
+  $config_factory->getEditable('system.theme.global')
+    ->set('features.node_user_picture', FALSE)
+    ->save(TRUE);
+
+  // Disable field prefix.
+  $config_factory->getEditable('field_ui.settings')
+    ->set('field_prefix', '')
+    ->save(TRUE);
+
+  // Assign user 1 the "administrator" role.
+  $user = User::load(1);
+  $user->roles[] = 'administrator';
+  $user->save();
+
+  // Allow authenticated users to use shortcuts.
+  user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access shortcuts']);
+
+  // Populate the default shortcut set.
+  $shortcut = Shortcut::create([
+    'shortcut_set' => 'default',
+    'title' => t('Add content'),
+    'weight' => -20,
+    'link' => ['uri' => 'internal:/node/add'],
+  ]);
+  $shortcut->save();
+
+  // Enable the admin theme for content create/edit pages.
+  $config_factory->getEditable('node.settings')
+    ->set('use_admin_theme', TRUE)
+    ->save(TRUE);
+}
