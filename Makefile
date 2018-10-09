@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all up down cex cim prepare install si exec info phpcs phpcbf
+.PHONY: all up down cex cim prepare install si exec info phpcs phpcbf drush
 
 # Read project name from .env file
 $(shell false | cp -i \.env.default \.env 2>/dev/null)
@@ -158,11 +158,23 @@ lint:
 
 dev:
 	@echo "Dev tasks..."
-	$(call php, chmod -R 777 sites/default/files)
-	$(call php, cp sites/default/default.services.yml sites/default/services.yml)
-	$(call php, cp sites/example.settings.local.php sites/default/settings.local.php)
+	$(call php, composer install --prefer-dist -o)
+	$(call php-0, chmod -R 777 web/sites/default)
+	$(call php, cp web/sites/default/default.services.yml web/sites/default/services.yml)
+	$(call php, sed -i -e 's/debug: false/debug: true/g' web/sites/default/services.yml)
+	$(call php, cp web/sites/example.settings.local.php web/sites/default/settings.local.php)
+	$(call php, drush -y config-set system.performance css.preprocess 0)
+	$(call php, drush -y config-set system.performance js.preprocess 0)
 	$(call php, drush en devel devel_generate webform_devel kint -y)
 	$(call php, drush pm-uninstall dynamic_page_cache page_cache -y)
+	$(call php, drush cr)
+
+drush:
+	$(call php, drush $(filter-out $@,$(MAKECMDGOALS)))
+
+# https://stackoverflow.com/a/6273809/1826109
+%:
+	@:
 
 ## Check codebase with phpcs sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards
 phpcs:
