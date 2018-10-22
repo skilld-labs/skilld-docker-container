@@ -112,8 +112,10 @@
     "composer-exit-on-patch-failure": true,
     "patches": {
       "drupal/core": {
-        "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2018-10-09/2731991-34.patch",
-        "Programmatically created translatable content type returns SQL error on content creation": "https://www.drupal.org/files/issues/2599228-31.patch"
+        "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2731991-28.patch",
+        "Number widget validation can break AJAX actions": "https://www.drupal.org/files/issues/2614250-40.patch",
+        "Programmatically created translatable content type returns SQL error on content creation": "https://www.drupal.org/files/issues/2599228-31.patch",
+        "ajax.js insert command sometimes wraps content in a div, potentially producing invalid HTML and other bugs": "https://www.drupal.org/files/issues/736066-322.patch"
       },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
