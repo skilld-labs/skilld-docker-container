@@ -1,7 +1,5 @@
-.directory
 .env
 .idea/
-.directory
 nbproject
 .buildpath
 .settings

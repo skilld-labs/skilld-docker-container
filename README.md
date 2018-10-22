@@ -1,4 +1,4 @@
-# skilld-docker-template
+# skilld-docker-container
 
 ---
 
@@ -19,9 +19,9 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 
 2\. Copy __\.env\.default__ to __\.env__
 
-  2\.1\. Set _COMPOSE_PROJECT_NAME_, _PROFILE_NAME_, _THEME_NAME_ variables with values you need.
+  2\.1\. Set _COMPOSE_PROJECT_NAME_, _PROFILE_NAME_, _THEME_NAME_ variables with values you need
 
-  2\.2\. Change _IMAGE_PHP_ in case you need another one.
+  2\.2\. Change _IMAGE_PHP_ in case you need another one
 
 3\. Copy __docker-compose\.override\.yml\.default__ to __docker-compose\.override\.yml__
 
@@ -33,7 +33,7 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 
   4\.1\.1\. Use `make exec` & `composer require` to add required extensions & libraries
 
-  4\.2\. Optionally add custom theme to _web/themes/custom_
+  4\.2\. Optionally add custom theme to _web/themes/_
 
   4\.2\.1\. Uncomment `make -s front` line to allow build of the theme
 
@@ -51,7 +51,8 @@ For Linux install <a href="https://docs.docker.com/compose/install/" target="_bl
 * `make chown` - Change permissions inside container. Use it in case you can not access files in _build_. folder from your machine.
 * `make exec` - docker exec into php container.
 * `make exec0` - docker exec into php container as root.
-* `make devel` - Devel + kint setup, and config for Twig debug mode.
+* `make dev` - Devel + kint setup, and config for Twig debug mode, disable aggregation.
+* `make drush [command]` - execute drush command. 
 * `make phpcs` - check codebase with `phpcs` sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards.
 * `make phpcbf` - fix codebase according to Drupal standards https://www.drupal.org/docs/develop/standards.
 * `make cex` - executes config export to `config/sync` directory.
