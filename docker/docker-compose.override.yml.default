@@ -1,4 +1,4 @@
-version: "2"
+version: "2.1"
 
 services:
 
@@ -16,7 +16,7 @@ services:
 #    volumes:
 #    - ../../mysql:/var/lib/mysql:Z
 # On for linux machines use ramfs, make sure to create the directory first.
-#    - /dev/shm/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:Z
+#    - ${MYSQL_BASE_PATH}/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:Z
 
 #  adminer:
 #    image: dockette/adminer:mysql-php7

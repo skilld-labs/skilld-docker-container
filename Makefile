@@ -17,6 +17,7 @@ CUID ?= $(LOCAL_UID)
 CGID ?= $(LOCAL_GID)
 
 COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
+MYSQL_DATADIR := $(MYSQL_BASE_PATH)/$(COMPOSE_PROJECT_NAME)_mysql
 
 php = docker-compose exec -T --user $(CUID):$(CGID) php time ${1}
 php-0 = docker-compose exec -T php time ${1}
@@ -32,10 +33,10 @@ $(error Project name can not be default, please edit ".env" and set COMPOSE_PROJ
 endif
 
 prepare:
-	mkdir -p /dev/shm/${COMPOSE_PROJECT_NAME}_mysql
+	mkdir -p $(MYSQL_DATADIR)
 	make -s down
 	make -s up
-	$(call php-0, apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community git)
+	$(call php-0, apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community graphicsmagick)
 	$(call php-0, kill -USR2 1)
 	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
 
@@ -131,6 +132,7 @@ down:
 clean: DIRS := core libraries modules/contrib profiles/contrib sites themes/contrib
 clean: info down
 	@for i in $(DIRS); do if [ -d "web/$$i" ]; then echo "Removing web/$$i..."; docker run --rm -v $(shell pwd):/mnt $(IMAGE_PHP) sh -c "rm -rf /mnt/web/$$i"; fi; done
+	@if [ -d $(MYSQL_DATADIR) ]; then echo "Removing mysql data $(MYSQL_DATADIR)..."; docker run --rm -v $(MYSQL_BASE_PATH):/mnt/2rm $(IMAGE_PHP) sh -c "rm -rf /mnt/2rm/$(COMPOSE_PROJECT_NAME)_mysql"; fi
 
 net:
 ifeq ($(shell docker network ls -q -f Name=$(COMPOSE_NET_NAME)),)
@@ -140,7 +142,7 @@ ifeq ($(shell grep -c -F 'IPRANGE=' .env), 0)
 #	@echo Define IP range $(net-range)
 	@printf "\nIPRANGE=%s\n" $(shell docker network inspect $(COMPOSE_NET_NAME) --format '{{(index .IPAM.Config 0).Subnet}}') >> .env
 else
-	@if [ '$(IPRANGE)' != '$(shell docker network inspect $(COMPOSE_NET_NAME) --format '{{(index .IPAM.Config 0).Subnet}}')' ]; then echo "Replace IP range $(IPRANGE)"; sed -i "s#IPRANGE=.*#IPRANGE=$(shell docker network inspect $(COMPOSE_NET_NAME) --format '{{(index .IPAM.Config 0).Subnet}}')#" .env; fi;
+#	@if [ '$(IPRANGE)' != '$(shell docker network inspect $(COMPOSE_NET_NAME) --format '{{(index .IPAM.Config 0).Subnet}}')' ]; then echo "Replace IP range $(IPRANGE)"; sed -i "s#IPRANGE=.*#IPRANGE=$(shell docker network inspect $(COMPOSE_NET_NAME) --format '{{(index .IPAM.Config 0).Subnet}}')#" .env; fi;
 endif
 #	grep -q -F 'IPRANGE=' .env || printf "\nIPRANGE=$(shell docker network inspect $(COMPOSE_NET_NAME) --format '{{(index .IPAM.Config 0).Subnet}}')" >> .env
 
@@ -159,7 +161,7 @@ lint:
 dev:
 	@echo "Dev tasks..."
 	$(call php, composer install --prefer-dist -o)
-	$(call php-0, chmod -R 777 web/sites/default)
+	$(call php-0, chmod +w web/sites/default)
 	$(call php, cp web/sites/default/default.services.yml web/sites/default/services.yml)
 	$(call php, sed -i -e 's/debug: false/debug: true/g' web/sites/default/services.yml)
 	$(call php, cp web/sites/example.settings.local.php web/sites/default/settings.local.php)
