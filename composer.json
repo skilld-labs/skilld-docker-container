@@ -113,7 +113,7 @@
     "patches": {
       "drupal/core": {
         "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2018-10-09/2731991-34.patch",
-        "Programmatically created translatable content type returns SQL error on content creation": "https://www.drupal.org/files/issues/2599228-31.patch"
+        "Programmatically created translatable content type returns SQL error on content creation": "https://www.drupal.org/files/issues/2018-10-06/2599228-74.patch"
       },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
