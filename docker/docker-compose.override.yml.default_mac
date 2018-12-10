@@ -1,0 +1,44 @@
+version: "2"
+
+services:
+
+# Override base service.
+  php:
+    volumes:
+      - ../../build:/var/www/html:cached
+      - ../${PROFILE_NAME}:/var/www/html/profiles/${PROFILE_NAME}:cached
+      - ../modules:/var/www/html/modules/custom:cached
+      - ../themes:/var/www/html/themes/custom:cached
+      - "./90-mail.ini:/etc/php${PHP_VERSION}/conf.d/90-mail.ini:cached"
+      - ../../config/sync:/var/www/html/sync:cached
+# Uncomment next line if you need PHP XDebug.
+#    command: php-fpm7 -F -d zend_extension=xdebug.so
+
+#  adminer:
+#    image: dockette/adminer:mysql-php7
+#    container_name: "${COMPOSE_PROJECT_NAME}_adminer"
+#    links:
+#      - mysql:mysql
+#    depends_on:
+#      - mysql
+#    networks:
+#      - front
+
+  mailhog:
+    image: skilldlabs/mailhog
+    container_name: "${COMPOSE_PROJECT_NAME}_mail"
+    restart: always
+    networks:
+      - front
+
+  mysql:
+    volumes:
+      - ${MYSQL_DATA_DIR}/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:cached
+
+
+  nginx:
+    ports:
+      - "8086:80"
+# Mount local folder with ssl keys.
+#    volumes:
+#     - ./nginx/ssl:/etc/nginx/ssl:Z
