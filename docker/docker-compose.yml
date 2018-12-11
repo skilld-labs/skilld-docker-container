@@ -5,8 +5,6 @@ services:
   php:
     image: ${IMAGE_PHP}
     container_name: "${COMPOSE_PROJECT_NAME}_php"
-#    depends_on:
-#      - mysql
     volumes:
       - ../:/var/www/html:z
       - ../drush/.drushrc.php:/home/www-data/.drushrc.php:z
@@ -15,7 +13,7 @@ services:
       - front
 
   nginx:
-    image: skilldlabs/nginx:1.14.1
+    image: ${IMAGE_NGINX}
     container_name: "${COMPOSE_PROJECT_NAME}_web"
     depends_on:
       - php
@@ -25,24 +23,6 @@ services:
     networks:
       - front
 
-#  mysql:
-#    image: percona:5.7
-#    container_name: "${COMPOSE_PROJECT_NAME}_mysql"
-#    volumes:
-#      - /dev/shm/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:Z
-#    environment:
-#      MYSQL_DATABASE: d8
-#      MYSQL_USER: d8
-#      MYSQL_PASSWORD: d8
-#      MYSQL_ROOT_PASSWORD: d8root
-#    restart: always
-#    networks:
-#      - front
-
 networks:
   front:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: "${IPRANGE}"
