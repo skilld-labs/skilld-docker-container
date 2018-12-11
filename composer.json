@@ -2,7 +2,7 @@
   "name": "skilld-labs/drupal-project",
   "description": "Project template for Drupal 8 projects with composer",
   "type": "project",
-  "license": "GPL-2.0+",
+  "license": "MIT",
   "authors": [
     {
       "name": "",
@@ -17,53 +17,37 @@
     {
       "type": "package",
       "package": {
-        "name": "ckeditor/colorbutton",
-        "version": "4.6.1",
-        "type": "drupal-library",
-        "dist": {
-          "url": "http://download.ckeditor.com/colorbutton/releases/colorbutton_4.6.1.zip",
-          "type": "zip"
-        }
-      }
-    },
-    {
-      "type": "package",
-      "package": {
         "name": "ckeditor/panelbutton",
-        "version": "4.6.1",
+        "version": "4.10.1",
         "type": "drupal-library",
         "dist": {
-          "url": "http://download.ckeditor.com/panelbutton/releases/panelbutton_4.6.1.zip",
+          "url": "https://download.ckeditor.com/panelbutton/releases/panelbutton_4.10.1.zip",
           "type": "zip"
         }
       }
     }
   ],
   "require": {
-    "ckeditor/colorbutton": "^4.6",
-    "ckeditor/panelbutton": "^4.6",
+    "ckeditor/panelbutton": "^4.10",
     "composer/installers": "^1.2",
     "cweagans/composer-patches": "^1.6.5",
     "drupal-composer/drupal-scaffold": "^2.5",
     "drupal/admin_toolbar": "^1",
-    "drupal/colorbutton": "^1",
     "drupal/components": "^1",
     "drupal/config_installer": "^1",
-    "drupal/core": "^8.6.3",
+    "drupal/core": "^8.6.7",
     "drupal/default_content": "^1",
-    "drupal/ds": "^3",
     "drupal/file_entity": "^2",
     "drupal/panelbutton": "^1",
     "drupal/styleguide": "^1",
     "drupal/swiftmailer": "^1",
     "drupal/token": "^1",
-    "neitanod/forceutf8": "2.0.*",
-    "webflo/drupal-finder": "^1.0.0",
+    "webflo/drupal-finder": "^1.1",
     "webmozart/path-util": "^2.3",
-    "wikimedia/composer-merge-plugin": "^1.4"
+    "wikimedia/composer-merge-plugin": "^1.4",
+    "zaporylie/composer-drupal-optimizations": "^1.0"
   },
   "require-dev": {
-    "drupal/devel": "^1.2"
   },
   "conflict": {
     "drupal/drupal": "*"
@@ -80,17 +64,15 @@
   },
   "scripts": {
     "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
+    "create-required-files": "SkilldDrupal\\composer\\ScriptHandler::createRequiredFiles",
+    "list-scaffold-files": [
+      "SkilldDrupal\\composer\\ScriptHandler::listScaffoldFiles"
+    ],
     "pre-install-cmd": [
-      "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+      "SkilldDrupal\\composer\\ScriptHandler::checkComposerVersion"
     ],
     "pre-update-cmd": [
-      "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
-    ],
-    "post-install-cmd": [
-      "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
-    ],
-    "post-update-cmd": [
-      "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
+      "SkilldDrupal\\composer\\ScriptHandler::checkComposerVersion"
     ]
   },
   "extra": {
@@ -101,6 +83,12 @@
       "web/profiles/contrib/{$name}": ["type:drupal-profile"],
       "web/themes/contrib/{$name}": ["type:drupal-theme"],
       "drush/contrib/{$name}": ["type:drupal-drush"]
+    },
+    "drupal-scaffold": {
+      "initial": {
+        ".editorconfig": "../.editorconfig",
+        ".gitattributes": "../.gitattributes"
+      }
     },
     "composer-exit-on-patch-failure": true,
     "patches": {

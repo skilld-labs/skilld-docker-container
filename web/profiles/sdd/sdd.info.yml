@@ -7,7 +7,7 @@ dependencies:
 # Core
 #  - action
 #  - aggregator
-#  - automated_cron
+  - automated_cron
 #  - ban
 #  - basic_auth
 #  - big_pipe
@@ -17,13 +17,13 @@ dependencies:
 #  - book
   - breakpoint
   - ckeditor
-#  - color
+  - color
 #  - comment
   - config #comment in prod
-#  - config_translation
+  - config_translation
 #  - contact
 #  - content_moderation
-#  - content_translation
+  - content_translation
   - contextual
   - datetime
 #  - datetime_range
@@ -41,10 +41,11 @@ dependencies:
 #  - history
   - image
 #  - inline_form_errors
-#  - language
+  - language
   - layout_discovery
   - link
-#  - locale
+  - locale
+#  - media
   - menu_link_content
   - menu_ui
 #  - migrate
@@ -67,7 +68,7 @@ dependencies:
 #  - syslog
   - system
   - taxonomy
-#  - telephone
+  - telephone
   - text
   - toolbar
 #  - tour
@@ -77,8 +78,8 @@ dependencies:
   - views
   - views_ui #comment in prod
 # Contrib modules
-  - admin_toolbar
-  - components
+#  - admin_toolbar
+#  - components
 # Custom modules
 #  - sdd_default_content
 
