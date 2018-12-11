@@ -1,4 +1,4 @@
-version: "2"
+version: "2.1"
 
 services:
 
@@ -15,14 +15,12 @@ services:
       - front
 
   nginx:
-    image: skilldlabs/nginx:1.10.1
+    image: skilldlabs/nginx:1.14.1
     container_name: "${COMPOSE_PROJECT_NAME}_web"
     depends_on:
       - php
     volumes_from:
       - php
-    volumes:
-      - ./drupal8.conf:/etc/nginx/conf.d/drupal8.conf:z
     restart: always
     networks:
       - front
