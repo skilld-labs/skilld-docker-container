@@ -126,7 +126,7 @@ up: net
 
 down:
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
-	@docker-compose down -v --remove-orphans
+	@docker-compose down -v --remove-orphans --rmi local
 
 ## Totally remove project build folder, docker containers and network
 clean: DIRS := core libraries modules/contrib profiles/contrib sites themes/contrib
