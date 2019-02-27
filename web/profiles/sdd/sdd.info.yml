@@ -82,6 +82,7 @@ dependencies:
 #  - components
 # Custom modules
 #  - sdd_default_content
+  - skilld_lang_dropdown
 
 themes:
   - bartik
