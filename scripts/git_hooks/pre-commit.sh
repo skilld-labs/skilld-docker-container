@@ -43,7 +43,7 @@ then
 	done
 	if [ $FAIL -eq 1 ]
 	then
-		echo "$MESSAGE_OUTPUT \n\n\e[33mBase configs should always be in same language as default site language.\e[0m\n\n${bold}\e[31mCOMMIT REJECTED!${normal}\e[0m\n"
+		echo "$MESSAGE_OUTPUT \n\n\e[33mBase configs should always be in same language as default site language.\e[0m\n\n${bold}\e[31mCOMMIT REJECTED!${normal}\e[0m\nTo bypass validation, use git commit --no-verify\n""
 	else
 		echo "\e[33mLangage of all base config files is matching default site language. You are good to go!\e[0m\n"
 	fi
