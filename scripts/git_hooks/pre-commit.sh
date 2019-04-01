@@ -14,7 +14,7 @@ then
 	printf "\nsystem.site.yml file exists\n"
 
 	# Display the site settings config file (if it exists) + save it in a variable
-	SITE_SETTINGS_FILE_PATH=$(find config/sync -type f -name "system.site.yml")
+	SITE_SETTINGS_FILE_PATH=$(find config/sync -maxdepth 1 -type f -name "system.site.yml")
 	printf "Its path is : $SITE_SETTINGS_FILE_PATH\n"
 
 	# Display Drupal default language as defined in the site settings config file + save it in a variable
