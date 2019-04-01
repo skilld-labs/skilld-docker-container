@@ -1,14 +1,10 @@
 #!/usr/bin/env sh
 
-# pre-commit.sh
-STASH_NAME="pre-commit-$(date +%s)"
-git stash save -q --keep-index $STASH_NAME
-
 # Bold and normal formating
 bold=$(tput bold)
 normal=$(tput sgr0)
 
-# langcode logic
+# Checking langcode of base config files
 if [ -r config/sync/system.site.yml ]
 then
 	printf "\nsystem.site.yml file exists\n"
@@ -51,10 +47,4 @@ then
 else
 	echo "system.site.yml file does not exist, nothing to check here"
 	exit 0
-fi
-
-# post-commit.sh
-STASHES=$(git stash list)
-if [[ $STASHES == "$STASH_NAME" ]]; then
-  git stash pop -q
 fi
