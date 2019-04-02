@@ -19,10 +19,6 @@ then
 
 	# Display the language defined in each of the basic config files + save them in a variable
 	LANG_VALUE_IN_BASE_CONFIG_FILES=$(awk '$1 ~ /^langcode/ { print $NF }' config/sync/*.yml | grep -wE '\w{1,2}' | sort | uniq)
-	#printf "LANG_VALUE_IN_BASE_CONFIG_FILES :\n$LANG_VALUE_IN_BASE_CONFIG_FILES\n\n"
-
-	# NAME_OF_BASE_CONFIG_FILES=$(grep -R 'langcode' config/sync/*.yml -l)
-	#printf "NAME_OF_BASE_CONFIG_FILES :\n$NAME_OF_BASE_CONFIG_FILES\n\n"
 
 	printf "\e[33mChecking lang for each file...\e[0m\n"
 	# Defining value of MESSAGE_OUTPUT variable
