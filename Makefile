@@ -41,6 +41,9 @@ phpcsexec = docker run --rm \
 	--ignore=*.css,libraries/*,dist/*,styleguide/* \
 	.
 
+$(info Installing git hooks)
+$(shell ln -sfn ../../scripts/git_hooks/pre-commit.sh .git/hooks/pre-commit)
+
 ## Full site install from the scratch
 all: | provision composer si info
 

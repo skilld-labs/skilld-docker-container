@@ -124,6 +124,11 @@ networks:
 
 * Use our <a href="https://github.com/skilld-labs/skilld-docker-container/issues">issue queue</a>, which is public, to search or add new issues.  
 
+## Git hooks
+
+* Project includes pre-commit [git hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) to perform automatic checks when `git commit` is executed
+* You can bypass these checks by running `git commit --no-verify`
+
 ## License
 
 This project is licensed under the MIT open source license.
