@@ -15,7 +15,7 @@ then
 	DEFAULT_SITE_LANG_VALUE=$(awk -v pattern="default_langcode" '$1 ~ pattern { print $NF }' config/sync/system.site.yml)
 
 	# Get the language defined in each of the basic config files + save them in a variable
-	LANG_VALUE_IN_BASE_CONFIG_FILES=$(awk '$1 ~ /^langcode/ { print $NF }' config/sync/*.yml | grep -wE '\w{1,2}' | sort | uniq)
+	LANG_VALUE_IN_BASE_CONFIG_FILES=$(grep -e "^langcode:" config/sync/*.yml | awk '{print $2}' | sort | uniq)
 
 	# Defining value of MESSAGE_OUTPUT variable
 	MESSAGE_OUTPUT="\n${bold}The language of some base config files is NOT matching site default language ${normal}(\e[32m$DEFAULT_SITE_LANG_VALUE\e[0m) :"
