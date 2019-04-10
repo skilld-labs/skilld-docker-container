@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush check hooksymlink hookexec
+.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink hookexec
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -158,7 +158,6 @@ else
 	@echo "scripts/git_hooks/pre-commit.sh file does not exist"
 endif
 
-
 ## Execute git hooks
 hookexec:
 ifneq ("$(wildcard scripts/git_hooks/pre-commit.sh)","")
@@ -167,3 +166,14 @@ ifneq ("$(wildcard scripts/git_hooks/pre-commit.sh)","")
 else
 	@echo "scripts/git_hooks/pre-commit.sh file does not exist"
 endif
+
+## Inspect configuration
+cinsp:
+	@echo "Config schema validation..."
+	@$(call php, drush -y en config_inspector)
+	@$(eval SCHEMA_ERRORS = $(shell docker-compose exec -T --user $(CUID):$(CGID) php drush inspect_config --only-error))
+	@$(call php, drush -y pmu config_inspector)
+	@if [ ! -z "$(SCHEMA_ERRORS)" ]; then echo "Error(s) in config schemas"; exit 1; fi
+
+## Full inspection
+insp: | cinsp phpcs
