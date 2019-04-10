@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink hookexec
+.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink insp clang
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -158,13 +158,13 @@ else
 	@echo "scripts/git_hooks/pre-commit.sh file does not exist"
 endif
 
-## Execute git hooks
-hookexec:
-ifneq ("$(wildcard scripts/git_hooks/pre-commit.sh)","")
-	@echo "Executing git hooks"
-	@/bin/sh ./scripts/git_hooks/pre-commit.sh
+## Validate langcode of base config files
+clang:
+ifneq ("$(wildcard scripts/makefile/baseconfig-langcode.sh)","")
+	@echo "Base config langcode validation..."
+	@/bin/sh ./scripts/makefile/baseconfig-langcode.sh
 else
-	@echo "scripts/git_hooks/pre-commit.sh file does not exist"
+	@echo "scripts/makefile/baseconfig-langcode.sh file does not exist"
 endif
 
 ## Inspect configuration
@@ -176,4 +176,4 @@ cinsp:
 	@if [ ! -z "$(SCHEMA_ERRORS)" ]; then echo "Error(s) in config schemas"; exit 1; fi
 
 ## Full inspection
-insp: | cinsp phpcs
+insp: | phpcs clang cinsp
