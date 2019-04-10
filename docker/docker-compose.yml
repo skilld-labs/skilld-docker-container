@@ -23,6 +23,49 @@ services:
     networks:
       - front
 
+#  mysql:
+#    image: percona:5.7.22
+#    container_name: "${COMPOSE_PROJECT_NAME}_mysql"
+#    environment:
+#      MYSQL_DATABASE: d8
+#      MYSQL_USER: d8
+#      MYSQL_PASSWORD: d8
+#      MYSQL_ROOT_PASSWORD: d8root
+#    restart: always
+#    networks:
+#      - front
+
+#  redis:
+#    image: redis:5-alpine
+#    container_name: "${COMPOSE_PROJECT_NAME}_redis"
+#    command: redis-server --requirepass ${REDIS_PASSWD}
+#    restart: always
+#    networks:
+#      - front
+
+#  varnish:
+#    image: skilldlabs/varnish:5.1
+#    container_name: "${COMPOSE_PROJECT_NAME}_varnish"
+#    depends_on:
+#      - nginx
+#    restart: always
+#    networks:
+#      - front
+
+#  solr:
+#    image: solr:6-alpine
+#    container_name: "${COMPOSE_PROJECT_NAME}_solr"
+#    restart: always
+#    volumes:
+#      - ./solr-conf/6.x:/solr-conf/conf
+#    entrypoint:
+#      - docker-entrypoint.sh
+#      - solr-precreate
+#      - apave
+#      - /solr-conf
+#    networks:
+#      - front
+
 networks:
   front:
     driver: bridge
