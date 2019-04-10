@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush check
+.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -158,3 +158,4 @@ cinsp:
 	@$(call php, drush -y pmu config_inspector)
 	@if [ ! -z "$(SCHEMA_ERRORS)" ]; then echo "Error(s) in config schemas"; exit 1; fi
 
+insp: | cinsp phpcs
