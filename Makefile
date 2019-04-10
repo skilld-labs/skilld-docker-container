@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp
+.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink hookexec
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -41,11 +41,9 @@ phpcsexec = docker run --rm \
 	--ignore=*.css,libraries/*,dist/*,styleguide/* \
 	.
 
-$(info Installing git hooks)
-$(shell ln -sfn ../../scripts/git_hooks/pre-commit.sh .git/hooks/pre-commit)
 
 ## Full site install from the scratch
-all: | provision composer si info
+all: | provision composer si hooksymlink info
 
 ## Provision enviroment
 provision:
@@ -151,6 +149,25 @@ phpcs:
 phpcbf:
 	@$(call phpcsexec, phpcbf)
 
+## Add symbolic link from custom script(s) to /.git/hooks/pre-commit
+hooksymlink:
+ifneq ("$(wildcard scripts/git_hooks/pre-commit.sh)","")
+	@echo "Installing git hooks"
+	$(shell ln -sf ../../scripts/git_hooks/pre-commit.sh .git/hooks/pre-commit)
+else
+	@echo "scripts/git_hooks/pre-commit.sh file does not exist"
+endif
+
+## Execute git hooks
+hookexec:
+ifneq ("$(wildcard scripts/git_hooks/pre-commit.sh)","")
+	@echo "Executing git hooks"
+	@/bin/sh ./scripts/git_hooks/pre-commit.sh
+else
+	@echo "scripts/git_hooks/pre-commit.sh file does not exist"
+endif
+
+## Inspect configuration
 cinsp:
 	@echo "Config schema validation..."
 	@$(call php, drush -y en config_inspector)
@@ -158,4 +175,5 @@ cinsp:
 	@$(call php, drush -y pmu config_inspector)
 	@if [ ! -z "$(SCHEMA_ERRORS)" ]; then echo "Error(s) in config schemas"; exit 1; fi
 
+## Full inspection
 insp: | cinsp phpcs
