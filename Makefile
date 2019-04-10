@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush check
+.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -150,3 +150,12 @@ phpcs:
 ## Fix codebase according to Drupal standards https://www.drupal.org/docs/develop/standards
 phpcbf:
 	@$(call phpcsexec, phpcbf)
+
+cinsp:
+	@echo "Config schema validation..."
+	@$(call php, drush -y en config_inspector)
+	@$(eval SCHEMA_ERRORS = $(shell docker-compose exec -T --user $(CUID):$(CGID) php drush inspect_config --only-error))
+	@$(call php, drush -y pmu config_inspector)
+	@if [ ! -z "$(SCHEMA_ERRORS)" ]; then echo "Error(s) in config schemas"; exit 1; fi
+
+insp: | cinsp phpcs
