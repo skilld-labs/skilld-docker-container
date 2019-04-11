@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink hookexec
+.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink insp clang
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -143,6 +143,7 @@ drush:
 
 ## Check codebase with phpcs sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards
 phpcs:
+	@echo "Phpcs validation..."
 	@$(call phpcsexec, phpcs)
 
 ## Fix codebase according to Drupal standards https://www.drupal.org/docs/develop/standards
@@ -158,22 +159,20 @@ else
 	@echo "scripts/git_hooks/pre-commit.sh file does not exist"
 endif
 
-## Execute git hooks
-hookexec:
-ifneq ("$(wildcard scripts/git_hooks/pre-commit.sh)","")
-	@echo "Executing git hooks"
-	@/bin/sh ./scripts/git_hooks/pre-commit.sh
+## Validate langcode of base config files
+clang:
+ifneq ("$(wildcard scripts/makefile/baseconfig-langcode.sh)","")
+	@echo "Base config langcode validation..."
+	@/bin/sh ./scripts/makefile/baseconfig-langcode.sh
 else
-	@echo "scripts/git_hooks/pre-commit.sh file does not exist"
+	@echo "scripts/makefile/baseconfig-langcode.sh file does not exist"
 endif
 
 ## Inspect configuration
 cinsp:
 	@echo "Config schema validation..."
-	@$(call php, drush -y en config_inspector)
-	@$(eval SCHEMA_ERRORS = $(shell docker-compose exec -T --user $(CUID):$(CGID) php drush inspect_config --only-error))
-	@$(call php, drush -y pmu config_inspector)
-	@if [ ! -z "$(SCHEMA_ERRORS)" ]; then echo "Error(s) in config schemas"; exit 1; fi
+	@$(call php, drush config:inspect --only-error)
 
 ## Full inspection
-insp: | cinsp phpcs
+insp: | phpcs clang cinsp
+
