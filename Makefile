@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink insp clang
+.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink insp clang compval
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -173,6 +173,12 @@ cinsp:
 	@echo "Config schema validation..."
 	@$(call php, drush config:inspect --only-error)
 
+## Validate composer.json file
+compval:
+	@echo "Composer.json validation..."
+	@$(call php, composer validate --strict)
+
+
 ## Full inspection
-insp: | phpcs clang cinsp
+insp: | phpcs clang cinsp compval
 
