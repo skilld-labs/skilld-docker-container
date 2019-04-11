@@ -143,6 +143,7 @@ drush:
 
 ## Check codebase with phpcs sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards
 phpcs:
+	@echo "Phpcs validation..."
 	@$(call phpcsexec, phpcs)
 
 ## Fix codebase according to Drupal standards https://www.drupal.org/docs/develop/standards
