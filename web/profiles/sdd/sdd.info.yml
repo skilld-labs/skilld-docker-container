@@ -20,6 +20,7 @@ dependencies:
   - color
 #  - comment
   - config #comment in prod
+  - config_inspector
   - config_translation
 #  - contact
 #  - content_moderation

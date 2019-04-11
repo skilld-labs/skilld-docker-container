@@ -171,10 +171,8 @@ endif
 ## Inspect configuration
 cinsp:
 	@echo "Config schema validation..."
-	@$(call php, drush -y en config_inspector)
-	@$(eval SCHEMA_ERRORS = $(shell docker-compose exec -T --user $(CUID):$(CGID) php drush inspect_config --only-error))
-	@$(call php, drush -y pmu config_inspector)
-	@if [ ! -z "$(SCHEMA_ERRORS)" ]; then echo "Error(s) in config schemas"; exit 1; fi
+	@$(call php, drush config:inspect --only-error)
 
 ## Full inspection
 insp: | phpcs clang cinsp
+
