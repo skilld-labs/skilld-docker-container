@@ -178,7 +178,11 @@ compval:
 	@echo "Composer.json validation..."
 	@$(call php, composer validate --strict)
 
+watchdogval:
+	@echo "Watchdog validation..."
+	@$(call php, /bin/sh ./scripts/makefile/watchdog-validation.sh)
+
 
 ## Full inspection
-insp: | phpcs clang cinsp compval
+insp: | phpcs clang cinsp compval watchdogval
 
