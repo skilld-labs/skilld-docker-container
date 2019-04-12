@@ -168,7 +168,7 @@ else
 	@echo "scripts/makefile/baseconfig-langcode.sh file does not exist"
 endif
 
-## Inspect configuration
+## Validate configuration schema
 cinsp:
 	@echo "Config schema validation..."
 	@$(call php, drush config:inspect --only-error)
@@ -178,8 +178,7 @@ compval:
 	@echo "Composer.json validation..."
 	@$(call php, /bin/sh ./scripts/makefile/composer-validation.sh)
 
-
-
+## Validate watchdog logs
 watchdogval:
 	@echo "Watchdog validation..."
 	@$(call php, /bin/sh ./scripts/makefile/watchdog-validation.sh)
