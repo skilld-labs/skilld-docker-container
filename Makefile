@@ -176,7 +176,9 @@ cinsp:
 ## Validate composer.json file
 compval:
 	@echo "Composer.json validation..."
-	@$(call php, composer validate --strict)
+	@$(call php, /bin/sh ./scripts/makefile/composer-validation.sh)
+
+
 
 watchdogval:
 	@echo "Watchdog validation..."
