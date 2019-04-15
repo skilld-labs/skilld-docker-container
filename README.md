@@ -39,6 +39,7 @@
 
 * Copy **.env.default** to **.env**, more information about enviroment file can be found <a href="https://docs.docker.com/compose/env-file/" target="_blank">docs.docker.com</a>
 * Copy **docker-compose.override.yml.default** to **docker-compose.override.yml**, update parts you want to overwrite.
+  * **docker-compose.yml** contains the base requirements of a working Drupal site. It should not be updated.
 * Run `make all`
  
 
