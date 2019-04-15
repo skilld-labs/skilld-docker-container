@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink insp clang compval watchdogval
+.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink validation clang compval watchdogval
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -159,31 +159,46 @@ else
 	@echo "scripts/git_hooks/pre-commit.sh file does not exist"
 endif
 
+
 ## Validate langcode of base config files
 clang:
 ifneq ("$(wildcard scripts/makefile/baseconfig-langcode.sh)","")
 	@echo "Base config langcode validation..."
-	@/bin/sh ./scripts/makefile/baseconfig-langcode.sh
+	@$(call php, /bin/sh ./scripts/makefile/baseconfig-langcode.sh)
 else
 	@echo "scripts/makefile/baseconfig-langcode.sh file does not exist"
 endif
 
+
 ## Validate configuration schema
 cinsp:
+ifneq ("$(wildcard scripts/makefile/config-inspector-validation.sh)","")
 	@echo "Config schema validation..."
-	@$(call php, drush config:inspect --only-error)
+	@$(call php, /bin/sh ./scripts/makefile/config-inspector-validation.sh)
+else
+	@echo "scripts/makefile/config-inspector-validation.sh file does not exist"
+endif
+
 
 ## Validate composer.json file
 compval:
+ifneq ("$(wildcard scripts/makefile/composer-validation.sh)","")
 	@echo "Composer.json validation..."
 	@$(call php, /bin/sh ./scripts/makefile/composer-validation.sh)
+else
+	@echo "scripts/makefile/composer-validation.sh file does not exist"
+endif
+
 
 ## Validate watchdog logs
 watchdogval:
+ifneq ("$(wildcard scripts/makefile/watchdog-validation.sh)","")
 	@echo "Watchdog validation..."
 	@$(call php, /bin/sh ./scripts/makefile/watchdog-validation.sh)
-
+else
+	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
+endif
 
 ## Full inspection
-insp: | phpcs clang cinsp compval watchdogval
+validation: | phpcs clang cinsp compval watchdogval
 
