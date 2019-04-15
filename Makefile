@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink validation clang compval watchdogval
+.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink validation clang compval watchdogval drupalcheckval
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -199,6 +199,16 @@ else
 	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
 endif
 
+
+## Validate drupal-check
+drupalcheckval:
+ifneq ("$(wildcard scripts/makefile/drupal-check-validation.sh)","")
+	@echo "Drupal-check validation..."
+	@$(call php, /bin/sh ./scripts/makefile/drupal-check-validation.sh)
+else
+	@echo "scripts/makefile/drupal-check-validation.sh file does not exist"
+endif
+
 ## Full inspection
-validation: | phpcs clang cinsp compval watchdogval
+validation: | phpcs clang cinsp compval watchdogval drupalcheckval
 
