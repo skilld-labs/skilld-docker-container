@@ -5,7 +5,7 @@
 LATEST_RELEASE_VERSION_URL=$(curl --silent "https://api.github.com/repos/mglaman/drupal-check/releases/latest" | grep "browser_download_url" | sed -E 's/.*"([^"]+)".*/\1/')
 
 # Define directory to scan recursively
-DIRECTORY_TO_SCAN="web/modules/custom"
+DIRECTORY_TO_SCAN="web/modules/custom/"
 
 # Get command result count
 COMMAND_COUNT=$(curl -s -O -L $LATEST_RELEASE_VERSION_URL \
