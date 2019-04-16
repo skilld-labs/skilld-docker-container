@@ -209,6 +209,7 @@ else
 	@echo "scripts/makefile/drupal-check-validation.sh file does not exist"
 endif
 
-## Full inspection
+## Run all quality validations
 validation: | phpcs clang cinsp compval watchdogval drupalcheckval
+# This target is executed by scripts/git_hooks/pre-commit.sh as git pre-commit hook
 
