@@ -5,7 +5,7 @@ COMMAND=$(composer validate --strict --quiet)
 COMMAND_EXIT_CODE=$(echo $?)
 
 # Exit1 and alert if not ok, otherwise remain silent
-if [[ "$COMMAND_EXIT_CODE" != "0" ]]; then
+if [ "$COMMAND_EXIT_CODE" != "0" ]; then
 	composer validate --strict
 	exit 1
 else

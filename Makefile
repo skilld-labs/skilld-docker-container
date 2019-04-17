@@ -164,7 +164,7 @@ endif
 clang:
 ifneq ("$(wildcard scripts/makefile/baseconfig-langcode.sh)","")
 	@echo "Base config langcode validation..."
-	@$(call php, /bin/sh ./scripts/makefile/baseconfig-langcode.sh)
+	@/bin/sh ./scripts/makefile/baseconfig-langcode.sh
 else
 	@echo "scripts/makefile/baseconfig-langcode.sh file does not exist"
 endif
@@ -204,7 +204,7 @@ endif
 drupalcheckval:
 ifneq ("$(wildcard scripts/makefile/drupal-check-validation.sh)","")
 	@echo "Drupal-check validation..."
-	@$(call php, /bin/sh ./scripts/makefile/drupal-check-validation.sh)
+	@/bin/sh ./scripts/makefile/drupal-check-validation.sh
 else
 	@echo "scripts/makefile/drupal-check-validation.sh file does not exist"
 endif

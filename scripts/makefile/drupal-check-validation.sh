@@ -13,8 +13,8 @@ COMMAND_COUNT=$(curl -s -O -L $LATEST_RELEASE_VERSION_URL \
     && ./drupal-check.phar -ad -vv -n --no-progress $DIRECTORY_TO_SCAN --format=raw | wc -l)
 
 # Exit1 and alert if not ok, otherwise remain silent
-if [[ "$COMMAND_COUNT" -gt "0" ]]; then
-	printf "The are \033[1m$COMMAND_COUNT issues\033[0m detected by drupal-check to fix :\n"
+if [ "$COMMAND_COUNT" -gt "0" ]; then
+	printf "There are \033[1m$COMMAND_COUNT issues\033[0m detected by drupal-check to fix :\n"
 	./drupal-check.phar -ad -vv -n --no-progress $DIRECTORY_TO_SCAN
 	rm drupal-check.phar
 	exit 1
