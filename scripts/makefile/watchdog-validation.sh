@@ -9,8 +9,8 @@ MESSAGES_SEVERITY="Emergency|Alert|Critical|Error"
 LOG_COUNT=$(drush watchdog-show --filter="severity~=#($MESSAGES_SEVERITY)#" --format=string | wc -l)
 
 # Exit1 and alert if logs
-if [[ "$LOG_COUNT" -gt "0" ]]; then
-	printf "The are \033[1m$LOG_COUNT messages\033[0m in logs to fix :\n"
+if [ "$LOG_COUNT" -gt "0" ]; then
+	printf "There are \033[1m$LOG_COUNT messages\033[0m in logs to fix :\n"
 	drush watchdog-show --filter="severity~=#($MESSAGES_SEVERITY)#" --format=string
 	exit 1
 else
