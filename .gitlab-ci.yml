@@ -1,0 +1,100 @@
+image: skilldlabs/php:72
+
+variables:
+  GIT_DEPTH: "3"
+
+before_script:
+  - date
+  - pwd
+
+stages:
+  - sniffers
+  - deploy
+
+
+sniffers:compose:
+  stage: sniffers
+  script:
+  - time composer validate
+
+sniffers:phpcs:
+  stage: sniffers
+  image: skilldlabs/docker-phpcs-drupal
+  script:
+  - phpcs -s --colors
+    --standard=Drupal,DrupalPractice
+    --extensions=php,module,inc,install,profile,theme,yml,txt,md,js
+    --ignore=*.css,libraries/*
+    web/profiles
+    web/modules/custom
+    web/themes/custom
+
+sniffers:sonarqube:
+  stage: sniffers
+  image: skilldlabs/sonar-scanner:3.3
+  script:
+  - sonar-scanner
+    -Dsonar.projectKey=$CI_PROJECT_PATH_SLUG
+    -Dsonar.projectName=$CI_PROJECT_NAME
+    -Dsonar.host.url=${SONAR_HOST}
+    -Dsonar.login=${SONAR_TOKEN}
+    -Dsonar.projectBaseDir=.
+    -Dsonar.sources=.
+    -Dsonar.inclusions=settings/**,web/modules/custom/**,web/profiles/sdd/**,web/themes/custom/**
+  only:
+  - integration-sonar
+  - master
+  # when: manual
+
+.job_deploy_commit_template: &job_deploy_commit
+  stage: deploy
+  before_script:
+    - date; pwd; ls -lahq;
+    - echo "Clean-up build dir ${BUILD_DIR}"
+    # Always down previous environment.
+    - (if [ -d ${BUILD_DIR} ]; then date; cd ${BUILD_DIR}; pwd; make clean; cd -; rm -rf ${BUILD_DIR}; fi)
+  script:
+    - echo "Removed previous review app ${CI_ENVIRONMENT_URL} from ${BUILD_DIR}."
+  only:
+    - branches
+  except:
+    - release
+  tags:
+    - review-apps-3
+  dependencies:
+    - sniffers:phpcs
+#    - sniffers:lint
+
+deploy:review:
+  <<: *job_deploy_commit
+  script:
+    - echo "Deploy ${CI_ENVIRONMENT_URL} review app to ${BUILD_DIR}."
+    - echo "CI_ENVIRONMENT_NAME=${CI_ENVIRONMENT_NAME}"
+    - echo "CI_ENVIRONMENT_SLUG=${CI_ENVIRONMENT_SLUG}"
+    - echo "CI_ENVIRONMENT_URL=${CI_ENVIRONMENT_URL}"
+    - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
+    - echo "REVIEW_DOMAIN=${REVIEW_DOMAIN}"
+    - mkdir -p ${BUILD_DIR}
+    - rsync -ah --exclude=.git --delete ./ ${BUILD_DIR}
+    - cd ${BUILD_DIR}
+    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-${CI_ENVIRONMENT_SLUG}" >> .env.default
+    - echo "MAIN_DOMAIN_NAME=${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}" >> .env.default
+    - docker --version
+    - docker-compose --version
+    - make all
+  after_script:
+    - echo "Started ${CI_ENVIRONMENT_URL} composition in ${BUILD_DIR} from Makefile."
+  environment:
+    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  when: manual
+
+stop_review:
+  <<: *job_deploy_commit
+  variables:
+    GIT_STRATEGY: none
+  when: manual
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
