@@ -198,12 +198,9 @@ endif
 
 ## Validate drupal-check
 drupalcheckval:
-ifneq ("$(wildcard scripts/makefile/drupal-check-validation.sh)","")
 	@echo "Drupal-check validation..."
-	@/bin/sh ./scripts/makefile/drupal-check-validation.sh
-else
-	@echo "scripts/makefile/drupal-check-validation.sh file does not exist"
-endif
+	@docker run --rm -v `pwd`:`pwd` -w `pwd` skilldlabs/docker-drupal-check:last drupal-check -ad -vv -n --no-progress web/modules/custom/
+
 
 ## Run all quality validations
 validation: | phpcs clang cinsp compval watchdogval drupalcheckval
