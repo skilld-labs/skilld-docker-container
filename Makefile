@@ -182,12 +182,8 @@ endif
 
 ## Validate composer.json file
 compval:
-ifneq ("$(wildcard scripts/makefile/composer-validation.sh)","")
 	@echo "Composer.json validation..."
-	@$(call php, /bin/sh ./scripts/makefile/composer-validation.sh)
-else
-	@echo "scripts/makefile/composer-validation.sh file does not exist"
-endif
+	@docker run --rm -v `pwd`:`pwd` -w `pwd` skilldlabs/php:72 composer validate --strict --quiet
 
 
 ## Validate watchdog logs
