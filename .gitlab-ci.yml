@@ -132,7 +132,7 @@ test:cinsp:
   - pwd
   - ls -lah
   - ls -lah scripts/makefile/
-  - make drush config:inspect
+  - make cinsp
   tags:
   - review-apps-3
   dependencies:

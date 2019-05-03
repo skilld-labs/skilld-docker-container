@@ -11,5 +11,6 @@ if [ "$ERROR_COUNT" -gt "0" ]; then
 	drush config:inspect --only-error
 	exit 1
 else
+	echo -e "Configuration is valid"
 	exit 0
 fi
