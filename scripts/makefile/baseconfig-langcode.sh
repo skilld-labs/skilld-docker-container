@@ -12,7 +12,7 @@ then
 	DEFAULT_SITE_LANG_VALUE=$(awk -v pattern="default_langcode" '$1 ~ pattern { print $NF }' config/sync/system.site.yml)
 
 	# Get the language defined in each of the basic config files + save them in a variable
-	LANG_VALUE_IN_BASE_CONFIG_FILES=$(grep -e "^langcode:" config/sync/*.yml | awk '{print $2}' | sort | uniq)
+	LANG_VALUE_IN_BASE_CONFIG_FILES=$(grep -E "^langcode:" config/sync/*.yml | awk '{print $2}' | sort | uniq)
 
 	# Defining value of MESSAGE_OUTPUT variable
 	MESSAGE_OUTPUT="\nThe language of some base config files is NOT matching site default language (\e[32m$DEFAULT_SITE_LANG_VALUE\e[0m) :"
@@ -23,12 +23,12 @@ then
 		if [ "$lang" != "$DEFAULT_SITE_LANG_VALUE" ]
 		then
 			FAIL=1
-			MESSAGE_OUTPUT="$MESSAGE_OUTPUT \n - langcode \e[31m$lang\e[0m was found in $(grep -Re "^langcode: $lang" config/sync/*.yml -l | wc -l) file(s)\n$(grep -Re "^langcode: $lang" config/sync/*.yml -l)"
+			MESSAGE_OUTPUT="$MESSAGE_OUTPUT \n - langcode \e[31m$lang\e[0m was found in $(grep -rE "^langcode: $lang" config/sync/*.yml -l | wc -l) file(s)\n$(grep -rE "^langcode: $lang" config/sync/*.yml -l)"
 		fi
 	done
 	if [ $FAIL -eq 1 ]
 	then
-		printf "$MESSAGE_OUTPUT \n\n\e[33mBase configs should always be in same language as default site language.\e[0m\n\n\e[31mCOMMIT REJECTED!\e[0m\n"
+		echo -e "$MESSAGE_OUTPUT \n\n\e[33mBase configs should always be in same language as default site language.\e[0m\n\n\e[31mCOMMIT REJECTED!\e[0m\n"
 	fi
 	exit $FAIL
 fi

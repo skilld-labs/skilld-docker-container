@@ -10,7 +10,13 @@ before_script:
 stages:
   - sniffers
   - deploy
+  - test
 
+
+sniffers:clang:
+  stage: sniffers
+  script:
+  - make clang
 
 sniffers:compose:
   stage: sniffers
@@ -46,6 +52,7 @@ sniffers:sonarqube:
   - master
   # when: manual
 
+
 .job_deploy_commit_template: &job_deploy_commit
   stage: deploy
   before_script:
@@ -57,13 +64,10 @@ sniffers:sonarqube:
     - echo "Removed previous review app ${CI_ENVIRONMENT_URL} from ${BUILD_DIR}."
   only:
     - branches
-  except:
-    - release
   tags:
     - review-apps-3
   dependencies:
     - sniffers:phpcs
-#    - sniffers:lint
 
 deploy:review:
   <<: *job_deploy_commit
@@ -88,7 +92,7 @@ deploy:review:
     url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
-  when: manual
+  # when: manual
 
 stop_review:
   <<: *job_deploy_commit
@@ -98,3 +102,63 @@ stop_review:
   environment:
     name: review/$CI_COMMIT_REF_NAME
     action: stop
+
+
+test:behat:
+  stage: test
+  environment:
+    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - pwd
+  - ls -lah
+  - ls -lah vendor/bin/
+  - make behat
+  tags:
+    - review-apps-3
+  dependencies:
+  - deploy:review
+
+test:cinsp:
+  stage: test
+  environment:
+    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - pwd
+  - ls -lah
+  - ls -lah scripts/makefile/
+  - make drush config:inspect
+  tags:
+  - review-apps-3
+  dependencies:
+  - deploy:review
+
+test:drupalcheck:
+  stage: test
+  image: skilldlabs/docker-drupal-check:latest
+  before_script:
+  - composer install -o --no-dev
+  script:
+  - drupal-check -ad -vv -n --no-progress web/modules/custom/
+
+test:watchdog:
+  stage: test
+  environment:
+    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - pwd
+  - ls -lah
+  - ls -lah scripts/makefile/
+  - make watchdogval
+  tags:
+  - review-apps-3
+  dependencies:
+  - deploy:review
