@@ -14,5 +14,6 @@ if [ "$LOG_COUNT" -gt "0" ]; then
 	drush watchdog-show --filter="severity~=#($MESSAGES_SEVERITY)#" --format=string
 	exit 1
 else
+	echo -e "Watchdog is valid : No message of high severity in logs ($MESSAGES_SEVERITY)"
 	exit 0
 fi

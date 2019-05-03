@@ -174,6 +174,7 @@ endif
 cinsp:
 ifneq ("$(wildcard scripts/makefile/config-inspector-validation.sh)","")
 	@echo "Config schema validation..."
+	$(call php, composer install -o)
 	@$(call php, /bin/sh ./scripts/makefile/config-inspector-validation.sh)
 else
 	@echo "scripts/makefile/config-inspector-validation.sh file does not exist"
