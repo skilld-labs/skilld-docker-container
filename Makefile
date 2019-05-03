@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev info phpcs phpcbf drush cinsp hooksymlink validation clang compval watchdogval drupalcheckval
+.PHONY: all provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat precommithook tests front
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -183,7 +183,7 @@ endif
 ## Validate composer.json file
 compval:
 	@echo "Composer.json validation..."
-	@docker run --rm -v `pwd`:`pwd` -w `pwd` skilldlabs/php:72 composer validate --strict --quiet
+	@docker run --rm -v `pwd`:`pwd` -w `pwd` skilldlabs/php:72 composer validate --strict
 
 
 ## Validate watchdog logs
@@ -199,10 +199,29 @@ endif
 ## Validate drupal-check
 drupalcheckval:
 	@echo "Drupal-check validation..."
-	@docker run --rm -v `pwd`:`pwd` -w `pwd` skilldlabs/docker-drupal-check:last drupal-check -ad -vv -n --no-progress web/modules/custom/
+	@docker run --rm -v `pwd`:`pwd` -w `pwd` skilldlabs/docker-drupal-check:latest drupal-check -ad -vv -n --no-progress web/modules/custom/
 
 
-## Run all quality validations
-validation: | phpcs clang cinsp compval watchdogval drupalcheckval
-# This target is executed by scripts/git_hooks/pre-commit.sh as git pre-commit hook
+## Behat scenarios validation
+behat:
+	@echo "Getting base url"
+ifdef REVIEW_DOMAIN
+	$(eval BASE_URL := $(MAIN_DOMAIN_NAME))
+else
+	$(eval BASE_URL := $(shell docker inspect --format="{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}" $(COMPOSE_PROJECT_NAME)_web))
+endif
+	@echo "Replacing URL_TO_UPDATE value in behat.yml with http://$(BASE_URL)"
+	$(call php, cp behat.yml.default behat.yml)
+	$(call php, sed -i "s/URL_TO_UPDATE/http:\/\/$(BASE_URL)/" behat.yml)
+	@echo "Running Behat scenarios against http://$(BASE_URL)"
+	$(call php, composer install -o)
+	$(call php, vendor/bin/behat -V)
+	$(call php, vendor/bin/behat --colors)
+
+
+## Run sniffer validations (executed as git pre-commit hook, by scripts/git_hooks/pre-commit.sh)
+precommithook: | clang compval phpcs
+
+## Run all tests & validations (including precommithook)
+tests: | precommithook behat cinsp drupalcheckval watchdogval
 

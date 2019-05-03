@@ -16,3 +16,4 @@ web/profiles/contrib/config_installer/
 web/sites/
 web/themes/contrib/
 mysql/
+behat.yml

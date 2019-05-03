@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
+# Enable config inspector module before inspection.
+drush pm:enable config_inspector -y
 
 # Get count of config inspector errors
 ERROR_COUNT=$(drush config:inspect --only-error --format=string | wc -l)
