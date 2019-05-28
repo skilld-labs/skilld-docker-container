@@ -140,11 +140,19 @@ test:cinsp:
 
 test:drupalcheck:
   stage: test
-  image: skilldlabs/docker-drupal-check:latest
-  before_script:
-  - composer install -o --no-dev
+  environment:
+    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
   script:
-  - drupal-check -ad -vv -n --no-progress web/modules/custom/
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - pwd
+  - ls -lah
+  - make drupalcheckval
+  tags:
+  - review-apps-3
+  dependencies:
+  - deploy:review
 
 test:watchdog:
   stage: test
