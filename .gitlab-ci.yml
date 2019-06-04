@@ -50,7 +50,6 @@ sniffers:sonarqube:
   only:
   - integration-sonar
   - master
-  # when: manual
 
 
 .job_deploy_commit_template: &job_deploy_commit
@@ -92,7 +91,6 @@ deploy:review:
     url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
-  # when: manual
 
 stop_review:
   <<: *job_deploy_commit
@@ -109,6 +107,7 @@ test:behat:
   environment:
     url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
@@ -126,6 +125,7 @@ test:cinsp:
   environment:
     url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
@@ -143,6 +143,7 @@ test:drupalcheck:
   environment:
     url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
@@ -159,6 +160,7 @@ test:watchdog:
   environment:
     url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
