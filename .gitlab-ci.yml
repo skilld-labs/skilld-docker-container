@@ -21,7 +21,8 @@ sniffers:clang:
 sniffers:compose:
   stage: sniffers
   script:
-  - time composer validate
+  - composer -V
+  - composer validate --profile
 
 sniffers:phpcs:
   stage: sniffers
