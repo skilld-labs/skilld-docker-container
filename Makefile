@@ -91,7 +91,7 @@ endif
 info:
 	$(info Containers for "$(COMPOSE_PROJECT_NAME)" info:)
 	$(eval CONTAINERS = $(shell docker ps -f name=$(COMPOSE_PROJECT_NAME) --format "{{ .ID }}" -f 'label=traefik.enable=true'))
-	$(foreach CONTAINER, $(CONTAINERS),$(info http://$(shell printf '%-19s \n'  $(shell docker inspect --format='{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}:{{index .Config.Labels "traefik.port"}} {{range $$p, $$conf := .NetworkSettings.Ports}}{{$$p}}{{end}} {{.Name}}' $(CONTAINER) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')) ))
+	$(foreach CONTAINER, $(CONTAINERS),$(info http://$(shell printf '%-19s \n'  $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "traefik.port"}} {{range $$p, $$conf := .NetworkSettings.Ports}}{{$$p}}{{end}} {{.Name}}' $(CONTAINER) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')) ))
 	@echo "$(RESULT)"
 
 ## Run shell in PHP container as regular user
@@ -110,10 +110,12 @@ DIRS = web/core web/libraries web/modules/contrib web/profiles/contrib web/sites
 
 ## Totally remove project build folder, docker containers and network
 clean: info
-	@for i in $(DIRS); do if [ -d "$$i" ]; then echo "Removing $$i..."; docker run --rm -v $(shell pwd):/mnt $(IMAGE_PHP) sh -c "rm -rf /mnt/$$i"; fi; done
+ifneq ($(shell docker-compose ps -q php),'')
 	$(eval SCAFFOLD = $(shell docker-compose exec -T --user $(CUID):$(CGID) php composer run-script list-scaffold-files | grep -P '^(?!>)'))
 	@for i in $(SCAFFOLD); do if [ -e "web/$$i" ]; then echo "Removing web/$$i..."; rm -rf web/$$i; fi; done
+endif
 	make -s down
+	@for i in $(DIRS); do if [ -d "$$i" ]; then echo "Removing $$i..."; docker run --rm -v $(shell pwd):/mnt $(IMAGE_PHP) sh -c "rm -rf /mnt/$$i"; fi; done
 ifeq ($(shell docker-compose config --services | grep mysql),mysql)
 	@if [ -d $(MYSQL_DATADIR) ]; then echo "Removing mysql data $(MYSQL_DATADIR) ..."; docker run --rm -v $(shell pwd):/mnt/2rm $(IMAGE_PHP) sh -c "rm -rf /mnt/2rm/$(DB_DATA_DIR)"; fi
 endif
@@ -184,7 +186,7 @@ endif
 ## Validate composer.json file
 compval:
 	@echo "Composer.json validation..."
-	@docker run --rm -v `pwd`:`pwd` -w `pwd` skilldlabs/php:72 composer validate --strict
+	@docker run --rm -v `pwd`:`pwd` -w `pwd` $(IMAGE_PHP) composer validate --strict
 
 
 ## Validate watchdog logs
@@ -200,7 +202,8 @@ endif
 ## Validate drupal-check
 drupalcheckval:
 	@echo "Drupal-check validation..."
-	@docker run --rm -v `pwd`:`pwd` -w `pwd` skilldlabs/docker-drupal-check:latest drupal-check -ad -vv -n --no-progress web/modules/custom/
+	$(call php, composer install -o)
+	@docker run --rm -v `pwd`:`pwd` -w `pwd` skilldlabs/docker-drupal-check drupal-check -ad -vv -n --no-progress web/modules/custom/
 
 
 ## Behat scenarios validation
