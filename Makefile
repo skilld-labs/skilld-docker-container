@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat precommithook tests front behatdl behatdi chrome
+.PHONY: all provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat precommithook tests front behatdl behatdi browser_driver browser_driver_stop
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -105,6 +105,10 @@ exec0:
 down:
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
 	@docker-compose down -v --remove-orphans --rmi local
+ifneq ($(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}'), )
+	@echo 'Stoping browser driver.'
+	make -s browser_driver_stop
+endif
 
 DIRS = web/core web/libraries web/modules/contrib web/profiles/contrib web/sites web/themes/contrib vendor
 
@@ -211,6 +215,10 @@ ifdef REVIEW_DOMAIN
 else
 	$(eval BASE_URL := $(shell docker inspect --format="{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}" $(COMPOSE_PROJECT_NAME)_web))
 endif
+ifeq ($(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}'), )
+	@echo 'Browser driver is stoped. Running it.'
+	make -s browser_driver
+endif
 	@echo "Replacing URL_TO_TEST value in behat.yml with http://$(BASE_URL)"
 	$(call php, cp behat.default.yml behat.yml)
 	$(call php, sed -i "s/URL_TO_TEST/http:\/\/$(BASE_URL)/" behat.yml)
@@ -225,11 +233,17 @@ behatdl:
 behatdi:
 	$(call php, vendor/bin/behat -di --colors)
 
-chrome:
-	docker run --init --rm -d --name $(COMPOSE_PROJECT_NAME)_chrome --shm-size=1024m --cap-add=SYS_ADMIN \
-  --entrypoint=/usr/bin/google-chrome-unstable --network container:$(COMPOSE_PROJECT_NAME)_php \
-  yukinying/chrome-headless-browser \
-  --disable-gpu --headless --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --no-sandbox
+## Running browser driver for behat tests.
+browser_driver:
+	docker run -d --init --rm --name $(COMPOSE_PROJECT_NAME)_chrome \
+	--network container:$(COMPOSE_PROJECT_NAME)_php $(IMAGE_DRIVER) \
+	--remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --no-sandbox \
+	--entrypoint "" chromium-browser --headless --disable-gpu \
+	--disable-web-security
+
+## Stopping browser driver.
+browser_driver_stop:
+	docker stop $(COMPOSE_PROJECT_NAME)_chrome
 
 ## Run sniffer validations (executed as git pre-commit hook, by scripts/git_hooks/pre-commit.sh)
 precommithook: | clang compval phpcs

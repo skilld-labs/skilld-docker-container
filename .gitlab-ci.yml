@@ -115,6 +115,9 @@ test:behat:
   - ls -lah
   - ls -lah vendor/bin/
   - make behat
+  after_script:
+  - cd ${BUILD_DIR}
+  - make browser_driver_stop
   tags:
     - review-apps-3
   dependencies:
