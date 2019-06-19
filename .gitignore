@@ -17,3 +17,5 @@ web/sites/
 web/themes/contrib/
 mysql/
 behat.yml
+features/*.html
+features/*.png
