@@ -4,6 +4,8 @@ services:
 
 # Override base service.
   php:
+    environment:
+      COMPOSER_MEMORY_LIMIT: "-1"
     volumes:
       - "./90-mail.ini:/etc/php7/conf.d/90-mail.ini:z"
 #    depends_on:
