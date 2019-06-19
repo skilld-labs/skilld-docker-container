@@ -8,6 +8,7 @@ default:
         - Drupal\DrupalExtension\Context\MessageContext
         - Drupal\DrupalExtension\Context\DrushContext
         - FailAid\Context\FailureContext
+        - espend\Behat\PlaceholderExtension\Context\PlaceholderContext
   extensions:
     DMore\ChromeExtension\Behat\ServiceContainer\ChromeExtension: ~
     Behat\MinkExtension:
@@ -34,3 +35,4 @@ default:
         message_selector: '.messages'
         error_message_selector: '.messages.messages-error'
         success_message_selector: '.messages.messages-status'
+    espend\Behat\PlaceholderExtension\PlaceholderExtension: ~
