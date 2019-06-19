@@ -34,8 +34,3 @@ default:
         message_selector: '.messages'
         error_message_selector: '.messages.messages-error'
         success_message_selector: '.messages.messages-status'
-      text:
-        log_out: "Se déconnecter"
-        log_in: "Se connecter"
-        username_field: "Nom d'utilisateur"
-        password_field: "Mot de passe"

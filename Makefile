@@ -233,7 +233,7 @@ behatdl:
 behatdi:
 	$(call php, vendor/bin/behat -di --colors)
 
-## Running browser driver for behat tests.
+## Running browser driver for behat tests
 browser_driver:
 	docker run -d --init --rm --name $(COMPOSE_PROJECT_NAME)_chrome \
 	--network container:$(COMPOSE_PROJECT_NAME)_php $(IMAGE_DRIVER) \
@@ -241,7 +241,7 @@ browser_driver:
 	--entrypoint "" chromium-browser --headless --disable-gpu \
 	--disable-web-security
 
-## Stopping browser driver.
+## Stopping browser driver
 browser_driver_stop:
 	docker stop $(COMPOSE_PROJECT_NAME)_chrome
 
