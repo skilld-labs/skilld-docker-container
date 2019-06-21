@@ -10,7 +10,8 @@ before_script:
 stages:
   - sniffers
   - deploy
-  - test
+  - tests
+  - logs
 
 
 sniffers:clang:
@@ -22,7 +23,7 @@ sniffers:compose:
   stage: sniffers
   script:
   - composer -V
-  - composer validate --profile
+  - time composer validate --profile
 
 sniffers:phpcs:
   stage: sniffers
@@ -49,9 +50,8 @@ sniffers:sonarqube:
     -Dsonar.sources=.
     -Dsonar.inclusions=settings/**,web/modules/custom/**,web/profiles/sdd/**,web/themes/custom/**
   only:
-  - integration-sonar
   - master
-
+  allow_failure: true
 
 .job_deploy_commit_template: &job_deploy_commit
   stage: deploy
@@ -83,6 +83,7 @@ deploy:review:
     - cd ${BUILD_DIR}
     - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-${CI_ENVIRONMENT_SLUG}" >> .env.default
     - echo "MAIN_DOMAIN_NAME=${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}" >> .env.default
+    - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
     - docker --version
     - docker-compose --version
     - make all
@@ -104,7 +105,7 @@ stop_review:
 
 
 test:behat:
-  stage: test
+  stage: tests
   environment:
     url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
@@ -125,7 +126,7 @@ test:behat:
   - deploy:review
 
 test:cinsp:
-  stage: test
+  stage: tests
   environment:
     url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
@@ -143,7 +144,7 @@ test:cinsp:
   - deploy:review
 
 test:drupalcheck:
-  stage: test
+  stage: tests
   environment:
     url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
@@ -160,7 +161,7 @@ test:drupalcheck:
   - deploy:review
 
 test:watchdog:
-  stage: test
+  stage: logs
   environment:
     url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME

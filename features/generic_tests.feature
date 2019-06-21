@@ -46,6 +46,14 @@ Feature: Generic tests
     And I should see "Page two"
 
 
+  Scenario: Target links within table rows
+    Given I am logged in as a user with the "administrator" role
+    When I am at "admin/structure/menu"
+    And I click "Modifier le menu" in the "Administration" row
+    Then I should be on "/fr/admin/structure/menu/manage/admin"
+    And I should see text matching "Modifier"
+
+
   Scenario: Create and view a node with fields
     Given I am viewing an "basic_page" content:
     | title | My node with fields! |
@@ -60,14 +68,6 @@ Feature: Generic tests
     And I am logged in as a user with the "administrator" role
     When I visit "/admin/people"
     Then I should see the link "John Doe"
-
-
-  Scenario: Target links within table rows
-    Given I am logged in as a user with the "administrator" role
-    When I am at "admin/structure/menu"
-    And I click "Edit menu" in the "Administration" row
-    Then I should be on "admin/structure/menu/manage/admin"
-    And I should see text matching "Edit"
 
 
   Scenario: Run cron
