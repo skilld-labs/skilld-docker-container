@@ -68,7 +68,15 @@ endif
 	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
 
 composer:
+ifeq ($(INSTALL_DEV_DEPENDENCIES), TRUE)
+	@echo "INSTALL_DEV_DEPENDENCIES=$(INSTALL_DEV_DEPENDENCIES)"
+	@echo "Installing composer dependencies, including dev ones"
+	$(call php, composer install --prefer-dist -o)
+else
+	@echo "INSTALL_DEV_DEPENDENCIES set to FALSE or missing from .env"
+	@echo "Installing composer dependencies, without dev ones"
 	$(call php, composer install --prefer-dist -o --no-dev)
+endif
 	$(call php, composer drupal-scaffold)
 	$(call php, composer create-required-files)
 #	Uncomment this string to build front separately. See scripts/makefile/front.mk
