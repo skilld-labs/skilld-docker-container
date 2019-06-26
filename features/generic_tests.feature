@@ -48,10 +48,9 @@ Feature: Generic tests
 
   Scenario: Target links within table rows
     Given I am logged in as a user with the "administrator" role
-    When I am at "admin/structure/menu"
-    And I click "Modifier le menu" in the "Administration" row
-    Then I should be on "/fr/admin/structure/menu/manage/admin"
-    And I should see text matching "Modifier"
+    When I am at "/admin/structure/menu/"
+    And I click "Edit menu" in the "Administration" row
+    And I should see text matching "menu Administration"
 
 
   Scenario: Create and view a node with fields
