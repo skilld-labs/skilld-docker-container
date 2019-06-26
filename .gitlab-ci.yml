@@ -120,6 +120,8 @@ test:behat:
   after_script:
   - cd ${BUILD_DIR}
   - make browser_driver_stop
+  - mv features/*.png web/
+  - echo "- Screenshots are available here :" && cd web && ls -h *.png | xargs -i echo "${CI_ENVIRONMENT_URL}/{}"
   tags:
     - review-apps-3
   dependencies:

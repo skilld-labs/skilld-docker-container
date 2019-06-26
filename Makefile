@@ -250,6 +250,7 @@ browser_driver:
 	--network container:$(COMPOSE_PROJECT_NAME)_php $(IMAGE_DRIVER) \
 	--remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --no-sandbox \
 	--entrypoint "" chromium-browser --headless --disable-gpu \
+	--window-size=1200,2080 \
 	--disable-web-security
 
 ## Stopping browser driver
