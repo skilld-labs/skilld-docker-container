@@ -219,4 +219,27 @@ JS;
     $this->getSession()->switchToIFrame(NULL);
   }
 
+  /**
+   * @Given I select in choices ":arg1" element number ":arg2"
+   */
+
+  public function iSelectOptionNumberInChoices($selector, $number) {
+    $page = $this->getSession()->getPage();
+    $element = $page->find('css', $selector);
+    $trigger = $element->getParent();
+    $trigger->click();
+    $items = $trigger->getParent()->findAll('css', '.choices__list--dropdown > .choices__list > .choices__item');
+    $item = $items[$number - 1];
+    $item->mouseOver();
+    $item->click();
+  }
+
+  /**
+   * @When /^wait for the page to be loaded$/
+   */
+  public function waitForThePageToBeLoaded()
+  {
+    $this->getSession()->wait(10000, "document.readyState === 'complete'");
+  }
+
 }
