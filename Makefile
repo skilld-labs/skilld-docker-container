@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat precommithook tests front behatdl behatdi browser_driver browser_driver_stop
+.PHONY: all provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat sniffers tests front behatdl behatdi browser_driver browser_driver_stop
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -164,13 +164,14 @@ phpcs:
 phpcbf:
 	@$(call phpcsexec, phpcbf)
 
-## Add symbolic link from custom script(s) to /.git/hooks/pre-commit
+## Add symbolic link from custom script(s) to .git/hooks/
 hooksymlink:
-ifneq ("$(wildcard scripts/git_hooks/pre-commit.sh)","")
-	@echo "Installing git hooks"
-	$(shell ln -sf ../../scripts/git_hooks/pre-commit.sh .git/hooks/pre-commit)
+ifneq ("$(wildcard scripts/git_hooks/sniffers.sh)","")
+	@echo "Removing previous git hooks and installing fresh ones"
+	$(shell find .git/hooks -type l -exec unlink {} \;)
+	$(shell ln -sf ../../scripts/git_hooks/sniffers.sh .git/hooks/pre-push)
 else
-	@echo "scripts/git_hooks/pre-commit.sh file does not exist"
+	@echo "scripts/git_hooks/sniffers.sh file does not exist"
 endif
 
 
@@ -257,9 +258,9 @@ browser_driver:
 browser_driver_stop:
 	docker stop $(COMPOSE_PROJECT_NAME)_chrome
 
-## Run sniffer validations (executed as git pre-commit hook, by scripts/git_hooks/pre-commit.sh)
-precommithook: | clang compval phpcs
+## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
+sniffers: | clang compval phpcs
 
-## Run all tests & validations (including precommithook)
-tests: | precommithook behat cinsp drupalcheckval watchdogval
+## Run all tests & validations (including sniffers)
+tests: | sniffers behat cinsp drupalcheckval watchdogval
 

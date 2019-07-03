@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 
-make precommithook
+make sniffers
 exit $?
 
