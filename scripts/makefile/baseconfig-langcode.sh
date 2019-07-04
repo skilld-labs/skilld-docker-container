@@ -28,7 +28,9 @@ then
 	done
 	if [ $FAIL -eq 1 ]
 	then
-		echo -e "$MESSAGE_OUTPUT \n\n\e[33mBase configs should always be in same language as default site language.\e[0m\n\n\e[31mCOMMIT REJECTED!\e[0m\n"
+		echo -e "$MESSAGE_OUTPUT \n\n\e[33mBase configs should have the same langcode as default site language.\n"
+	else
+		echo "Langcode of config files are valid"
 	fi
 	exit $FAIL
 fi
