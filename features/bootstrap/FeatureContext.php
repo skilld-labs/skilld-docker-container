@@ -116,6 +116,24 @@ class FeatureContext extends RawDrupalContext implements SnippetAcceptingContext
   }
 
   /**
+   * @Given I select in combobox ":arg1" value ":arg2"
+   */
+  public function iSelectCombobox($field_wrapper_selector, $value) {
+    $page = $this->getSession()->getPage();
+    $element = $page->find('css', $field_wrapper_selector);
+    $combo = $element->getParent()->find('css', 'span');
+    $combo->click();
+
+    // Caught this case on RA instance, its chrome can not draw selectlist so
+    // fast.
+    $this->iWaitSeconds(3);
+    $option = $page->find('xpath', "//li [@class='ui-menu-item']/div [text () ='$value']");
+    $option->mouseOver();
+    $option->getParent()->getParent()->click();
+    $this->iWaitSeconds(1);
+  }
+
+  /**
    * Click some text
    *
    * @When /^I click on the text "([^"]*)"$/
@@ -240,6 +258,75 @@ JS;
   public function waitForThePageToBeLoaded()
   {
     $this->getSession()->wait(10000, "document.readyState === 'complete'");
+  }
+
+  /**
+   * @Then I wait :arg1 seconds until element :arg2 appears
+   */
+  public function waitSecondsUntilElementAppears($seconds, $selector) {
+    $startTime = time();
+    do {
+      try {
+        $element = $this->getSession()->getPage()->findAll('css', $selector);
+        if (count($element) > 0) {
+          return TRUE;
+        }
+      } catch (ExpectationException $e) {
+        /* Intentionally left blank */
+      }
+    } while (time() - $startTime < $seconds);
+    throw new ResponseTextException(
+      sprintf('Cannot find the element %s after %s seconds', $selector, $seconds),
+      $this->getSession()
+    );
+  }
+
+  /**
+   * @Then I should see the pin with title :arg1 on the map :arg2
+   */
+  public function iShouldSeeThePinWithTitleOnTheMap($pin, $map_selector) {
+    if ($map = $this->getSession()->getPage()->find('css', $map_selector)) {
+      if ($pin = $map->find('css', 'area[title="' . $pin . '"]')) {
+        return $pin;
+      }
+      else {
+        throw new \Exception(sprintf("The map '%s' does not contain pin with title '%s'", $map_selector, $pin));
+      }
+    }
+    else {
+      throw new \Exception(sprintf("The page does not contain the map with selector '%s'", $map_selector));
+    }
+  }
+
+  /**
+   * @When I click on the pin with title :arg1 on the map :arg2
+   */
+  public function iClickThePinWithTitleOnTheMap($pin, $map_selector) {
+    $element = $this->iShouldSeeThePinWithTitleOnTheMap($pin, $map_selector);
+    if (empty($element)) {
+      throw new \Exception(sprintf("The map '%s' does not contain pin with title '%s'", $map_selector, $pin));
+    }
+    $element->click();
+}
+
+  /**
+   * Switch to the another tab.
+   * Example: I switch to "2" tab
+   * Example: I switch to "main" tab
+   *
+   * @Given I switch to ":arg1" tab
+   */
+  public function switchToNextTab($tab) {
+    if ($tab == 'main') {
+      $tab = 1;
+    }
+    $windowNames = $this->getSession()->getWindowNames();
+    if(isset($windowNames[$tab])) {
+      $this->getSession()->switchToWindow($windowNames[$tab]);
+    }
+    else {
+      throw new Exception('There is not a tab to switch.');
+    }
   }
 
 }
