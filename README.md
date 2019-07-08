@@ -2,19 +2,21 @@
 
 ---
 
-* [Overview](#overview)
-* [What is this?](#what-is-this)
-* [What is this not?](#what-is-this-not)
-* [Quickstart](#quickstart)
-  + [Used variables](#used-variables)
-  + [Persistent Mysql](#persistent-mysql)
-  + [Network](#network)
-* [Usage](#usage)
-  + [Additional goals](#additional-goals)
-* [Support](#support)
-* [Drush commands](#drush-commands)
-* [Troubleshooting](#troubleshooting)
-* [License](#license)
+- [Skilld docker container](#Skilld-docker-container)
+  - [Overview](#Overview)
+  - [What is this?](#What-is-this)
+  - [What is this not?](#What-is-this-not)
+  - [Quickstart](#Quickstart)
+      - [Used variables](#Used-variables)
+      - [Persistent Mysql](#Persistent-Mysql)
+      - [Network](#Network)
+  - [Usage](#Usage)
+      - [Additional goals](#Additional-goals)
+  - [Support](#Support)
+  - [Drush commands](#Drush-commands)
+  - [Troubleshooting](#Troubleshooting)
+  - [Git hooks](#Git-hooks)
+  - [License](#License)
 
 
 ## Overview
@@ -40,8 +42,9 @@
 * Copy **.env.default** to **.env**, more information about enviroment file can be found <a href="https://docs.docker.com/compose/env-file/" target="_blank">docs.docker.com</a>
 * Copy **docker-compose.override.yml.default** to **docker-compose.override.yml**, update parts you want to overwrite.
   * **docker-compose.yml** contains the base requirements of a working Drupal site. It should not be updated.
+* Update **.gitlab-ci.yml** `variables` section THEME_PATH to make front gitlab CI works.
 * Run `make all`
- 
+
 
 #### Used variables
 
@@ -66,23 +69,23 @@
 | MAIN_DOMAIN_NAME | Domain name used for traefik | `docker.localhost` |
 | DB_URL | Url to connect to database | `sqlite:///dev/shm/d8.sqlite` |
 | DB_DATA_DIR | Full path to database storage | `/dev/shm` |
-
+| CLEAR_FRONT_PACKAGES | Set it to `no` to keep `/node_nodules` directory in theme after `make front` task to save build time. | yes |
 
 #### Persistent Mysql
 
 * By default sqlite storage used, which is created inside php container, if you need persistent data to be saved:
-  * Update `docker-compose.override.yml`, set 
+  * Update `docker-compose.override.yml`, set
   ```yaml
   php:
      depends_on:
        - mysql
-  ``` 
-  and update mysql container part 
+  ```
+  and update mysql container part
   ```yaml
   mysql:
     image: percona:5.7.22
   ...
-  ``` 
+  ```
   * Update `.env` file, and set `DB_URL=mysql://d8:d8@mysql/d8`
 
 #### Network
@@ -108,11 +111,12 @@ networks:
 * `make exec` - `docker exec` into php container.
 * `make exec0` - `docker exec` into php container as root.
 * `make dev` - Devel + kint setup, and config for Twig debug mode, disable aggregation.
-* `make drush [command]` - execute drush command. 
+* `make drush [command]` - execute drush command.
 * `make phpcs` - Check codebase with `phpcs` sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards.
 * `make phpcbf` - Fix codebase according to Drupal standards https://www.drupal.org/docs/develop/standards.
 * `make front` - Builds frontend tasks.
 * `make lint` - Runs frontend linters.
+* `make storybook` - Runs storybook in current theme.
 
 #### Additional goals
 
@@ -120,7 +124,7 @@ networks:
 
 ## Support
 
-* This project is supported by <a href="http://www.skilld.fr">© Skilld SAS</a> 
+* This project is supported by <a href="http://www.skilld.fr">© Skilld SAS</a>
 
 ## Drush commands
 
@@ -128,7 +132,7 @@ networks:
 
 ## Troubleshooting
 
-* Use our <a href="https://github.com/skilld-labs/skilld-docker-container/issues">issue queue</a>, which is public, to search or add new issues.  
+* Use our <a href="https://github.com/skilld-labs/skilld-docker-container/issues">issue queue</a>, which is public, to search or add new issues.
 
 ## Git hooks
 

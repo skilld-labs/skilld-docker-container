@@ -30,7 +30,9 @@ php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 php-0 = docker-compose exec -T php ${1}
 
 ## Full site install from the scratch
-all: | provision composer si localize hooksymlink info
+all: | provision composer front si info localize hooksymlink info
+## Full site install from the scratch without front task(it managed in .gitlab-ci).
+all_ci: | provision composer si info localize hooksymlink info
 
 ## Provision enviroment
 provision:
@@ -66,8 +68,6 @@ else
 endif
 	$(call php, composer drupal-scaffold)
 	$(call php, composer create-required-files)
-#	Uncomment this string to build front separately. See scripts/makefile/front.mk
-#	make -s front
 
 ## Install drupal
 si:
