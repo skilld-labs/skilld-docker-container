@@ -100,7 +100,8 @@
     "composer-exit-on-patch-failure": true,
     "patches": {
       "drupal/core": {
-        "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2019-03-19/2731991-38.patch"
+        "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2019-03-19/2731991-38.patch",
+        "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch"
       },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
