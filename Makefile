@@ -216,8 +216,7 @@ endif
 drupalcheckval:
 	@echo "Drupal-check validation..."
 	$(call php, composer install -o)
-	@docker run --rm -v `pwd`:`pwd` -w `pwd` skilldlabs/docker-drupal-check drupal-check -ad -vv -n --no-progress web/modules/custom/
-
+	$(call php, vendor/bin/drupal-check -ad -vv -n --no-progress web/modules/custom/)
 
 ## Behat scenarios validation
 behat:
