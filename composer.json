@@ -53,7 +53,8 @@
     "drupal/config_inspector": "^1.0@beta",
     "drupal/drupal-extension": "^3.4",
     "espend/behat-placeholder-extension": "^1.1",
-    "genesis/behat-fail-aid": "^2.1"
+    "genesis/behat-fail-aid": "^2.1",
+    "mglaman/drupal-check": "^1.0"
   },
   "conflict": {
     "drupal/drupal": "*"
