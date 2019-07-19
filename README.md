@@ -50,14 +50,18 @@
 | COMPOSE_FILE   | Path to a Compose file(s) | `./docker/docker-compose.yml:./docker/docker-compose.override.yml` |
 | COMPOSE_PROJECT_NAME   | Your project name | - |
 | PROFILE_NAME   | Profile used for site install | sdd |
-| MODULES   | Additional modules to enable after site install |  |
+| MODULES   | Additional modules to enable after site install | skilld_default_content |
 | THEME_NAME  | Theme name used for frontend | - |
-| SITE_NAME  | Site name | - |
+| SITE_NAME  | Site name | Example |
 | SITE_MAIL  | Site e-mail address | admin@example.com |
+| ADMIN_NAME  | Admin username | admin |
+| ADMIN_PW  | Admin password | admin |
+| ADMIN_MAIL  | Admin e-mail address | admin@example.com |
 | PROJECT_INSTALL | Way to install site - from straight or existing config | - |
 | IMAGE_PHP | Php image to use | `skilldlabs/php:72-fpm` |
 | IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.14.1` |
 | IMAGE_FRONT | Image to use for front tasks | `skilldlabs/frontend:zen` |
+| IMAGE_DRIVER | Image to use for automated testing webdriver | `zenika/alpine-chrome` |
 | MAIN_DOMAIN_NAME | Domain name used for traefik | `docker.localhost` |
 | DB_URL | Url to connect to database | `sqlite:///dev/shm/d8.sqlite` |
 | DB_DATA_DIR | Full path to database storage | `/dev/shm` |
