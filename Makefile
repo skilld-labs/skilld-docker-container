@@ -223,6 +223,7 @@ endif
 drupalcheckval:
 	@echo "Drupal-check validation..."
 	$(call php, composer install -o)
+	$(call php, vendor/bin/drupal-check -V)
 	$(call php, vendor/bin/drupal-check -ad -vv -n --no-progress web/modules/custom/)
 
 ## Behat scenarios validation
