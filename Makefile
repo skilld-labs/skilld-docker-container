@@ -167,12 +167,18 @@ phpcbf:
 
 ## Add symbolic link from custom script(s) to .git/hooks/
 hooksymlink:
+# Check if .git directory exists
+ifneq ($(wildcard .git/.*),)
+# Check if script file exists
 ifneq ("$(wildcard scripts/git_hooks/sniffers.sh)","")
 	@echo "Removing previous git hooks and installing fresh ones"
 	$(shell find .git/hooks -type l -exec unlink {} \;)
 	$(shell ln -sf ../../scripts/git_hooks/sniffers.sh .git/hooks/pre-push)
 else
 	@echo "scripts/git_hooks/sniffers.sh file does not exist"
+endif
+else
+	@echo "No git directory found, git hooks won't be installed"
 endif
 
 
