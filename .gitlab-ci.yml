@@ -29,13 +29,11 @@ sniffers:phpcs:
   stage: sniffers
   image: skilldlabs/docker-phpcs-drupal
   script:
-  - phpcs -s --colors
-    --standard=Drupal,DrupalPractice
-    --extensions=php,module,inc,install,profile,theme,yml,txt,md,js
-    --ignore=*.css,libraries/*
-    web/profiles
-    web/modules/custom
-    web/themes/custom
+  - ls -lah
+  - docker -v
+  - make phpcs
+  tags:
+  - review-apps-3
 
 sniffers:sonarqube:
   stage: sniffers
