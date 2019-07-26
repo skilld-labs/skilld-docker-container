@@ -8,16 +8,16 @@ include scripts/makefile/*.mk
 %:
 	@:
 
-# Prepare enviroment variables from defaults.
+# Prepare enviroment variables from defaults
 $(shell false | cp -i \.env.default \.env 2>/dev/null)
 $(shell false | cp -i \.\/docker\/docker-compose\.override\.yml\.default \.\/docker\/docker-compose\.override\.yml 2>/dev/null)
 include .env
 
-# Get user/group id to manage permissions between host and containers.
+# Get user/group id to manage permissions between host and containers
 LOCAL_UID := $(shell id -u)
 LOCAL_GID := $(shell id -g)
 
-# Evaluate recursively.
+# Evaluate recursively
 CUID ?= $(LOCAL_UID)
 CGID ?= $(LOCAL_GID)
 
@@ -26,28 +26,17 @@ COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 # Define mysql storage folder.
 MYSQL_DATADIR := $(DB_DATA_DIR)/$(COMPOSE_PROJECT_NAME)_mysql
 
-# Execute php container as regular user.
+# Execute php container as regular user
 php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
-# Execute php container as root user.
+# Execute php container as root user
 php-0 = docker-compose exec -T php ${1}
-# Function for code sniffer images.
-phpcsexec = docker run --rm \
-	-v $(shell pwd)/web/profiles/$(PROFILE_NAME):/work/profile \
-	-v $(shell pwd)/web/modules/custom:/work/modules \
-	-v $(shell pwd)/web/themes/custom:/work/themes \
-	skilldlabs/docker-phpcs-drupal ${1} -s --colors \
-	--standard=Drupal,DrupalPractice \
-	--extensions=php,module,inc,install,profile,theme,yml,txt,md,js \
-	--ignore=*.css,libraries/*,dist/*,styleguide/*,README.md,README.txt \
-	.
-
 
 ## Full site install from the scratch
 all: | provision composer si hooksymlink info
 
 ## Provision enviroment
 provision:
-# Check if enviroment variables has been defined.
+# Check if enviroment variables has been defined
 ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
 	$(info Project name can not be default, please enter project name.)
 	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "Project name: " REPLY;echo -n $$REPLY)))
@@ -82,7 +71,7 @@ endif
 #	Uncomment this string to build front separately. See scripts/makefile/front.mk
 #	make -s front
 
-## Install drupal.
+## Install drupal
 si:
 	@echo "Installing from: $(PROJECT_INSTALL)"
 ifeq ($(PROJECT_INSTALL), config)
@@ -95,7 +84,7 @@ ifneq ($(strip $(MODULES)),)
 	$(call php, drush pmu $(MODULES) -y)
 endif
 
-## Project's containers information
+## Display project's information
 info:
 	$(info Containers for "$(COMPOSE_PROJECT_NAME)" info:)
 	$(eval CONTAINERS = $(shell docker ps -f name=$(COMPOSE_PROJECT_NAME) --format "{{ .ID }}" -f 'label=traefik.enable=true'))
@@ -133,7 +122,7 @@ ifeq ($(shell docker-compose config --services | grep mysql),mysql)
 	@if [ -d $(MYSQL_DATADIR) ]; then echo "Removing mysql data $(MYSQL_DATADIR) ..."; docker run --rm -v $(shell pwd):/mnt/2rm $(IMAGE_PHP) sh -c "rm -rf /mnt/2rm/$(DB_DATA_DIR)"; fi
 endif
 
-## Enable development mode and disable caching.
+## Enable development mode and disable caching
 dev:
 	@echo "Dev tasks..."
 	$(call php, composer install --prefer-dist -o)
@@ -155,119 +144,4 @@ dev:
 drush:
 	$(call php, $(filter-out "$@",$(MAKECMDGOALS)))
 	$(info "To pass arguments use double dash: "make drush dl devel -- -y"")
-
-## Check codebase with phpcs sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards
-phpcs:
-	@echo "Phpcs validation..."
-	@$(call phpcsexec, phpcs)
-
-## Fix codebase according to Drupal standards https://www.drupal.org/docs/develop/standards
-phpcbf:
-	@$(call phpcsexec, phpcbf)
-
-## Add symbolic link from custom script(s) to .git/hooks/
-hooksymlink:
-# Check if .git directory exists
-ifneq ($(wildcard .git/.*),)
-# Check if script file exists
-ifneq ("$(wildcard scripts/git_hooks/sniffers.sh)","")
-	@echo "Removing previous git hooks and installing fresh ones"
-	$(shell find .git/hooks -type l -exec unlink {} \;)
-	$(shell ln -sf ../../scripts/git_hooks/sniffers.sh .git/hooks/pre-push)
-else
-	@echo "scripts/git_hooks/sniffers.sh file does not exist"
-endif
-else
-	@echo "No git directory found, git hooks won't be installed"
-endif
-
-
-## Validate langcode of base config files
-clang:
-ifneq ("$(wildcard scripts/makefile/baseconfig-langcode.sh)","")
-	@echo "Base config langcode validation..."
-	@/bin/sh ./scripts/makefile/baseconfig-langcode.sh
-else
-	@echo "scripts/makefile/baseconfig-langcode.sh file does not exist"
-endif
-
-
-## Validate configuration schema
-cinsp:
-ifneq ("$(wildcard scripts/makefile/config-inspector-validation.sh)","")
-	@echo "Config schema validation..."
-	$(call php, composer install -o)
-	@$(call php, /bin/sh ./scripts/makefile/config-inspector-validation.sh)
-else
-	@echo "scripts/makefile/config-inspector-validation.sh file does not exist"
-endif
-
-
-## Validate composer.json file
-compval:
-	@echo "Composer.json validation..."
-	@docker run --rm -v `pwd`:`pwd` -w `pwd` $(IMAGE_PHP) composer validate --strict
-
-
-## Validate watchdog logs
-watchdogval:
-ifneq ("$(wildcard scripts/makefile/watchdog-validation.sh)","")
-	@echo "Watchdog validation..."
-	@$(call php, /bin/sh ./scripts/makefile/watchdog-validation.sh)
-else
-	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
-endif
-
-
-## Validate drupal-check
-drupalcheckval:
-	@echo "Drupal-check validation..."
-	$(call php, composer install -o)
-	$(call php, vendor/bin/drupal-check -V)
-	$(call php, vendor/bin/drupal-check -ad -vv -n --no-progress web/modules/custom/)
-
-## Behat scenarios validation
-behat:
-	@echo "Getting base url"
-ifdef REVIEW_DOMAIN
-	$(eval BASE_URL := $(MAIN_DOMAIN_NAME))
-else
-	$(eval BASE_URL := $(shell docker inspect --format="{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}" $(COMPOSE_PROJECT_NAME)_web))
-endif
-ifeq ($(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}'), )
-	@echo 'Browser driver is stoped. Running it.'
-	make -s browser_driver
-endif
-	@echo "Replacing URL_TO_TEST value in behat.yml with http://$(BASE_URL)"
-	$(call php, cp behat.default.yml behat.yml)
-	$(call php, sed -i "s/URL_TO_TEST/http:\/\/$(BASE_URL)/" behat.yml)
-	@echo "Running Behat scenarios against http://$(BASE_URL)"
-	$(call php, composer install -o)
-	$(call php, vendor/bin/behat -V)
-	$(call php, vendor/bin/behat --colors)
-
-behatdl:
-	$(call php, vendor/bin/behat -dl --colors)
-
-behatdi:
-	$(call php, vendor/bin/behat -di --colors)
-
-## Running browser driver for behat tests
-browser_driver:
-	docker run -d --init --rm --name $(COMPOSE_PROJECT_NAME)_chrome \
-	--network container:$(COMPOSE_PROJECT_NAME)_php $(IMAGE_DRIVER) \
-	--remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --no-sandbox \
-	--entrypoint "" chromium-browser --headless --disable-gpu \
-	--window-size=1200,2080 \
-	--disable-web-security
-
-## Stopping browser driver
-browser_driver_stop:
-	docker stop $(COMPOSE_PROJECT_NAME)_chrome
-
-## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
-sniffers: | clang compval phpcs
-
-## Run all tests & validations (including sniffers)
-tests: | sniffers behat cinsp drupalcheckval watchdogval
 

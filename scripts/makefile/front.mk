@@ -1,7 +1,7 @@
-# Execute front container function.
+# Execute front container function
 front = docker run --rm -u $(CUID):$(CGID) -v $(shell pwd)/web/themes/custom/$(THEME_NAME):/work $(IMAGE_FRONT) ${1}
 
-## Build front tasks.
+## Build front tasks
 front:
 	@echo "Building front tasks..."
 	docker pull $(IMAGE_FRONT)

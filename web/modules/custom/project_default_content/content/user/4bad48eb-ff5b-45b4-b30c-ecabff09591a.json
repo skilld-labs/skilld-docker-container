@@ -40,7 +40,7 @@
     ],
     "mail": [
         {
-            "value": "default_content_author@skilld.cloud"
+            "value": ""
         }
     ],
     "timezone": [
@@ -80,7 +80,7 @@
     ],
     "init": [
         {
-            "value": "default_content_author@skilld.cloud"
+            "value": ""
         }
     ],
     "default_langcode": [
