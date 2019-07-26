@@ -50,7 +50,7 @@
 | COMPOSE_FILE   | Path to a Compose file(s) | `./docker/docker-compose.yml:./docker/docker-compose.override.yml` |
 | COMPOSE_PROJECT_NAME   | Your project name | - |
 | PROFILE_NAME   | Profile used for site install | sdd |
-| MODULES   | Additional modules to enable after site install | skilld_default_content |
+| MODULES   | Additional modules to enable after site install | project_default_content |
 | THEME_NAME  | Theme name used for frontend | - |
 | SITE_NAME  | Site name | Example |
 | SITE_MAIL  | Site e-mail address | admin@example.com |
