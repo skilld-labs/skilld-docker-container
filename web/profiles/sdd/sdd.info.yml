@@ -81,6 +81,7 @@ dependencies:
 # Contrib modules
 #  - admin_toolbar
 #  - components
+  - drush_language
 # Custom modules
 #  - sdd_default_content
 
@@ -90,4 +91,4 @@ themes:
 
 keep_english: true
 'interface translation project': sdd
-'interface translation server pattern': 'profiles/sdd/%language_custom.po'
+'interface translation server pattern': 'profiles/sdd/%language.po'

@@ -79,10 +79,18 @@ ifeq ($(PROJECT_INSTALL), config)
 else
 	$(call php, drush si $(PROFILE_NAME) --db-url=$(DB_URL) --account-name=$(ADMIN_NAME) --account-mail=$(ADMIN_MAIL) --account-pass=$(ADMIN_PW) -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
 endif
+	make -s local-settings
 ifneq ($(strip $(MODULES)),)
 	$(call php, drush en $(MODULES) -y)
 	$(call php, drush pmu $(MODULES) -y)
 endif
+	$(call php, drush langimp)
+
+local-settings:
+	@echo "Turn on settings.local"
+	$(call php, chmod +w web/sites/default)
+	$(call php, cp settings/settings.local.php web/sites/default/settings.local.php)
+	$(call php-0, sed -i "/settings.local.php';/s/# //g" web/sites/default/settings.php)
 
 ## Display project's information
 info:
