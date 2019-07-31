@@ -6,7 +6,7 @@ phpcsexec = docker run --rm \
 	skilldlabs/docker-phpcs-drupal ${1} -s --colors \
 	--standard=Drupal,DrupalPractice \
 	--extensions=php,module,inc,install,profile,theme,yml,txt,md,js \
-	--ignore=*.css,libraries/*,dist/*,styleguide/*,README.md,README.txt \
+	--ignore=*.css,libraries/*,dist/*,styleguide/*,README.md,README.txt,node_modules/*,$(THEME_NAME)/*.js \
 	.
 
 ## Validate codebase with phpcs sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards
