@@ -18,7 +18,6 @@ phpcs:
 phpcbf:
 	@$(call phpcsexec, phpcbf)
 
-
 ## Add symbolic link from custom script(s) to .git/hooks/
 hooksymlink:
 # Check if .git directory exists
@@ -35,7 +34,6 @@ else
 	@echo "No git directory found, git hooks won't be installed"
 endif
 
-
 ## Validate langcode of base config files
 clang:
 ifneq ("$(wildcard scripts/makefile/baseconfig-langcode.sh)","")
@@ -44,7 +42,6 @@ ifneq ("$(wildcard scripts/makefile/baseconfig-langcode.sh)","")
 else
 	@echo "scripts/makefile/baseconfig-langcode.sh file does not exist"
 endif
-
 
 ## Validate configuration schema
 cinsp:
@@ -56,12 +53,10 @@ else
 	@echo "scripts/makefile/config-inspector-validation.sh file does not exist"
 endif
 
-
 ## Validate composer.json file
 compval:
 	@echo "Composer.json validation..."
 	@docker run --rm -v `pwd`:`pwd` -w `pwd` $(IMAGE_PHP) composer validate --strict
-
 
 ## Validate watchdog logs
 watchdogval:
@@ -72,6 +67,14 @@ else
 	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
 endif
 
+## Validate status report
+statusreportval:
+ifneq ("$(wildcard scripts/makefile/status-report-validation.sh)","")
+	@echo "Status report validation..."
+	@$(call php, /bin/sh ./scripts/makefile/status-report-validation.sh)
+else
+	@echo "scripts/makefile/status-report-validation.sh file does not exist"
+endif
 
 ## Validate drupal-check
 drupalcheckval:
@@ -123,4 +126,5 @@ browser_driver_stop:
 sniffers: | clang compval phpcs
 
 ## Run all tests & validations (including sniffers)
-tests: | sniffers behat cinsp drupalcheckval watchdogval
+tests: | sniffers behat cinsp drupalcheckval watchdogval statusreportval
+
