@@ -137,8 +137,6 @@ test:cinsp:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
   - pwd
-  - ls -lah
-  - ls -lah scripts/makefile/
   - make cinsp
   tags:
   - review-apps-3
@@ -162,7 +160,23 @@ test:drupalcheck:
   dependencies:
   - deploy:review
 
-test:watchdog:
+test:statusreportval:
+  stage: tests
+  environment:
+    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - pwd
+  - make statusreportval
+  tags:
+  - review-apps-3
+  dependencies:
+  - deploy:review
+
+logs:watchdog:
   stage: logs
   environment:
     url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
@@ -172,8 +186,6 @@ test:watchdog:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
   - pwd
-  - ls -lah
-  - ls -lah scripts/makefile/
   - make watchdogval
   tags:
   - review-apps-3
