@@ -75,6 +75,7 @@ endif
 si:
 	@echo "Installing from: $(PROJECT_INSTALL)"
 ifeq ($(PROJECT_INSTALL), config)
+	$(call php, sed -i 's/admin@example.com/$(ADMIN_MAIL)/g' web/profiles/sdd/config/install/update.settings.yml)
 	$(call php, drush si config_installer --db-url=$(DB_URL) --account-name=$(ADMIN_NAME) --account-mail=$(ADMIN_MAIL) --account-pass=$(ADMIN_PW) -y config_installer_sync_configure_form.sync_directory=../config/sync)
 else
 	$(call php, drush si $(PROFILE_NAME) --db-url=$(DB_URL) --account-name=$(ADMIN_NAME) --account-mail=$(ADMIN_MAIL) --account-pass=$(ADMIN_PW) -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
