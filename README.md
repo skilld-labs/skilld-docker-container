@@ -131,8 +131,8 @@ networks:
 
 ## Git hooks
 
-* Project includes pre-commit [git hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) to perform automatic checks when `git commit` is executed
-* You can bypass these checks by running `git commit --no-verify`
+* Project includes [git hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) to perform automatic validation when certain git commands are executed
+* You can bypass this validation with option `--no-verify`
 
 ## License
 
