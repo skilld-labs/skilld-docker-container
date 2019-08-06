@@ -126,6 +126,8 @@ test:behat:
     - review-apps-3
   dependencies:
   - deploy:review
+  only:
+    - branches
 
 test:cinsp:
   stage: tests
@@ -142,6 +144,8 @@ test:cinsp:
   - review-apps-3
   dependencies:
   - deploy:review
+  only:
+    - branches
 
 test:drupalcheck:
   stage: tests
@@ -159,6 +163,8 @@ test:drupalcheck:
   - review-apps-3
   dependencies:
   - deploy:review
+  only:
+    - branches
 
 test:statusreportval:
   stage: tests
@@ -175,6 +181,8 @@ test:statusreportval:
   - review-apps-3
   dependencies:
   - deploy:review
+  only:
+    - branches
 
 logs:watchdog:
   stage: logs
@@ -191,3 +199,5 @@ logs:watchdog:
   - review-apps-3
   dependencies:
   - deploy:review
+  only:
+    - branches
