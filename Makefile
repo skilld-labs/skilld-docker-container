@@ -30,9 +30,9 @@ php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 php-0 = docker-compose exec -T php ${1}
 
 ## Full site install from the scratch
-all: | provision composer front si info localize hooksymlink info
+all: | provision composer front si localize hooksymlink info
 ## Full site install from the scratch without front task(it managed in .gitlab-ci).
-all_ci: | provision composer si info localize hooksymlink info
+all_ci: | provision composer si localize hooksymlink info
 
 ## Provision enviroment
 provision:
@@ -126,6 +126,9 @@ endif
 	make -s down
 	@for i in $(DIRS); do if [ -d "$$i" ]; then echo "Removing $$i..."; docker run --rm -v $(shell pwd):/mnt $(IMAGE_PHP) sh -c "rm -rf /mnt/$$i"; fi; done
 	if [ -d $(DB_DATA_DIR) ]; then echo "Removing mysql data $(DB_DATA_DIR) ..."; docker run --rm --user 0:0 -v $(shell pwd):/mnt/2rm $(IMAGE_PHP) sh -c "rm -rf /mnt/2rm/$(DB_DATA_DIR)"; fi
+ifeq ($(CLEAR_FRONT_PACKAGES), yes)
+	make clear-front
+endif
 
 ## Enable development mode and disable caching
 dev:

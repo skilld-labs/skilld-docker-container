@@ -139,7 +139,7 @@ deploy:review:
     - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
     - docker --version
     - docker-compose --version
-    - make all_ci
+    - make all MAKE_ENV=ci
   after_script:
     - echo "Started ${CI_ENVIRONMENT_URL} composition in ${BUILD_DIR} from Makefile."
   environment:
