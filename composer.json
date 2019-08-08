@@ -43,6 +43,7 @@
     "drupal/styleguide": "^1",
     "drupal/swiftmailer": "^1",
     "drupal/token": "^1",
+    "drupal/views_bulk_edit": "^2.3",
     "drush/drush": "^9.6",
     "webflo/drupal-finder": "^1.1",
     "webmozart/path-util": "^2.3",
