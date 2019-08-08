@@ -10,7 +10,7 @@ dependencies:
   - automated_cron
 #  - ban
 #  - basic_auth
-#  - big_pipe
+  - big_pipe
   - block
   - block_content
 #  - block_place
@@ -79,7 +79,8 @@ dependencies:
   - views
   - views_ui #comment in prod
 # Contrib modules
-#  - admin_toolbar
+  - views_bulk_edit
+  - views_bulk_operations
 #  - components
 # Custom modules
 #  - sdd_default_content
