@@ -166,6 +166,25 @@ test:drupalcheck:
   only:
     - branches
 
+test:contentgen:
+  stage: tests
+  environment:
+    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - pwd
+  - make contentgen
+  tags:
+  - review-apps-3
+  dependencies:
+  - deploy:review
+  only:
+    - branches
+  when: manual
+
 test:statusreportval:
   stage: tests
   environment:
