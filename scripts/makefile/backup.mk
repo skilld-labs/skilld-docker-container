@@ -6,6 +6,6 @@ backup_name = $(COMPOSE_PROJECT_NAME)-$(datestamp).tar.gz
 
 backup:
 	rm -f $(backup_name)
-	$(call php, drush sql-dump --database=default --result-file=../$(mysql_dump_name))
+	$(call php, drush sql-dump --database=default --result-file=../$(mysql_dump_name) --structure-tables-list=cachetags,cache_*,flood,sessions,watchdog --extra=--single-transaction)
 	tar -czvf $(backup_name) $(files_dir) $(mysql_dump_name) --exclude=$(files_dir)/translations --exclude=$(files_dir)/js --exclude=$(files_dir)/css --exclude=$(files_dir)/styles --exclude=$(files_dir)/php
 	rm $(mysql_dump_name)
