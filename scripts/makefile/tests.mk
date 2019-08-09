@@ -122,6 +122,16 @@ browser_driver:
 browser_driver_stop:
 	docker stop $(COMPOSE_PROJECT_NAME)_chrome
 
+## Create a high number of random content
+contentgen:
+ifneq ("$(wildcard scripts/makefile/contentgen.sh)","")
+	@$(call php, composer require --dev drupal/devel_generate)
+	@$(call php, drush pm:enable devel_generate -y)
+	@$(call php, /bin/sh ./scripts/makefile/contentgen.sh)
+else
+	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
+endif
+
 ## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
 sniffers: | clang compval phpcs
 
