@@ -125,8 +125,6 @@ browser_driver_stop:
 ## Create a high number of random content
 contentgen:
 ifneq ("$(wildcard scripts/makefile/contentgen.sh)","")
-	@$(call php, composer require --dev drupal/devel_generate)
-	@$(call php, drush pm:enable devel_generate -y)
 	@$(call php, /bin/sh ./scripts/makefile/contentgen.sh)
 else
 	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
