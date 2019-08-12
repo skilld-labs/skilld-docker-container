@@ -1,13 +1,20 @@
 #!/usr/bin/env sh
 
+# Preparing
+echo -e "Installing devel_generate..."
+composer require --dev drupal/devel_generate
+
+echo -e "Enabling module..."
+drush pm:enable devel_generate -y
+
 # Parsing command
 PARSING_CMD='echo drush config:status --state=Any --format=list'
 
-echo -e "\nLooking for bundles ..."
+echo -e "\nLooking for bundles..."
 
 # Voc entity
 
-	# Entity to parse. Can be node.type or taxonomy.vocabulary for ex
+	# Entity to parse. Can be node.type or taxonomy.vocabulary for ex (see PARSING_CMD for more)
 	ENTITY_TO_PARSE=taxonomy.vocabulary
 
 	# Count bundles
@@ -20,12 +27,13 @@ echo -e "\nLooking for bundles ..."
 		echo $BUNDLES_FOUND
 
 		echo "  Generating content..."
-		GENERATE_COUNT=20
+		VOC_GENERATE_COUNT=10
 
 		# TODO : Update after https://www.drupal.org/project/devel/issues/3073850
 		BUNDLES_FOUND=$($($PARSING_CMD) | grep $ENTITY_TO_PARSE | awk -F "." '{print $3}')
 		for voc_bundles in $BUNDLES_FOUND; do
-			drush devel-generate-terms $voc_bundles $GENERATE_COUNT
+			drush devel-generate-terms $voc_bundles $VOC_GENERATE_COUNT
+			echo "  $VOC_GENERATE_COUNT terms have been created for $voc_bundles"
 		done
 
 	else
@@ -34,7 +42,7 @@ echo -e "\nLooking for bundles ..."
 
 # CT entity
 
-	# Entity to parse. Can be node.type or taxonomy.vocabulary for ex
+	# Entity to parse. Can be node.type or taxonomy.vocabulary for ex (see PARSING_CMD for more)
 	ENTITY_TO_PARSE=node.type
 
 	# Count bundles
@@ -47,10 +55,17 @@ echo -e "\nLooking for bundles ..."
 		echo $BUNDLES_FOUND
 
 		echo "  Generating content..."
-		GENERATE_COUNT=20
-		drush devel-generate-content $GENERATE_COUNT --types=$BUNDLES_FOUND
+		CT_GENERATE_COUNT=100
+
+		# TODO : Update after https://www.drupal.org/project/devel/issues/3073850
+		BUNDLES_FOUND=$($($PARSING_CMD) | grep $ENTITY_TO_PARSE | awk -F "." '{print $3}')
+		for ct_bundles in $BUNDLES_FOUND; do
+			drush devel-generate-content $CT_GENERATE_COUNT --types=$ct_bundles --quiet
+			echo "  $CT_GENERATE_COUNT nodes have been created for $ct_bundles"
+		done
 
 	else
 		printf "- \033[1mNo CT bundle\033[0m found\n"
 	fi
 
+echo -e "\nRun this job multiple times for more content or enable Devel UI in Drupal for manual creation."
