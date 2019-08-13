@@ -125,6 +125,7 @@ browser_driver_stop:
 ## Create a high number of random content
 contentgen:
 ifneq ("$(wildcard scripts/makefile/contentgen.sh)","")
+	$(call php, composer install -o)
 	@$(call php, /bin/sh ./scripts/makefile/contentgen.sh)
 else
 	@echo "scripts/makefile/watchdog-validation.sh file does not exist"

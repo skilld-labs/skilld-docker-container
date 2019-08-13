@@ -1,9 +1,6 @@
 #!/usr/bin/env sh
 
 # Preparing
-echo -e "Installing devel_generate..."
-composer require --dev drupal/devel_generate
-
 echo -e "Enabling module..."
 drush pm:enable devel_generate -y
 
@@ -68,4 +65,10 @@ echo -e "\nLooking for bundles..."
 		printf "- \033[1mNo CT bundle\033[0m found\n"
 	fi
 
-echo -e "\nRun this job multiple times for more content or enable Devel UI in Drupal for manual creation."
+
+# Cleaning
+echo -e "Disabling module..."
+drush pmu devel_generate devel -y
+
+# Informing
+echo -e "\nRun this job multiple times for more content or enable Devel Generate in Drupal UI for manual creation."
