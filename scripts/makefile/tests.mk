@@ -89,12 +89,13 @@ behat:
 ifdef REVIEW_DOMAIN
 	$(eval BASE_URL := $(MAIN_DOMAIN_NAME))
 else
-	$(eval BASE_URL := $(shell docker inspect --format="{{.NetworkSettings.Networks.$(COMPOSE_NET_NAME).IPAddress}}" $(COMPOSE_PROJECT_NAME)_web))
+	$(eval BASE_URL := $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}' $(COMPOSE_PROJECT_NAME)_web))
 endif
-ifeq ($(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}'), )
-	@echo 'Browser driver is stoped. Running it.'
-	make -s browser_driver
-endif
+	echo "Base URL: " $(BASE_URL)
+	if [ -z `docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}'` ]; then \
+		echo 'Browser driver is stoped. Running it.'; \
+		make -s browser_driver; \
+	fi
 	@echo "Replacing URL_TO_TEST value in behat.yml with http://$(BASE_URL)"
 	$(call php, cp behat.default.yml behat.yml)
 	$(call php, sed -i "s/URL_TO_TEST/http:\/\/$(BASE_URL)/" behat.yml)
@@ -102,6 +103,7 @@ endif
 	$(call php, composer install -o)
 	$(call php, vendor/bin/behat -V)
 	$(call php, vendor/bin/behat --colors)
+	make browser_driver_stop
 
 behatdl:
 	$(call php, vendor/bin/behat -dl --colors)
@@ -116,7 +118,7 @@ browser_driver:
 	--remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --no-sandbox \
 	--entrypoint "" chromium-browser --headless --disable-gpu \
 	--window-size=1200,2080 \
-	--disable-web-security
+	--disable-web-security --w3c=false
 
 ## Stop browser driver
 browser_driver_stop:
