@@ -23,7 +23,6 @@ services:
 #    networks:
 #      - front
 
-
 #  mysql:
 #    image: percona:5.7.22
 #    container_name: "${COMPOSE_PROJECT_NAME}_mysql"
@@ -48,7 +47,8 @@ services:
       - 'traefik.enable=true'
       - 'traefik.backend=${MAIN_DOMAIN_NAME}_mail'
       - 'traefik.port=8025'
-      - 'traefik.frontend.rule=Host:mail.${MAIN_DOMAIN_NAME}'
+      - 'traefik.frontend.rule=Host:mail-${MAIN_DOMAIN_NAME}'
+      - 'traefik.frontend.redirect.entryPoint=https'
 
   nginx:
 # Uncomment for MacOS.
@@ -62,6 +62,8 @@ services:
       - 'traefik.backend=${MAIN_DOMAIN_NAME}_web'
       - 'traefik.port=80'
       - 'traefik.frontend.rule=Host:${MAIN_DOMAIN_NAME}'
+      - 'traefik.frontend.redirect.entryPoint=https'
+
 #networks:
 #  front:
 #    driver: bridge
