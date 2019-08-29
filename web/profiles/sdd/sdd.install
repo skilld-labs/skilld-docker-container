@@ -20,7 +20,7 @@ function sdd_install() {
   $config_factory = \Drupal::configFactory();
   // Set front page to "node".
   $config_factory->getEditable('system.site')
-    ->set('page.front', '/node')
+    ->set('page.front', '/user')
     ->save(TRUE);
 
   // Allow visitor account creation with administrative approval.
