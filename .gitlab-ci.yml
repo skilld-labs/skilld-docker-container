@@ -1,3 +1,8 @@
+# Variables to add in Gitalb UI : Settings > CI/CI
+# - REVIEW_DOMAIN // Mandatory, should equal to DNS of available runner server with docker + docker-compose
+# - SONAR_HOST // Optional
+# - SONAR_TOKEN // Optional
+
 image: skilldlabs/php:72
 
 variables:
@@ -11,7 +16,7 @@ stages:
   - sniffers
   - deploy
   - tests
-  - logs
+  - reports
 
 
 sniffers:clang:
@@ -33,7 +38,7 @@ sniffers:phpcs:
   - docker -v
   - make phpcs
   tags:
-  - review-apps-3
+  - review-apps-4
 
 sniffers:sonarqube:
   stage: sniffers
@@ -63,7 +68,7 @@ sniffers:sonarqube:
   only:
     - branches
   tags:
-    - review-apps-3
+    - review-apps-4
   dependencies:
     - sniffers:phpcs
 
@@ -74,13 +79,14 @@ deploy:review:
     - echo "CI_ENVIRONMENT_NAME=${CI_ENVIRONMENT_NAME}"
     - echo "CI_ENVIRONMENT_SLUG=${CI_ENVIRONMENT_SLUG}"
     - echo "CI_ENVIRONMENT_URL=${CI_ENVIRONMENT_URL}"
+    - echo "CI_PROJECT_PATH_SLUG=${CI_PROJECT_PATH_SLUG}"
     - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
     - echo "REVIEW_DOMAIN=${REVIEW_DOMAIN}"
     - mkdir -p ${BUILD_DIR}
     - rsync -ah --exclude=.git --delete ./ ${BUILD_DIR}
     - cd ${BUILD_DIR}
     - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-${CI_ENVIRONMENT_SLUG}" >> .env.default
-    - echo "MAIN_DOMAIN_NAME=${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}" >> .env.default
+    - echo "MAIN_DOMAIN_NAME=${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}" >> .env.default
     - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
     - docker --version
     - docker-compose --version
@@ -88,7 +94,7 @@ deploy:review:
   after_script:
     - echo "Started ${CI_ENVIRONMENT_URL} composition in ${BUILD_DIR} from Makefile."
   environment:
-    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
 
@@ -105,7 +111,7 @@ stop_review:
 test:behat:
   stage: tests
   environment:
-    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
@@ -123,7 +129,7 @@ test:behat:
   - mv features/*.png web/screenshots/
   - echo "- Screenshots are available here :" && cd web/screenshots && ls -h *.png | xargs -i echo "${CI_ENVIRONMENT_URL}/screenshots/{}"
   tags:
-    - review-apps-3
+    - review-apps-4
   dependencies:
   - deploy:review
   only:
@@ -132,7 +138,7 @@ test:behat:
 test:cinsp:
   stage: tests
   environment:
-    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
@@ -141,7 +147,7 @@ test:cinsp:
   - pwd
   - make cinsp
   tags:
-  - review-apps-3
+  - review-apps-4
   dependencies:
   - deploy:review
   only:
@@ -150,7 +156,7 @@ test:cinsp:
 test:drupalcheck:
   stage: tests
   environment:
-    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
@@ -160,7 +166,7 @@ test:drupalcheck:
   - ls -lah
   - make drupalcheckval
   tags:
-  - review-apps-3
+  - review-apps-4
   dependencies:
   - deploy:review
   only:
@@ -169,7 +175,7 @@ test:drupalcheck:
 test:contentgen:
   stage: tests
   environment:
-    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
@@ -178,17 +184,17 @@ test:contentgen:
   - pwd
   - make contentgen
   tags:
-  - review-apps-3
+  - review-apps-4
   dependencies:
   - deploy:review
   only:
     - branches
   when: manual
 
-test:statusreportval:
-  stage: tests
+report:statusreportval:
+  stage: reports
   environment:
-    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
@@ -197,16 +203,16 @@ test:statusreportval:
   - pwd
   - make statusreportval
   tags:
-  - review-apps-3
+  - review-apps-4
   dependencies:
   - deploy:review
   only:
     - branches
 
-logs:watchdog:
-  stage: logs
+report:watchdog:
+  stage: reports
   environment:
-    url: http://${CI_ENVIRONMENT_SLUG}.${REVIEW_DOMAIN}
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
@@ -215,7 +221,7 @@ logs:watchdog:
   - pwd
   - make watchdogval
   tags:
-  - review-apps-3
+  - review-apps-4
   dependencies:
   - deploy:review
   only:
