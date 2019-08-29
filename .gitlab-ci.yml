@@ -3,6 +3,13 @@
 # - SONAR_HOST // Optional
 # - SONAR_TOKEN // Optional
 
+# Tags defines which runner to use (expected shell runner)
+.ra_tags_branches: &ra_tags_branches
+  tags:
+    - review-apps-4
+  only:
+    - branches
+
 image: skilldlabs/php:72
 
 variables:
@@ -37,8 +44,7 @@ sniffers:phpcs:
   - ls -lah
   - docker -v
   - make phpcs
-  tags:
-  - review-apps-4
+  <<: *ra_tags_branches
 
 sniffers:sonarqube:
   stage: sniffers
@@ -65,12 +71,9 @@ sniffers:sonarqube:
     - (if [ -d ${BUILD_DIR} ]; then date; cd ${BUILD_DIR}; pwd; make clean; cd -; rm -rf ${BUILD_DIR}; fi)
   script:
     - echo "Removed previous review app ${CI_ENVIRONMENT_URL} from ${BUILD_DIR}."
-  only:
-    - branches
-  tags:
-    - review-apps-4
   dependencies:
     - sniffers:phpcs
+  <<: *ra_tags_branches
 
 deploy:review:
   <<: *job_deploy_commit
@@ -128,12 +131,9 @@ test:behat:
   - mkdir web/screenshots
   - mv features/*.png web/screenshots/
   - echo "- Screenshots are available here :" && cd web/screenshots && ls -h *.png | xargs -i echo "${CI_ENVIRONMENT_URL}/screenshots/{}"
-  tags:
-    - review-apps-4
   dependencies:
   - deploy:review
-  only:
-    - branches
+  <<: *ra_tags_branches
 
 test:cinsp:
   stage: tests
@@ -146,12 +146,9 @@ test:cinsp:
   - cd ${BUILD_DIR}
   - pwd
   - make cinsp
-  tags:
-  - review-apps-4
   dependencies:
   - deploy:review
-  only:
-    - branches
+  <<: *ra_tags_branches
 
 test:drupalcheck:
   stage: tests
@@ -165,12 +162,9 @@ test:drupalcheck:
   - pwd
   - ls -lah
   - make drupalcheckval
-  tags:
-  - review-apps-4
   dependencies:
   - deploy:review
-  only:
-    - branches
+  <<: *ra_tags_branches
 
 test:contentgen:
   stage: tests
@@ -183,12 +177,9 @@ test:contentgen:
   - cd ${BUILD_DIR}
   - pwd
   - make contentgen
-  tags:
-  - review-apps-4
   dependencies:
   - deploy:review
-  only:
-    - branches
+  <<: *ra_tags_branches
   when: manual
 
 report:statusreportval:
@@ -202,12 +193,9 @@ report:statusreportval:
   - cd ${BUILD_DIR}
   - pwd
   - make statusreportval
-  tags:
-  - review-apps-4
   dependencies:
   - deploy:review
-  only:
-    - branches
+  <<: *ra_tags_branches
 
 report:watchdog:
   stage: reports
@@ -220,9 +208,6 @@ report:watchdog:
   - cd ${BUILD_DIR}
   - pwd
   - make watchdogval
-  tags:
-  - review-apps-4
   dependencies:
   - deploy:review
-  only:
-    - branches
+  <<: *ra_tags_branches
