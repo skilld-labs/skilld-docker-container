@@ -18,16 +18,6 @@ use Drupal\user\RoleInterface;
  */
 function sdd_install() {
   $config_factory = \Drupal::configFactory();
-  // Set front page to "node".
-  $config_factory->getEditable('system.site')
-    ->set('page.front', '/user')
-    ->save(TRUE);
-
-  // Allow visitor account creation with administrative approval.
-  $user_settings = $config_factory->getEditable('user.settings');
-  $user_settings
-    ->set('register', USER_REGISTER_VISITORS)
-    ->save(TRUE);
 
   // Disable the user pictures on nodes.
   $config_factory->getEditable('system.theme.global')
