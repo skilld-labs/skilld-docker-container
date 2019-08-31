@@ -1,0 +1,35 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Info
+      run: |
+        pwd
+        env
+        ls -lah
+        php -v
+        php -m
+        composer -vvv -V
+        composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3"
+        composer install -o --profile
+        vendor/bin/drupal-check -ad -vv -n web/modules/custom web/profiles/sdd
+
+#    - name: Build
+#      uses: docker://skilldlabs/php:73
+#      with:
+#        args: sh -c "composer install -o && vendor/bin/drupal-check -ad -vv -n web/modules/custom"
+
+    - name: Run a multi-line script
+      run: |
+        ls -la
+        ls -lah vendor/bin
