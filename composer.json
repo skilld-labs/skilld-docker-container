@@ -1,5 +1,5 @@
 {
-  "name": "skilld-labs/drupal-project",
+  "name": "skilld-labs/sdc",
   "description": "Project template for Drupal 8 projects with composer",
   "type": "project",
   "license": "MIT",
@@ -94,6 +94,9 @@
       "drush/contrib/{$name}": ["type:drupal-drush"]
     },
     "drupal-scaffold": {
+      "excludes": [
+        "web.config"
+      ],
       "initial": {
         ".editorconfig": "../.editorconfig",
         ".gitattributes": "../.gitattributes"
