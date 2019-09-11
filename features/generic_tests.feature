@@ -66,6 +66,7 @@ Feature: Generic tests
     | John Doe | johndoe@example.com | 1 |
     And I am logged in as a user with the "administrator" role
     When I visit "/admin/people"
+    When wait for the page to be loaded
     Then I should see the link "John Doe"
 
 
@@ -73,10 +74,12 @@ Feature: Generic tests
     Given I am logged in as a user with the "administrator" role
     When I run cron
     And am on "admin/reports/dblog"
+    When wait for the page to be loaded
     Then I should see the link "Cron run completed"
 
 
   Scenario: Clear cache
     Given the cache has been cleared
     When I am on the homepage
+    When wait for the page to be loaded
     Then I should get a "200" HTTP response
