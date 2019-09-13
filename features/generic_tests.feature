@@ -7,12 +7,14 @@ Feature: Generic tests
     Given I am an anonymous user
     When I am on the homepage
     Then I should get a "200" HTTP response
+    And I take a screenshot
 
 
   Scenario: User login page is accessible
     Given I am an anonymous user
     When I visit "/user"
     Then I should get a "200" HTTP response
+    And I take a screenshot
 
 
   Scenario: Submit valid credentials as admin user login
@@ -42,6 +44,7 @@ Feature: Generic tests
     | Page two |
     And I am logged in as a user with the "administrator" role
     When I go to "admin/content"
+    And I take a screenshot
     Then I should see "Page one"
     And I should see "Page two"
 
