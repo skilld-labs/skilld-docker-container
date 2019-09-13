@@ -50,7 +50,7 @@ endif
 	docker-compose pull
 	@echo "Build and run containers..."
 	docker-compose up -d --remove-orphans
-	$(call php-0, apk add --no-cache graphicsmagick)
+	$(call php-0, apk add --no-cache graphicsmagick $(ADD_PHP_EXT))
 	$(call php-0, kill -USR2 1)
 	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
 

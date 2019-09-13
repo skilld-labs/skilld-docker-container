@@ -62,6 +62,7 @@
 | IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.14.1` |
 | IMAGE_FRONT | Image to use for front tasks | `skilldlabs/frontend:zen` |
 | IMAGE_DRIVER | Image to use for automated testing webdriver | `zenika/alpine-chrome` |
+| ADD_PHP_EXT | Additional php extension to install | - |
 | MAIN_DOMAIN_NAME | Domain name used for traefik | `docker.localhost` |
 | DB_URL | Url to connect to database | `sqlite:///dev/shm/d8.sqlite` |
 | DB_DATA_DIR | Full path to database storage | `/dev/shm` |
