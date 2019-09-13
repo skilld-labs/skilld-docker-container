@@ -83,6 +83,14 @@ drupalcheckval:
 	$(call php, vendor/bin/drupal-check -V)
 	$(call php, vendor/bin/drupal-check -ad -vv -n --no-progress web/modules/custom/)
 
+## Validate newline at the end of files
+newlineeof:
+ifneq ("$(wildcard scripts/makefile/newlineeof.sh)","")
+	@/bin/sh ./scripts/makefile/newlineeof.sh
+else
+	@echo "scripts/makefile/newlineeof.sh file does not exist"
+endif
+
 ## Validate Behat scenarios
 behat:
 	@echo "Getting base url"
@@ -135,7 +143,7 @@ else
 endif
 
 ## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
-sniffers: | clang compval phpcs
+sniffers: | clang compval phpcs newlineeof
 
 ## Run all tests & validations (including sniffers)
 tests: | sniffers behat cinsp drupalcheckval watchdogval statusreportval

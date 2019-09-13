@@ -46,6 +46,12 @@ sniffers:phpcs:
   - make phpcs
   <<: *ra_tags_branches
 
+sniffers:newlineeof:
+  stage: sniffers
+  script:
+  - ls -lah
+  - make newlineeof
+
 sniffers:sonarqube:
   stage: sniffers
   image: skilldlabs/sonar-scanner:3.3
