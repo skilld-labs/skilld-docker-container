@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_form_mode.media.media_library
+    - field.field.media.local_video.field_media_file
+    - media.type.local_video
+id: media.local_video.media_library
+targetEntityType: media
+bundle: local_video
+mode: media_library
+content: {  }
+hidden:
+  created: true
+  field_media_file: true
+  langcode: true
+  name: true
+  path: true
+  status: true
+  uid: true
