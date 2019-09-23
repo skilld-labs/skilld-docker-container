@@ -131,7 +131,7 @@ dev:
 	@$(call php, drush -y -q config-set system.performance css.preprocess 0)
 	@$(call php, drush -y -q config-set system.performance js.preprocess 0)
 	@echo "Enabling devel module."
-	@$(call php, drush -y -q en devel devel_generate kint)
+	@$(call php, drush -y -q en devel devel_generate)
 	@echo "Disabling caches."
 	@$(call php, drush -y -q pm-uninstall dynamic_page_cache page_cache)
 	@$(call php, drush cr)
