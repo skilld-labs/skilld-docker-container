@@ -44,7 +44,9 @@ dependencies:
   - panels
   - panels_everywhere
   - path
+  - pathauto
   - quickedit
+  - redirect
   - rdf
   - responsive_image
   - shortcut
