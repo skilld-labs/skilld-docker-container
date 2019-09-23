@@ -5,8 +5,14 @@ dependencies:
     - field.field.media.audio.field_media_file
     - media.type.audio
   module:
+    - field_layout
     - file
+    - layout_discovery
     - path
+third_party_settings:
+  field_layout:
+    id: layout_onecol
+    settings: {  }
 id: media.audio.default
 targetEntityType: media
 bundle: audio
@@ -53,6 +59,11 @@ content:
     weight: 100
     region: content
     third_party_settings: {  }
+  translation:
+    weight: 10
+    settings: {  }
+    third_party_settings: {  }
+    region: content
   uid:
     type: entity_reference_autocomplete
     weight: 5

@@ -6,7 +6,13 @@ dependencies:
     - field.field.media.local_video.field_media_file
     - media.type.local_video
   module:
+    - field_layout
     - file
+    - layout_discovery
+third_party_settings:
+  field_layout:
+    id: layout_onecol
+    settings: {  }
 id: media.local_video.full
 targetEntityType: media
 bundle: local_video

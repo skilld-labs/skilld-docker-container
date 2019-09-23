@@ -6,8 +6,14 @@ dependencies:
     - image.style.thumbnail
     - media.type.image
   module:
+    - field_layout
     - image
+    - layout_discovery
     - path
+third_party_settings:
+  field_layout:
+    id: layout_onecol
+    settings: {  }
 id: media.image.default
 targetEntityType: media
 bundle: image
@@ -55,6 +61,11 @@ content:
     weight: 100
     region: content
     third_party_settings: {  }
+  translation:
+    weight: 10
+    settings: {  }
+    third_party_settings: {  }
+    region: content
   uid:
     type: entity_reference_autocomplete
     weight: 5
