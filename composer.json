@@ -42,6 +42,8 @@
     "drupal/page_manager": "^4.0@beta",
     "drupal/panelbutton": "^1",
     "drupal/panels_everywhere": "^4.0@beta",
+    "drupal/pathauto": "^1.4",
+    "drupal/redirect": "^1.4",
     "drupal/styleguide": "^1",
     "drupal/swiftmailer": "^1",
     "drupal/token": "^1",

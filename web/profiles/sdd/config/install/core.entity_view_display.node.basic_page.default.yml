@@ -7,8 +7,8 @@ dependencies:
   module:
     - field_layout
     - layout_discovery
+    - manage_display
     - text
-    - user
 third_party_settings:
   field_layout:
     id: layout_onecol
@@ -21,14 +21,20 @@ content:
   body:
     label: hidden
     type: text_default
-    weight: 101
+    weight: 1
     settings: {  }
     third_party_settings: {  }
     region: content
-  links:
-    weight: 100
+  title:
+    label: hidden
+    type: title
+    weight: 0
     region: content
-    settings: {  }
+    settings:
+      tag: h2
+      linked: true
     third_party_settings: {  }
 hidden:
   langcode: true
+  links: true
+  uid: true

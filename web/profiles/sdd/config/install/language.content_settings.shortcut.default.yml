@@ -2,7 +2,7 @@ langcode: en
 status: true
 dependencies:
   config:
-    - media.type.image
+    - shortcut.set.default
   module:
     - content_translation
 third_party_settings:
@@ -10,8 +10,8 @@ third_party_settings:
     enabled: true
     bundle_settings:
       untranslatable_fields_hide: '1'
-id: media.image
-target_entity_type_id: media
-target_bundle: image
+id: shortcut.default
+target_entity_type_id: shortcut
+target_bundle: default
 default_langcode: current_interface
 language_alterable: true
