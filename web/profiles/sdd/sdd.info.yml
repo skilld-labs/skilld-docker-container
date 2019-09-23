@@ -31,6 +31,7 @@ dependencies:
   - layout_discovery
   - link
   - locale
+  - manage_display
   - media
   - media_library
   - menu_link_content
@@ -38,6 +39,10 @@ dependencies:
   - node
   - options
   - page_cache
+  - page_manager
+  - page_manager_ui
+  - panels
+  - panels_everywhere
   - path
   - quickedit
   - rdf

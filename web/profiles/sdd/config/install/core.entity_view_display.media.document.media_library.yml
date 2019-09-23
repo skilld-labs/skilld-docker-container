@@ -7,7 +7,13 @@ dependencies:
     - image.style.medium
     - media.type.document
   module:
+    - field_layout
     - image
+    - layout_discovery
+third_party_settings:
+  field_layout:
+    id: layout_onecol
+    settings: {  }
 id: media.document.media_library
 targetEntityType: media
 bundle: document

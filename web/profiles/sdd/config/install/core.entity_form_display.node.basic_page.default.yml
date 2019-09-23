@@ -5,8 +5,14 @@ dependencies:
     - field.field.node.basic_page.body
     - node.type.basic_page
   module:
+    - field_layout
+    - layout_discovery
     - path
     - text
+third_party_settings:
+  field_layout:
+    id: layout_onecol
+    settings: {  }
 id: node.basic_page.default
 targetEntityType: node
 bundle: basic_page

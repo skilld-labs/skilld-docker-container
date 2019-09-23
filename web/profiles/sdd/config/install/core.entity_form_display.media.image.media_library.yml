@@ -7,7 +7,13 @@ dependencies:
     - image.style.thumbnail
     - media.type.image
   module:
+    - field_layout
     - image
+    - layout_discovery
+third_party_settings:
+  field_layout:
+    id: layout_onecol
+    settings: {  }
 id: media.image.media_library
 targetEntityType: media
 bundle: image
@@ -20,6 +26,11 @@ content:
       preview_image_style: thumbnail
     third_party_settings: {  }
     type: image_image
+    region: content
+  translation:
+    weight: 10
+    settings: {  }
+    third_party_settings: {  }
     region: content
 hidden:
   created: true
