@@ -38,6 +38,7 @@
     "drupal/core": "^8.6.7",
     "drupal/default_content": "^1",
     "drupal/file_entity": "^2",
+    "drupal/google_tag": "^1.2",
     "drupal/manage_display": "^1.0@alpha",
     "drupal/page_manager": "^4.0@beta",
     "drupal/panelbutton": "^1",
