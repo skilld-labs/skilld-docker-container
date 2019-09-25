@@ -3,13 +3,13 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.full
-    - field.field.node.basic_page.body
+    - field.field.node.basic_page.content
     - node.type.basic_page
   module:
+    - entity_reference_revisions
     - field_layout
     - layout_discovery
     - manage_display
-    - text
 third_party_settings:
   field_layout:
     id: layout_onecol
@@ -19,17 +19,19 @@ targetEntityType: node
 bundle: basic_page
 mode: full
 content:
-  body:
-    label: hidden
-    type: text_default
-    weight: 0
-    settings: {  }
-    third_party_settings: {  }
+  content:
+    type: entity_reference_revisions_entity_view
+    weight: 1
     region: content
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
   title:
     label: hidden
     type: title
-    weight: -50
+    weight: 0
     region: content
     settings:
       tag: h1

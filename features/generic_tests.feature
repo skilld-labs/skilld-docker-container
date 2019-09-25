@@ -56,11 +56,10 @@ Feature: Generic tests
     And I should see text matching "menu Administration"
 
 
-  Scenario: Create and view a node with fields
+  Scenario: Create a node with listed field(s) and check display 
     Given I am viewing an "basic_page" content:
     | title | My node with fields! |
-    | body  | A placeholder           |
-    Then I should see the text "A placeholder"
+    Then I should see the text "My node with fields!"
 
 
   Scenario: Create users

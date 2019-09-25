@@ -42,6 +42,7 @@ dependencies:
   - page_cache
   - page_manager
   - page_manager_ui
+  - paragraphs
   - panels
   - panels_everywhere
   - path

@@ -3,13 +3,11 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.teaser
-    - field.field.node.basic_page.body
     - node.type.basic_page
   module:
     - field_layout
     - layout_discovery
     - manage_display
-    - text
 third_party_settings:
   field_layout:
     id: layout_onecol
@@ -19,14 +17,6 @@ targetEntityType: node
 bundle: basic_page
 mode: teaser
 content:
-  body:
-    label: hidden
-    type: text_summary_or_trimmed
-    weight: 1
-    settings:
-      trim_length: 600
-    third_party_settings: {  }
-    region: content
   title:
     label: hidden
     type: title

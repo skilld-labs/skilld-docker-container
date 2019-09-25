@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  content:
+    - 'file:file:c6e7f73c-b694-47d0-8073-de3adfa42c48'
+id: wysiwyg
+label: WYSIWYG
+icon_uuid: c6e7f73c-b694-47d0-8073-de3adfa42c48
+description: 'A simple formated text field using a WYSIWYG editor'
+behavior_plugins: {  }

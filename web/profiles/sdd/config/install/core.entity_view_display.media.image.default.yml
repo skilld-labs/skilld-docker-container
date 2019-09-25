@@ -3,6 +3,7 @@ status: true
 dependencies:
   config:
     - field.field.media.image.field_media_image
+    - field.field.media.image.text_short
     - image.style.thumbnail
     - media.type.image
   module:
@@ -31,12 +32,20 @@ content:
     third_party_settings: {  }
   field_media_image:
     weight: 6
-    label: above
+    label: hidden
     settings:
       image_style: ''
       image_link: ''
     third_party_settings: {  }
     type: image
+    region: content
+  text_short:
+    weight: 7
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
     region: content
   thumbnail:
     type: image

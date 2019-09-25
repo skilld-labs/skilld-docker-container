@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+id: contributor
+label: Contributor
+weight: 3
+is_admin: null
+permissions:
+  - 'use text format basic_html'
