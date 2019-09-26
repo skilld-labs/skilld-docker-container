@@ -43,6 +43,7 @@
     "drupal/page_manager": "^4.0@beta",
     "drupal/panelbutton": "^1",
     "drupal/panels_everywhere": "^4.0@beta",
+    "drupal/paragraphs": "^1.9",
     "drupal/pathauto": "^1.4",
     "drupal/redirect": "^1.4",
     "drupal/styleguide": "^1",
@@ -116,9 +117,6 @@
       },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
-      },
-      "drupal/config_inspector": {
-        "Adds Drush 9 support to module command": "https://www.drupal.org/files/issues/2019-04-12/3047418-7.patch"
       }
     }
   }
