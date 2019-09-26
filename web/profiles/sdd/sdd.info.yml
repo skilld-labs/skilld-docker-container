@@ -56,6 +56,7 @@ dependencies:
   - taxonomy
   - telephone
   - text
+  - telephone_validation
   - toolbar
   - update
   - user
@@ -63,6 +64,8 @@ dependencies:
   - views_ui
   - views_bulk_edit
   - views_bulk_operations
+  - webform
+  - webform_ui
 
 themes:
   - bartik
