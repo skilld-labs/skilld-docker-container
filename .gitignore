@@ -19,3 +19,6 @@ mysql/
 behat.yml
 features/*.html
 features/*.png
+.cache/
+.editorconfig
+.gitattributes
