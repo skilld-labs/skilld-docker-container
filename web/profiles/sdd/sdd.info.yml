@@ -35,6 +35,7 @@ dependencies:
   - manage_display
   - media
   - media_library
+  - menu_link_attributes
   - menu_link_content
   - menu_ui
   - node
