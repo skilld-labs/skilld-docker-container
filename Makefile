@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat sniffers tests front behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof
+.PHONY: all provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat sniffers tests front behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -30,7 +30,7 @@ php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 php-0 = docker-compose exec -T php ${1}
 
 ## Full site install from the scratch
-all: | provision composer si hooksymlink info
+all: | provision composer si localize hooksymlink info
 
 ## Provision enviroment
 provision:
@@ -81,6 +81,16 @@ ifneq ($(strip $(MODULES)),)
 	$(call php, drush en $(MODULES) -y)
 	$(call php, drush pmu $(MODULES) -y)
 endif
+
+## Import online & local translations
+localize:
+	@echo "Checking & importing online translations..."
+	$(call php, drush locale:check)
+	$(call php, drush locale:update)
+	@echo "Importing custom translations..."
+	-$(call php, drush locale:import fr /var/www/html/translations/fr.po --type=customized --override=all)
+#	Duplicate and adapt previous string as needed for enabled languages
+	@echo "Localization finished"
 
 ## Display project's information
 info:
