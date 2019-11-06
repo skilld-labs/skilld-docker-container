@@ -137,6 +137,9 @@ test:behat:
   - mkdir web/screenshots
   - mv features/*.png web/screenshots/
   - echo "- Screenshots are available here :" && cd web/screenshots && ls -h *.png | xargs -i echo "${CI_ENVIRONMENT_URL}/screenshots/{}"
+  retry:
+    max: 2
+    when: script_failure
   dependencies:
   - deploy:review
   <<: *ra_tags_branches
