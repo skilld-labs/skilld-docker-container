@@ -26,10 +26,9 @@ echo -e "\nLooking for bundles..."
 		echo "  Generating content..."
 		VOC_GENERATE_COUNT=10
 
-		# TODO : Update after https://www.drupal.org/project/devel/issues/3073850
 		BUNDLES_FOUND=$($($PARSING_CMD) | grep $ENTITY_TO_PARSE | awk -F "." '{print $3}')
 		for voc_bundles in $BUNDLES_FOUND; do
-			drush devel-generate-terms $voc_bundles $VOC_GENERATE_COUNT
+			drush devel-generate-terms $VOC_GENERATE_COUNT --bundles=$voc_bundles --quiet
 			echo "  $VOC_GENERATE_COUNT terms have been created for $voc_bundles"
 		done
 
@@ -54,10 +53,9 @@ echo -e "\nLooking for bundles..."
 		echo "  Generating content..."
 		CT_GENERATE_COUNT=100
 
-		# TODO : Update after https://www.drupal.org/project/devel/issues/3073850
 		BUNDLES_FOUND=$($($PARSING_CMD) | grep $ENTITY_TO_PARSE | awk -F "." '{print $3}')
 		for ct_bundles in $BUNDLES_FOUND; do
-			drush devel-generate-content $CT_GENERATE_COUNT --types=$ct_bundles --quiet
+			drush devel-generate-content $CT_GENERATE_COUNT --bundles=$ct_bundles --quiet
 			echo "  $CT_GENERATE_COUNT nodes have been created for $ct_bundles"
 		done
 
@@ -71,4 +69,4 @@ echo -e "Disabling module..."
 drush pmu devel_generate devel -y
 
 # Informing
-echo -e "\nRun this job multiple times for more content or enable Devel Generate in Drupal UI for manual creation."
+echo -e "\nFor more content, run this job multiple times or use Devel Generate Drupal UI."
