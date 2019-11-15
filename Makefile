@@ -88,8 +88,7 @@ localize:
 	$(call php, drush locale:check)
 	$(call php, drush locale:update)
 	@echo "Importing custom translations..."
-	-$(call php, drush locale:import fr /var/www/html/translations/fr.po --type=customized --override=all)
-#	Duplicate and adapt previous string as needed for enabled languages
+	$(call php, drush locale:import:all /var/www/html/translations/ --type=customized --override=all)
 	@echo "Localization finished"
 
 ## Display project's information
