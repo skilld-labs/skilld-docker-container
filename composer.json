@@ -116,6 +116,7 @@
     "patches": {
       "drupal/core": {
         "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2019-03-19/2731991-38.patch",
+        "Split Authored by and Authored on in Display Settings": "https://www.drupal.org/files/issues/2019-11-07/core-remove_display_author-1399990-108.patch",
         "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch"
       },
       "drupal/default_content": {
