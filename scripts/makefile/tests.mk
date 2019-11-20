@@ -113,9 +113,11 @@ endif
 	$(call php, vendor/bin/behat --colors)
 	make browser_driver_stop
 
+## List existing behat definitions
 behatdl:
 	$(call php, vendor/bin/behat -dl --colors)
 
+## List existing behat definitions with more details
 behatdi:
 	$(call php, vendor/bin/behat -di --colors)
 
