@@ -54,7 +54,7 @@
     "drupal/token": "^1",
     "drupal/views_bulk_edit": "^2.3",
     "drupal/webform": "^5.4",
-    "drush/drush": "^9.6",
+    "drush/drush": "^10.0.2",
     "webflo/drupal-finder": "^1.1",
     "webmozart/path-util": "^2.3",
     "zaporylie/composer-drupal-optimizations": "^1.0"
@@ -124,6 +124,9 @@
       },
       "drupal/menu_link_attributes": {
         "Add a basic configuration schema": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
+      },
+      "drush/drush": {
+        "Import multiple custom translation po files": "https://patch-diff.githubusercontent.com/raw/drush-ops/drush/pull/4251.patch"
       }
     }
   }
