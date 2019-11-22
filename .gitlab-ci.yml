@@ -106,6 +106,8 @@ deploy:review:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
+  when: manual
+  allow_failure: false
 
 stop_review:
   <<: *job_deploy_commit
@@ -143,6 +145,7 @@ test:behat:
   dependencies:
   - deploy:review
   <<: *ra_tags_branches
+  allow_failure: false
 
 test:cinsp:
   stage: tests
