@@ -15,10 +15,14 @@ clear-front:
 	$(call frontexec, rm -rf /app/node_modules /app/dist)
 
 front:
-	@echo "Running front tasks..."
-	docker pull $(IMAGE_FRONT)
-	$(call frontexec, yarn install --prod --ignore-optional --check-files)
-	$(call frontexec, yarn build --verbose)
+	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
+		echo "Running front tasks..."; \
+		docker pull $(IMAGE_FRONT); \
+		$(call frontexec, yarn install --prod --ignore-optional --check-files); \
+		$(call frontexec, yarn build --verbose); \
+	else \
+		echo "Theme directory not found. Skipping front tasks."; \
+	fi
 
 lint:
 	@echo "Running theme linters with fix..."
