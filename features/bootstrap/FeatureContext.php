@@ -329,4 +329,39 @@ JS;
     }
   }
 
+  /**
+   * @Given I select :arg1 with value :arg2 from :arg3 Selectmenu select element
+   */
+  public function iSelectValueFromSelectmenuList($optionValueSelector, $value, $listSelector) {
+    $page = $this->getSession()->getPage();
+
+    $autocompletePanel = $page->find('css', $listSelector);
+    $autocompleteListOptions = $autocompletePanel->findAll('css', '.ui-menu-item-wrapper');
+
+    /** @var \Behat\Mink\Element\NodeElement $option */
+    foreach ($autocompleteListOptions as $option) {
+      $optionValue = $option->find('css', $optionValueSelector);
+      if ($optionValue && $optionValue->getHtml() == $value) {
+        $option->click();
+        return;
+      }
+    }
+
+    throw new Exception("Unable to find the item in the autocomplete list.");
+  }
+
+  /**
+   * @Given I see :arg1 value in input element :arg2
+   */
+  public function iCheckInputsValue($value, $selector) {
+    $page = $this->getSession()->getPage();
+    $element = $page->find('css', $selector);
+    if (empty($element)) {
+      throw new Exception("No input element found.");
+    }
+    if ($element->getValue() != $value) {
+      throw new Exception("No matches.");
+    }
+  }
+
 }
