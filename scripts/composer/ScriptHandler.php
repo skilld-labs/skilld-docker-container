@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \DrupalProject\composer\ScriptHandler.
+ * Contains \SkilldDrupal\composer\ScriptHandler.
  */
 
-namespace DrupalProject\composer;
+namespace SkilldDrupal\composer;
 
 use Composer\Script\Event;
 use Composer\Semver\Comparator;
@@ -13,8 +13,44 @@ use DrupalFinder\DrupalFinder;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\PathUtil\Path;
 
+/**
+ * Class ScriptHandler
+ *
+ * @package SkilldDrupal\composer
+ */
 class ScriptHandler {
 
+  /**
+   * @param \Composer\Script\Event $event
+   */
+  public static function listScaffoldFiles(Event $event) {
+    $files = [
+      '.csslintrc',
+      '.editorconfig',
+      '.eslintignore',
+      '.eslintrc.json',
+      '.gitattributes',
+      '.ht.router.php',
+      '.htaccess',
+      'index.php',
+      'robots.txt',
+      'sites/default/default.settings.php',
+      'sites/default/default.services.yml',
+      'sites/development.services.yml',
+      'sites/example.settings.local.php',
+      'sites/example.sites.php',
+      'update.php',
+      'web.config',
+    ];
+    $event->getIO()->write("\r\n".implode(' ',$files));
+  }
+
+
+  /**
+   * @param \Composer\Script\Event $event
+   *
+   * @throws \Exception
+   */
   public static function createRequiredFiles(Event $event) {
     $fs = new Filesystem();
     $drupalFinder = new DrupalFinder();
@@ -29,9 +65,9 @@ class ScriptHandler {
 
     // Required for unit testing
     foreach ($dirs as $dir) {
-      if (!$fs->exists($drupalRoot . '/'. $dir)) {
-        $fs->mkdir($drupalRoot . '/'. $dir);
-        $fs->touch($drupalRoot . '/'. $dir . '/.gitkeep');
+      if (!$fs->exists($drupalRoot . '/' . $dir)) {
+        $fs->mkdir($drupalRoot . '/' . $dir);
+        $fs->touch($drupalRoot . '/' . $dir . '/.gitkeep');
       }
     }
 
@@ -48,15 +84,20 @@ class ScriptHandler {
       ];
       drupal_rewrite_settings($settings, $drupalRoot . '/sites/default/settings.php');
       $fs->chmod($drupalRoot . '/sites/default/settings.php', 0666);
-      $event->getIO()->write("Create a sites/default/settings.php file with chmod 0666");
+      $event->getIO()
+        ->write("Create a sites/default/settings.php file with chmod 0666");
     }
 
     // Create the files directory with chmod 0777
     if (!$fs->exists($drupalRoot . '/sites/default/files')) {
       $oldmask = umask(0);
-      $fs->mkdir($drupalRoot . '/sites/default/files', 0777);
+      $fs->mkdir($drupalRoot . '/sites/default/files', 0775);
       umask($oldmask);
-      $event->getIO()->write("Create a sites/default/files directory with chmod 0777");
+      $event->getIO()
+        ->write("Create a sites/default/files directory with chmod 0775");
+    }
+    else {
+      $fs->chmod($drupalRoot . '/sites/default/files', 0775);
     }
   }
 

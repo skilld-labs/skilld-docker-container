@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  content:
+    - 'file:file:516e2944-f833-407a-909d-565d52256b5f'
+id: media
+label: Media
+icon_uuid: 516e2944-f833-407a-909d-565d52256b5f
+description: 'Access to Media Library content'
+behavior_plugins: {  }

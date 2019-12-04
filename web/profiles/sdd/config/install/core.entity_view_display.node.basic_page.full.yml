@@ -1,0 +1,61 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.basic_page.content
+    - node.type.basic_page
+  module:
+    - entity_reference_revisions
+    - field_layout
+    - layout_discovery
+    - manage_display
+third_party_settings:
+  field_layout:
+    id: layout_onecol
+    settings: {  }
+id: node.basic_page.full
+targetEntityType: node
+bundle: basic_page
+mode: full
+content:
+  content:
+    type: entity_reference_revisions_entity_view
+    weight: 3
+    region: content
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+  created:
+    label: inline
+    type: timestamp
+    weight: 2
+    settings:
+      show_prefix_label: true
+      date_format: long
+      custom_date_format: ''
+      timezone: ''
+    region: content
+    third_party_settings: {  }
+  title:
+    label: hidden
+    type: title
+    weight: 0
+    region: content
+    settings:
+      tag: h1
+      linked: false
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_label
+    weight: 1
+    region: content
+    label: inline
+    settings:
+      link: true
+    third_party_settings: {  }
+hidden:
+  langcode: true
+  links: true

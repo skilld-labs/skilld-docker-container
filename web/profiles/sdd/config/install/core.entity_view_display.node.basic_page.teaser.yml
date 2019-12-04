@@ -1,0 +1,32 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - node.type.basic_page
+  module:
+    - field_layout
+    - layout_discovery
+    - manage_display
+third_party_settings:
+  field_layout:
+    id: layout_onecol
+    settings: {  }
+id: node.basic_page.teaser
+targetEntityType: node
+bundle: basic_page
+mode: teaser
+content:
+  title:
+    label: hidden
+    type: title
+    weight: 0
+    region: content
+    settings:
+      tag: h2
+      linked: true
+    third_party_settings: {  }
+hidden:
+  langcode: true
+  links: true
+  uid: true

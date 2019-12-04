@@ -1,22 +1,17 @@
-version: "2"
+version: "2.1"
 
 services:
 
 # Override base service.
   php:
+    environment:
+      COMPOSER_MEMORY_LIMIT: "-1"
     volumes:
-      - "./90-mail.ini:/etc/php${PHP_VERSION}/conf.d/90-mail.ini:z"
+      - "./90-mail.ini:/etc/php7/conf.d/90-mail.ini:z"
+#    depends_on:
+#      - mysql
 # Uncomment next line if you need PHP XDebug.
 #    command: php-fpm7 -F -d zend_extension=xdebug.so
-
-# Use local folder to not lose data on container crash.
-# CAUTION: Don't use this section on development machine because container
-# working speed will be decreased.
-#  mysql:
-#    volumes:
-#    - ../../mysql:/var/lib/mysql:Z
-# On for linux machines use ramfs, make sure to create the directory first.
-#    - /dev/shm/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:Z
 
 #  adminer:
 #    image: dockette/adminer:mysql-php7
@@ -28,12 +23,32 @@ services:
 #    networks:
 #      - front
 
+#  mysql:
+#    image: percona:5.7.22
+#    container_name: "${COMPOSE_PROJECT_NAME}_mysql"
+#    volumes:
+#      - ${DB_DATA_DIR}/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:Z
+#    environment:
+#      MYSQL_DATABASE: d8
+#      MYSQL_USER: d8
+#      MYSQL_PASSWORD: d8
+#      MYSQL_ROOT_PASSWORD: d8root
+#    restart: always
+#    networks:
+#      - front
+
   mailhog:
     image: skilldlabs/mailhog
     container_name: "${COMPOSE_PROJECT_NAME}_mail"
     restart: always
     networks:
       - front
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.backend=${MAIN_DOMAIN_NAME}_mail'
+      - 'traefik.port=8025'
+      - 'traefik.frontend.rule=Host:mail-${MAIN_DOMAIN_NAME}'
+      - 'traefik.frontend.redirect.entryPoint=https'
 
   nginx:
 # Uncomment for MacOS.
@@ -42,3 +57,17 @@ services:
 # Mount local folder with ssl keys.
 #    volumes:
 #     - ./nginx/ssl:/etc/nginx/ssl:Z
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.backend=${MAIN_DOMAIN_NAME}_web'
+      - 'traefik.port=80'
+      - 'traefik.frontend.rule=Host:${MAIN_DOMAIN_NAME}'
+      - 'traefik.frontend.redirect.entryPoint=https'
+
+#networks:
+#  front:
+#    driver: bridge
+#    ipam:
+#      driver: default
+#      config:
+#        - subnet: "${IPRANGE}"
