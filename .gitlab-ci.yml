@@ -10,7 +10,7 @@
   only:
     - branches
 
-image: skilldlabs/php:72
+image: skilldlabs/php:73
 
 variables:
   GIT_DEPTH: "3"
