@@ -14,7 +14,7 @@ image: skilldlabs/php:72
 
 variables:
   GIT_DEPTH: "3"
-  THEME_PATH: "web/themes/custom/test_project"
+  THEME_PATH: "" # update to enable front jobs
 
 before_script:
   - date
@@ -55,6 +55,9 @@ sniffers:front:
     - cd ${THEME_PATH}
     - yarn install --no-optional --prod
     - yarn run lint
+  only:
+    variables:
+      - $THEME_PATH
 
 sniffers:phpcs:
   stage: sniffers
@@ -107,6 +110,9 @@ prepare:nodejs:
     name: "$CI_COMMIT_REF_NAME"
     paths:
       - ${THEME_PATH}/dist/
+  only:
+    variables:
+      - $THEME_PATH
 
 .job_deploy_commit_template: &job_deploy_commit
   stage: deploy
