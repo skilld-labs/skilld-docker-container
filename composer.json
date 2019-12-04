@@ -32,11 +32,11 @@
     "ckeditor/panelbutton": "^4.10",
     "composer/installers": "^1.2",
     "cweagans/composer-patches": "^1.6.5",
-    "drupal-composer/drupal-scaffold": "^2.5",
     "drupal/better_normalizers": "^1.0@beta",
     "drupal/components": "^1",
     "drupal/config_installer": "^1",
-    "drupal/core": "^8.7.5",
+    "drupal/core-composer-scaffold": "^8.8.0",
+    "drupal/core-recommended": "^8.8.0",
     "drupal/default_content": "^1",
     "drupal/file_entity": "^2",
     "drupal/google_tag": "^1.2",
@@ -46,7 +46,7 @@
     "drupal/panelbutton": "^1",
     "drupal/panels_everywhere": "^4.0@beta",
     "drupal/paragraphs": "^1.9",
-    "drupal/pathauto": "^1.4",
+    "drupal/pathauto": "^1.6",
     "drupal/redirect": "^1.4",
     "drupal/styleguide": "^1",
     "drupal/swiftmailer": "^1",
@@ -54,7 +54,7 @@
     "drupal/token": "^1",
     "drupal/views_bulk_edit": "^2.3",
     "drupal/webform": "^5.4",
-    "drush/drush": "^10.0.2",
+    "drush/drush": "^10.1.0",
     "webflo/drupal-finder": "^1.1",
     "webmozart/path-util": "^2.3",
     "zaporylie/composer-drupal-optimizations": "^1.0"
@@ -104,19 +104,18 @@
       "drush/contrib/{$name}": ["type:drupal-drush"]
     },
     "drupal-scaffold": {
-      "excludes": [
-        "web.config"
-      ],
-      "initial": {
-        ".editorconfig": "../.editorconfig",
-        ".gitattributes": "../.gitattributes"
+      "locations": {
+        "web-root": "web/"
+      },
+      "file-mapping": {
+        "[web-root]/web.config": false
       }
     },
     "composer-exit-on-patch-failure": true,
     "patches": {
       "drupal/core": {
         "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2019-03-19/2731991-38.patch",
-        "Split Authored by and Authored on in Display Settings": "https://www.drupal.org/files/issues/2019-11-07/core-remove_display_author-1399990-108.patch",
+        "Split Authored by and Authored on in Display Settings": "https://www.drupal.org/files/issues/2019-12-05/1399990-108-reroll.patch",
         "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch"
       },
       "drupal/default_content": {
