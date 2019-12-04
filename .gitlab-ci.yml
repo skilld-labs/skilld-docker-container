@@ -107,7 +107,7 @@ prepare:nodejs:
   - yarn install --no-optional --prod
   - yarn run build --verbose
   artifacts:
-    name: "$CI_COMMIT_REF_NAME"
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA"
     paths:
       - ${THEME_PATH}/dist/
   only:
