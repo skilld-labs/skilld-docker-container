@@ -58,7 +58,7 @@ compval:
 	@echo "Composer.json validation..."
 	@docker run --rm -v `pwd`:`pwd` -w `pwd` $(IMAGE_PHP) composer validate --strict
 
-## Validate hook_update_N() for field storage changes
+## Validate hook_update_N()
 hookupdateval:
 ifneq ("$(wildcard scripts/makefile/hookupdateval.sh)","")
 	@echo "hook_update_N() validation..."
