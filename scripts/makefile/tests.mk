@@ -58,6 +58,15 @@ compval:
 	@echo "Composer.json validation..."
 	@docker run --rm -v `pwd`:`pwd` -w `pwd` $(IMAGE_PHP) composer validate --strict
 
+## Validate hook_update_N()
+hookupdateval:
+ifneq ("$(wildcard scripts/makefile/hookupdateval.sh)","")
+	@echo "hook_update_N() validation..."
+	@/bin/sh ./scripts/makefile/hookupdateval.sh
+else
+	@echo "scripts/makefile/hookupdateval.sh.sh file does not exist"
+endif
+
 ## Validate watchdog logs
 watchdogval:
 ifneq ("$(wildcard scripts/makefile/watchdog-validation.sh)","")

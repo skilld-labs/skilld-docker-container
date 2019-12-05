@@ -74,6 +74,12 @@ sniffers:newlineeof:
   - ls -lah
   - make newlineeof
 
+sniffers:hookupdate:
+  stage: sniffers
+  script:
+  - make hookupdateval
+  when: manual # Remove to run automatically when site is live
+
 sniffers:sonarqube:
   stage: sniffers
   image: skilldlabs/sonar-scanner:3.3
