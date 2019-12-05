@@ -60,11 +60,11 @@ compval:
 
 ## Validate hook_update_N() for field storage changes
 hookupdateval:
-ifneq ("$(wildcard scripts/makefile/field-storage-hook-update.sh)","")
+ifneq ("$(wildcard scripts/makefile/hookupdateval.sh)","")
 	@echo "hook_update_N() validation..."
-	@/bin/sh ./scripts/makefile/field-storage-hook-update.sh
+	@/bin/sh ./scripts/makefile/hookupdateval.sh
 else
-	@echo "scripts/makefile/field-storage-hook-update.sh.sh file does not exist"
+	@echo "scripts/makefile/hookupdateval.sh.sh file does not exist"
 endif
 
 ## Validate watchdog logs
