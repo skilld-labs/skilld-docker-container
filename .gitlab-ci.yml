@@ -41,7 +41,7 @@ sniffers:compose:
 
 sniffers:front:
   cache:
-    key: "front-packages"
+    key: ${CI_COMMIT_REF_SLUG}-front
     paths:
       - ${THEME_PATH}/node_modules/
   stage: sniffers
@@ -98,7 +98,7 @@ sniffers:sonarqube:
 
 prepare:nodejs:
   cache:
-    key: "front-packages"
+    key: ${CI_COMMIT_REF_SLUG}-front
     paths:
       - ${THEME_PATH}/node_modules/
   stage: prepare
