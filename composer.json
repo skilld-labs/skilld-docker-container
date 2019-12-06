@@ -32,10 +32,10 @@
     "ckeditor/panelbutton": "^4.10",
     "composer/installers": "^1.2",
     "cweagans/composer-patches": "^1.6.5",
+    "drupal-composer/drupal-scaffold": "^2.5",
     "drupal/better_normalizers": "^1.0@beta",
     "drupal/components": "^1",
     "drupal/config_installer": "^1",
-    "drupal/core-composer-scaffold": "^8.8.0",
     "drupal/core-recommended": "^8.8.0",
     "drupal/default_content": "^1",
     "drupal/file_entity": "^2",
@@ -56,7 +56,6 @@
     "drupal/webform": "^5.4",
     "drush/drush": "^10.1.0",
     "webflo/drupal-finder": "^1.1",
-    "webmozart/path-util": "^2.3",
     "zaporylie/composer-drupal-optimizations": "^1.0"
   },
   "require-dev": {
