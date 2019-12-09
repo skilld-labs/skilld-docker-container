@@ -18,6 +18,8 @@ front:
 	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
 		echo "Theme directory found. Running front tasks..."; \
 		docker pull $(IMAGE_FRONT); \
+		$(call frontexec, node -v); \
+		$(call frontexec, yarn -v); \
 		$(call frontexec, yarn install --prod --ignore-optional --check-files); \
 		$(call frontexec, yarn build --verbose); \
 	else \

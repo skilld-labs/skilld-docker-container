@@ -96,22 +96,14 @@ sniffers:sonarqube:
   - master
   allow_failure: true
 
-prepare:nodejs:
+prepare:front:
   cache:
     key: ${CI_COMMIT_REF_SLUG}-front
     paths:
       - ${THEME_PATH}/node_modules/
   stage: prepare
-  image: node:lts-alpine
-  before_script:
-  - date
-  - pwd
-  - node -v
-  - yarn -v
   script:
-  - cd ${THEME_PATH}
-  - yarn install --no-optional --prod
-  - yarn run build --verbose
+  - make front
   artifacts:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA"
     paths:
@@ -119,6 +111,7 @@ prepare:nodejs:
   only:
     variables:
       - $THEME_PATH
+  <<: *ra_tags_branches
 
 .job_deploy_commit_template: &job_deploy_commit
   stage: deploy
@@ -159,7 +152,7 @@ deploy:review:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   dependencies:
-    - prepare:nodejs
+    - prepare:front
   when: manual
   allow_failure: false
 
