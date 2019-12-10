@@ -6,7 +6,7 @@ phpcsexec = docker run --rm \
 	skilldlabs/docker-phpcs-drupal ${1} -s --colors \
 	--standard=Drupal,DrupalPractice \
 	--extensions=php,module,inc,install,profile,theme,yml,txt,md,js \
-	--ignore=*.css,libraries/*,dist/*,styleguide/*,README.md,README.txt,node_modules/*,$(THEME_NAME)/**.js \
+	--ignore=*.css,libraries/*,dist/*,styleguide/*,README.md,README.txt,node_modules/*,work/themes/**.js \
 	.
 
 ## Validate codebase with phpcs sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards
@@ -57,6 +57,15 @@ endif
 compval:
 	@echo "Composer.json validation..."
 	@docker run --rm -v `pwd`:`pwd` -w `pwd` $(IMAGE_PHP) composer validate --strict
+
+## Validate hook_update_N()
+hookupdateval:
+ifneq ("$(wildcard scripts/makefile/hookupdateval.sh)","")
+	@echo "hook_update_N() validation..."
+	@/bin/sh ./scripts/makefile/hookupdateval.sh
+else
+	@echo "scripts/makefile/hookupdateval.sh.sh file does not exist"
+endif
 
 ## Validate watchdog logs
 watchdogval:

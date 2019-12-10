@@ -3,6 +3,7 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.teaser
+    - field.field.node.basic_page.content
     - node.type.basic_page
   module:
     - field_layout
@@ -11,12 +12,24 @@ dependencies:
 third_party_settings:
   field_layout:
     id: layout_onecol
-    settings: {  }
+    settings:
+      label: ''
 id: node.basic_page.teaser
 targetEntityType: node
 bundle: basic_page
 mode: teaser
 content:
+  created:
+    label: hidden
+    type: timestamp
+    weight: 0
+    settings:
+      custom_date_format: ''
+      timezone: ''
+      show_prefix_label: true
+      date_format: medium
+    region: content
+    third_party_settings: {  }
   title:
     label: hidden
     type: title
@@ -27,6 +40,7 @@ content:
       linked: true
     third_party_settings: {  }
 hidden:
+  content: true
   langcode: true
   links: true
   uid: true

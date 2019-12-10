@@ -12,7 +12,8 @@ dependencies:
 third_party_settings:
   field_layout:
     id: layout_onecol
-    settings: {  }
+    settings:
+      label: ''
 id: node.basic_page.default
 targetEntityType: node
 bundle: basic_page
@@ -27,6 +28,17 @@ content:
       link: ''
     third_party_settings: {  }
     region: content
+  created:
+    label: hidden
+    type: timestamp
+    weight: 0
+    settings:
+      custom_date_format: ''
+      timezone: ''
+      show_prefix_label: true
+      date_format: medium
+    region: content
+    third_party_settings: {  }
   title:
     label: hidden
     type: title

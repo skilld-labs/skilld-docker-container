@@ -212,6 +212,7 @@ handlers:
       return_path: ''
       sender_mail: ''
       sender_name: ''
+      parameters: {  }
   email_notification:
     id: email
     label: 'Email notification'
@@ -246,3 +247,4 @@ handlers:
       return_path: ''
       sender_mail: ''
       sender_name: ''
+      parameters: {  }
