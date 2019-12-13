@@ -40,30 +40,33 @@ sniffers:compose:
   - time composer validate --profile --strict
 
 sniffers:front:
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}-front
-    paths:
-      - ${THEME_PATH}/node_modules/
   stage: sniffers
-  image: node:lts-alpine
   before_script:
   - date
   - pwd
-  - node -v
-  - yarn -v
   script:
-    - cd ${THEME_PATH}
-    - yarn install --no-optional --prod
-    - yarn run lint
+    - make front-install # Dependencies are required for js imports to pass linters
+    - make lintval
   only:
     variables:
       - $THEME_PATH
+  cache:
+    key:
+      files:
+        - ${THEME_PATH}/package.json
+        - ${THEME_PATH}/yarn.lock
+    paths:
+      - ${THEME_PATH}/node_modules/ # Populated during yarn install
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
+    paths:
+      - ${THEME_PATH}/node_modules/ # Populated during yarn install
+  <<: *ra_tags_branches
 
 sniffers:phpcs:
   stage: sniffers
   image: skilldlabs/docker-phpcs-drupal
   script:
-  - ls -lah
   - docker -v
   - make phpcs
   <<: *ra_tags_branches
@@ -71,7 +74,6 @@ sniffers:phpcs:
 sniffers:newlineeof:
   stage: sniffers
   script:
-  - ls -lah
   - make newlineeof
 
 sniffers:hookupdate:
@@ -96,38 +98,63 @@ sniffers:sonarqube:
   - master
   allow_failure: true
 
-prepare:front:
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}-front
-    paths:
-      - ${THEME_PATH}/node_modules/
+
+prepare:back:
   stage: prepare
   script:
-  - make front
-  artifacts:
-    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA"
+    - docker --version
+    - docker-compose --version
+    - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
+    - make back
+    - docker-compose down # PHP container was required for composer
+  cache:
+    key:
+      files:
+        - composer.json
+        - composer.lock
     paths:
-      - ${THEME_PATH}/dist/
+      - vendor/
+      - web/core/
+      - web/libraries/
+      - web/modules/contrib/
+      - web/profiles/contrib/
+      - web/themes/contrib/
+      - drush/contrib/
+  dependencies: []
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:back"
+    paths:
+      - vendor/
+      - web/
+      - drush/contrib/
+  <<: *ra_tags_branches
+
+prepare:front:
+  stage: prepare
+  script:
+    - make front-build
   only:
     variables:
       - $THEME_PATH
-  <<: *ra_tags_branches
-
-.job_deploy_commit_template: &job_deploy_commit
-  stage: deploy
-  before_script:
-    - date; pwd; ls -lahq;
-    - echo "Clean-up build dir ${BUILD_DIR}"
-    # Always down previous environment.
-    - (if [ -d ${BUILD_DIR} ]; then date; cd ${BUILD_DIR}; pwd; make clean; cd -; rm -rf ${BUILD_DIR}; fi)
-  script:
-    - echo "Removed previous review app ${CI_ENVIRONMENT_URL} from ${BUILD_DIR}."
+  cache:
+    key:
+      files:
+        - ${THEME_PATH}/package.json
+        - ${THEME_PATH}/yarn.lock
+    paths:
+      - ${THEME_PATH}/node_modules/ # Populated during yarn install
   dependencies:
-    - sniffers:phpcs
+    - sniffers:front
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
+    paths:
+      - ${THEME_PATH}/node_modules/ # Populated during yarn install
+      - ${THEME_PATH}/dist/ # Populated during yarn build
   <<: *ra_tags_branches
 
 deploy:review:
-  <<: *job_deploy_commit
+  <<: *ra_tags_branches
+  stage: deploy
   script:
     - echo "Deploy ${CI_ENVIRONMENT_URL} review app to ${BUILD_DIR}."
     - echo "CI_ENVIRONMENT_NAME=${CI_ENVIRONMENT_NAME}"
@@ -144,7 +171,7 @@ deploy:review:
     - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
     - docker --version
     - docker-compose --version
-    - make all MAKE_ENV=ci
+    - make all_ci
   after_script:
     - echo "Started ${CI_ENVIRONMENT_URL} composition in ${BUILD_DIR} from Makefile."
   environment:
@@ -152,12 +179,19 @@ deploy:review:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   dependencies:
+    - prepare:back
     - prepare:front
   when: manual
   allow_failure: false
 
 stop_review:
-  <<: *job_deploy_commit
+  <<: *ra_tags_branches
+  stage: deploy
+  script:
+    - date; pwd; ls -lahq;
+    - echo "Clean-up build dir ${BUILD_DIR}"
+    - (if [ -d ${BUILD_DIR} ]; then date; cd ${BUILD_DIR}; pwd; make clean; cd -; rm -rf ${BUILD_DIR}; fi)
+    - echo "Removed previous review app ${CI_ENVIRONMENT_URL} from ${BUILD_DIR}."
   variables:
     GIT_STRATEGY: none
   when: manual
@@ -175,9 +209,6 @@ test:behat:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
-  - ls -lah
-  - ls -lah vendor/bin/
   - make behat
   after_script:
   - cd ${BUILD_DIR}
@@ -203,7 +234,6 @@ test:cinsp:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
   - make cinsp
   dependencies:
   - deploy:review
@@ -218,8 +248,6 @@ test:drupalcheck:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
-  - ls -lah
   - make drupalcheckval
   dependencies:
   - deploy:review
@@ -234,7 +262,6 @@ test:contentgen:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
   - make contentgen
   dependencies:
   - deploy:review
@@ -250,7 +277,6 @@ report:statusreportval:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
   - make statusreportval
   dependencies:
   - deploy:review
@@ -265,7 +291,6 @@ report:watchdog:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
   - make watchdogval
   dependencies:
   - deploy:review
