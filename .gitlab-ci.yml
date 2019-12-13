@@ -153,7 +153,6 @@ prepare:front:
   <<: *ra_tags_branches
 
 deploy:review:
-  <<: *ra_tags_branches
   stage: deploy
   script:
     - echo "Deploy ${CI_ENVIRONMENT_URL} review app to ${BUILD_DIR}."
@@ -183,9 +182,9 @@ deploy:review:
     - prepare:front
   when: manual
   allow_failure: false
+  <<: *ra_tags_branches
 
 stop_review:
-  <<: *ra_tags_branches
   stage: deploy
   script:
     - date; pwd; ls -lahq;
@@ -198,6 +197,7 @@ stop_review:
   environment:
     name: review/$CI_COMMIT_REF_NAME
     action: stop
+  <<: *ra_tags_branches
 
 
 test:behat:
@@ -222,8 +222,8 @@ test:behat:
     when: script_failure
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
   allow_failure: false
+  <<: *ra_tags_branches
 
 test:cinsp:
   stage: tests
