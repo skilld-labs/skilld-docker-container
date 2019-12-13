@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat sniffers tests front behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize
+.PHONY: all provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -30,9 +30,9 @@ php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 php-0 = docker-compose exec -T php ${1}
 
 ## Full site install from the scratch
-all: | provision composer front si localize hooksymlink info
-## Full site install from the scratch without front task(it managed in .gitlab-ci).
-all_ci: | provision composer si localize hooksymlink info
+all: | provision back front si localize hooksymlink info
+# Install for CI deploy:review. Back & Front tasks are run in a dedicated previous step in order to leverage CI cache
+all_ci: | provision si localize hooksymlink info
 
 ## Provision enviroment
 provision:
@@ -56,7 +56,9 @@ endif
 	$(call php-0, kill -USR2 1)
 	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
 
-composer:
+## Install backend dependencies
+back:
+	docker-compose up -d --remove-orphans php # PHP container is required for composer
 ifeq ($(INSTALL_DEV_DEPENDENCIES), TRUE)
 	@echo "INSTALL_DEV_DEPENDENCIES=$(INSTALL_DEV_DEPENDENCIES)"
 	@echo "Installing composer dependencies, including dev ones"
