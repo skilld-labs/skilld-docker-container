@@ -1,4 +1,4 @@
-# Variables to add in Gitalb UI : Settings > CI/CI
+# Variables to add in Gitalb UI : Settings > CI/CD
 # - REVIEW_DOMAIN // Mandatory, should equal to DNS of available runner server with docker + docker-compose
 # - SONAR_HOST // Optional
 # - SONAR_TOKEN // Optional
@@ -144,7 +144,8 @@ prepare:front:
       - ${THEME_PATH}/dist/ # Populated during yarn build
   <<: *ra_tags_branches
 
-deploy:review:
+
+.deploy_template: &deploy_template
   stage: deploy
   script:
     - echo "Deploy ${CI_ENVIRONMENT_URL} review app to ${BUILD_DIR}."
@@ -172,9 +173,20 @@ deploy:review:
   dependencies:
     - prepare:back
     - prepare:front
-  when: manual
   allow_failure: false
   <<: *ra_tags_branches
+
+deploy:review:
+  <<: *deploy_template
+  when: manual
+  except:
+  - master
+
+deploy:master:
+  <<: *deploy_template
+  when: always
+  only:
+  - master
 
 stop_review:
   stage: deploy
