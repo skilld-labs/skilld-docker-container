@@ -136,19 +136,11 @@ prepare:front:
   only:
     variables:
       - $THEME_PATH
-  cache:
-    key:
-      files:
-        - ${THEME_PATH}/package.json
-        - ${THEME_PATH}/yarn.lock
-    paths:
-      - ${THEME_PATH}/node_modules/ # Populated during yarn install
   dependencies:
     - sniffers:front
   artifacts:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
     paths:
-      - ${THEME_PATH}/node_modules/ # Populated during yarn install
       - ${THEME_PATH}/dist/ # Populated during yarn build
   <<: *ra_tags_branches
 
