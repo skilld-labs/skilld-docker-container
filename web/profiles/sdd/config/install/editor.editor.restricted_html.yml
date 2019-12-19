@@ -30,6 +30,7 @@ settings:
             - Language
             - HorizontalRule
             - Table
+            - DrupalMediaLibrary
         -
           name: Links
           items:

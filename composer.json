@@ -49,6 +49,7 @@
     "drupal/pathauto": "^1.6",
     "drupal/redirect": "^1.4",
     "drupal/styleguide": "^1",
+    "drupal/svg_image": "^1.9",
     "drupal/swiftmailer": "^1",
     "drupal/telephone_validation": "^2.2",
     "drupal/token": "^1",
@@ -115,13 +116,18 @@
       "drupal/core": {
         "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2019-03-19/2731991-38.patch",
         "Split Authored by and Authored on in Display Settings": "https://www.drupal.org/files/issues/2019-12-05/1399990-108-reroll.patch",
-        "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch"
+        "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch",
+        "Fix multilingual site's layout edit context issue": "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
+        "SQLite database locking errors cause fatal errors": "https://www.drupal.org/files/issues/1120020-59.patch"
       },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
       },
       "drupal/menu_link_attributes": {
-        "Add a basic configuration schema": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
+        "Add missing schema for menu_link_attributes": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
+      },
+      "drupal/svg_image": {
+        "Add missing schema for svg_image": "https://www.drupal.org/files/issues/2018-12-31/missing_schema_field_formatter.patch"
       },
       "drush/drush": {
         "Import multiple custom translation po files": "https://patch-diff.githubusercontent.com/raw/drush-ops/drush/pull/4251.patch"
