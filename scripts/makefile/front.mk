@@ -35,6 +35,7 @@ front-build:
 		$(call frontexec, node -v); \
 		$(call frontexec, yarn -v); \
 		$(call frontexec, yarn build --verbose); \
+		$(call frontexec, yarn build-storybook -c .storybook -o dist/storybook --verbose)
 	else \
 		echo "- Theme directory defined in .env file was not found. Skipping front-build."; \
 	fi
@@ -54,4 +55,4 @@ storybook:
 	@echo "Running storybook..."
 	docker pull $(IMAGE_FRONT)
 	$(call frontexec, yarn install --ignore-optional --check-files)
-	$(call frontexec, yarn build-storybook --verbose)
+	$(call frontexec, yarn storybook -p $(FRONT_PORT))
