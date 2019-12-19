@@ -32,6 +32,7 @@ settings:
             - Table
             - SpecialChar
             - ShowBlocks
+            - DrupalMediaLibrary
         -
           name: Links
           items:
