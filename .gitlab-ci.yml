@@ -52,7 +52,7 @@ sniffers:front:
       - $THEME_PATH
   cache:
     key:
-      files:
+      files: # These paths have to be hardcoded until https://gitlab.com/gitlab-org/gitlab/issues/118466 lands or use a non-custom gitlab variable
         - ${THEME_PATH}/package.json
         - ${THEME_PATH}/yarn.lock
     paths:
