@@ -129,6 +129,9 @@
       "drupal/svg_image": {
         "Add missing schema for svg_image": "https://www.drupal.org/files/issues/2018-12-31/missing_schema_field_formatter.patch"
       },
+      "drupal/devel": {
+        "Generate translated content": "https://www.drupal.org/files/issues/2019-12-06/devel-generate-translated-content-1277654-78.patch"
+      },
       "drush/drush": {
         "Import multiple custom translation po files": "https://patch-diff.githubusercontent.com/raw/drush-ops/drush/pull/4251.patch"
       }
