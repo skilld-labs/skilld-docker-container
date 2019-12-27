@@ -1,4 +1,4 @@
-# French translation of interface strings
+# English translation of interface strings
 
 # These empty lines above are required for import to work
 msgid ""
@@ -11,9 +11,3 @@ msgid ""
 "creating a block, place it in a region from the <a "
 "href=\":blocks\">Block layout</a> page."
 msgstr " "
-
-msgid "Send"
-msgstr "Envoyer"
-
-msgid "in"
-msgstr "à"
