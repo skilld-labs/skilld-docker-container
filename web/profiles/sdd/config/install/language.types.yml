@@ -26,8 +26,8 @@ negotiation:
       language-selected: -18
     method_weights:
       language-url: -20
-      language-session: -19
-      language-selected: -18
+      language-selected: -19
+      language-session: -18
       language-user: -17
       language-browser: -16
       language-user-admin: -15
