@@ -34,6 +34,7 @@
     "cweagans/composer-patches": "^1.6.5",
     "drupal-composer/drupal-scaffold": "^2.5",
     "drupal/better_normalizers": "^1.0@beta",
+    "drupal/block_content_permissions": "^1.8",
     "drupal/components": "^1",
     "drupal/config_installer": "^1",
     "drupal/core-recommended": "^8.8.0",
@@ -41,6 +42,7 @@
     "drupal/file_entity": "^2",
     "drupal/google_tag": "^1.2",
     "drupal/manage_display": "^1.0@alpha",
+    "drupal/menu_admin_per_menu": "^1.0",
     "drupal/menu_link_attributes": "^1.0",
     "drupal/page_manager": "^4.0@beta",
     "drupal/panelbutton": "^1",
@@ -135,6 +137,9 @@
       },
       "drush/drush": {
         "Import multiple custom translation po files": "https://patch-diff.githubusercontent.com/raw/drush-ops/drush/pull/4251.patch"
+      },
+      "drupal/block_content_permissions": {
+        "Allow accessing the Custom block library page without Administer blocks permission": "https://www.drupal.org/files/issues/2019-06-20/block_content_permissions-access_listing_page-2920739-23.patch"
       }
     }
   }

@@ -8,6 +8,7 @@ dependencies:
   - big_pipe
   - block
   - block_content
+  - block_content_permissions
   - breakpoint
   - ckeditor
   - color
@@ -35,6 +36,7 @@ dependencies:
   - manage_display
   - media
   - media_library
+  - menu_admin_per_menu
   - menu_link_attributes
   - menu_link_content
   - menu_ui
@@ -43,28 +45,30 @@ dependencies:
   - page_cache
   - page_manager
   - page_manager_ui
-  - paragraphs
   - panels
   - panels_everywhere
+  - paragraphs
   - path
+  - path_alias
   - pathauto
   - quickedit
-  - redirect
   - rdf
+  - redirect
+  - redirect_404
   - responsive_image
   - shortcut
   - system
   - taxonomy
   - telephone
-  - text
   - telephone_validation
+  - text
   - toolbar
   - update
   - user
   - views
-  - views_ui
   - views_bulk_edit
   - views_bulk_operations
+  - views_ui
   - webform
   - webform_ui
 
