@@ -46,10 +46,14 @@ dependencies:
   - path
   - path_alias
   - quickedit
+  - rabbit_hole
   - rdf
   - redirect
   - redirect_404
   - responsive_image
+  - rh_media
+  - rh_taxonomy
+  - rh_user
   - shortcut
   - system
   - taxonomy
