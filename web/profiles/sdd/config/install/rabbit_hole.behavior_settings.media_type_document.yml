@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - media.type.document
+id: media_type_document
+action: page_not_found
+allow_override: 1
+redirect: ''
+redirect_code: 301

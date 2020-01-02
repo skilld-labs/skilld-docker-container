@@ -49,6 +49,7 @@
     "drupal/panels_everywhere": "^4.0@beta",
     "drupal/paragraphs": "^1.9",
     "drupal/pathauto": "^1.6",
+    "drupal/rabbit_hole": "^1.0@beta",
     "drupal/redirect": "^1.4",
     "drupal/styleguide": "^1",
     "drupal/svg_image": "^1.9",
