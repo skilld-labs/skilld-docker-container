@@ -60,6 +60,7 @@ dependencies:
   - toolbar
   - update
   - user
+  - username_enumeration_prevention
   - views_bulk_edit
   - views_bulk_operations
   - views_ui

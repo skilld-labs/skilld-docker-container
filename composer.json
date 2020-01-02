@@ -55,6 +55,7 @@
     "drupal/swiftmailer": "^1",
     "drupal/telephone_validation": "^2.2",
     "drupal/token": "^1",
+    "drupal/username_enumeration_prevention": "^1.0",
     "drupal/views_bulk_edit": "^2.3",
     "drupal/webform": "^5.4",
     "drush/drush": "^10.1.0",
