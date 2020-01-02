@@ -34,7 +34,8 @@ Feature: Generic tests
     And I fill in "edit-pass" with "YYYYY"
     And I press the "edit-submit" button
     Then I am on "/admin/people"
-    And the response status code should be 403
+    And the response status code should be 404 
+    # See https://www.drupal.org/project/username_enumeration_prevention
 
 
   Scenario: Create many nodes
