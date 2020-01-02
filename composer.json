@@ -123,23 +123,26 @@
         "Fix error loged with remote video in Seven theme": "https://www.drupal.org/files/issues/2019-12-07/3099441-2.patch",
         "SQLite database locking errors cause fatal errors": "https://www.drupal.org/files/issues/1120020-59.patch"
       },
+      "drush/drush": {
+        "Import multiple custom translation po files": "https://patch-diff.githubusercontent.com/raw/drush-ops/drush/pull/4251.patch"
+      },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
+      },
+      "drupal/devel": {
+        "Generate translated content": "https://www.drupal.org/files/issues/2019-12-06/devel-generate-translated-content-1277654-78.patch"
+      },
+      "drupal/block_content_permissions": {
+        "Allow accessing the Custom block library page without Administer blocks permission": "https://www.drupal.org/files/issues/2019-06-20/block_content_permissions-access_listing_page-2920739-23.patch"
+      },
+      "drupal/paragraphs": {
+        "Support paragraph type icon config deployment": "https://www.drupal.org/files/issues/2019-11-25/2832021-40.patch"
       },
       "drupal/menu_link_attributes": {
         "Add missing schema for menu_link_attributes": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
       },
       "drupal/svg_image": {
         "Add missing schema for svg_image": "https://www.drupal.org/files/issues/2018-12-31/missing_schema_field_formatter.patch"
-      },
-      "drupal/devel": {
-        "Generate translated content": "https://www.drupal.org/files/issues/2019-12-06/devel-generate-translated-content-1277654-78.patch"
-      },
-      "drush/drush": {
-        "Import multiple custom translation po files": "https://patch-diff.githubusercontent.com/raw/drush-ops/drush/pull/4251.patch"
-      },
-      "drupal/block_content_permissions": {
-        "Allow accessing the Custom block library page without Administer blocks permission": "https://www.drupal.org/files/issues/2019-06-20/block_content_permissions-access_listing_page-2920739-23.patch"
       }
     }
   }

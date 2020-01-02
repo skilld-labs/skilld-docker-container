@@ -14,7 +14,6 @@ dependencies:
   - color
   - config
   - config_translation
-  - content_translation
   - contextual
   - datetime
   - datetime_range
@@ -33,12 +32,9 @@ dependencies:
   - layout_discovery
   - link
   - locale
-  - manage_display
   - media
   - media_library
-  - menu_admin_per_menu
   - menu_link_attributes
-  - menu_link_content
   - menu_ui
   - node
   - options
@@ -47,10 +43,8 @@ dependencies:
   - page_manager_ui
   - panels
   - panels_everywhere
-  - paragraphs
   - path
   - path_alias
-  - pathauto
   - quickedit
   - rdf
   - redirect
@@ -62,15 +56,22 @@ dependencies:
   - telephone
   - telephone_validation
   - text
+  - token
   - toolbar
   - update
   - user
-  - views
   - views_bulk_edit
   - views_bulk_operations
   - views_ui
   - webform
   - webform_ui
+  - manage_display
+  - menu_admin_per_menu
+  - menu_link_content
+  - pathauto
+  - content_translation
+  - views
+  - paragraphs
 
 themes:
   - bartik
