@@ -1,8 +1,6 @@
 langcode: en
 status: true
-dependencies:
-  config:
-    - media.type.image
+dependencies: {  }
 id: media_type_image
 action: page_not_found
 allow_override: 1

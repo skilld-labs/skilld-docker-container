@@ -1,8 +1,6 @@
 langcode: en
 status: true
-dependencies:
-  config:
-    - media.type.document
+dependencies: {  }
 id: media_type_document
 action: page_not_found
 allow_override: 1

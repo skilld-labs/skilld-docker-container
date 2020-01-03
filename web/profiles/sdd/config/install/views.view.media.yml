@@ -4,8 +4,8 @@ dependencies:
   config:
     - image.style.thumbnail
   module:
-    - image
     - media
+    - svg_image
     - user
 id: media
 label: Media

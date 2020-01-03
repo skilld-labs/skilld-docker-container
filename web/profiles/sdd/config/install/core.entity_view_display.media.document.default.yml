@@ -8,8 +8,8 @@ dependencies:
   module:
     - field_layout
     - file
-    - image
     - layout_discovery
+    - svg_image
     - user
 third_party_settings:
   field_layout:

@@ -8,8 +8,8 @@ dependencies:
     - media.type.audio
   module:
     - field_layout
-    - image
     - layout_discovery
+    - svg_image
 third_party_settings:
   field_layout:
     id: layout_onecol

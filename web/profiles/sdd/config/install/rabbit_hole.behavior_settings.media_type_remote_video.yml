@@ -1,8 +1,6 @@
 langcode: en
 status: true
-dependencies:
-  config:
-    - media.type.remote_video
+dependencies: {  }
 id: media_type_remote_video
 action: page_not_found
 allow_override: 1
