@@ -4,6 +4,12 @@ dependencies:
   enforced:
     module:
       - webform
+  module:
+    - honeypot
+third_party_settings:
+  honeypot:
+    honeypot: true
+    time_restriction: true
 open: null
 close: null
 weight: 0
@@ -130,6 +136,8 @@ settings:
   results_disabled: false
   results_disabled_ignore: false
   token_update: false
+  wizard_progress_states: false
+  token_view: false
 access:
   create:
     roles:

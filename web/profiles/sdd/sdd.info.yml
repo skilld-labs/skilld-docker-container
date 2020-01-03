@@ -29,6 +29,7 @@ dependencies:
   - focal_point
   - google_tag
   - help
+  - honeypot
   - image
   - language
   - layout_discovery
