@@ -8,8 +8,8 @@ dependencies:
     - media.type.local_video
   module:
     - field_layout
-    - image
     - layout_discovery
+    - svg_image
 third_party_settings:
   field_layout:
     id: layout_onecol

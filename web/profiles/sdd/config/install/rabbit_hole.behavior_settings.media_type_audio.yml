@@ -1,8 +1,6 @@
 langcode: en
 status: true
-dependencies:
-  config:
-    - media.type.audio
+dependencies: {  }
 id: media_type_audio
 action: page_not_found
 allow_override: 1

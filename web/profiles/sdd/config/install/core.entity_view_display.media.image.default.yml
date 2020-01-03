@@ -8,8 +8,8 @@ dependencies:
     - media.type.image
   module:
     - field_layout
-    - image
     - layout_discovery
+    - svg_image
     - user
 third_party_settings:
   field_layout:
@@ -24,37 +24,38 @@ content:
   created:
     label: hidden
     type: timestamp
-    weight: 0
+    weight: 1
     region: content
     settings:
       date_format: medium
       custom_date_format: ''
       timezone: ''
+      show_prefix_label: false
     third_party_settings: {  }
   field_media_image:
-    weight: 6
+    weight: 3
     label: hidden
     settings:
       image_style: ''
       image_link: ''
+      svg_attributes:
+        width: null
+        height: null
+      svg_render_as_image: true
     third_party_settings: {  }
     type: image
-    region: content
-  text_short:
-    weight: 7
-    label: hidden
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
     region: content
   thumbnail:
     type: image
-    weight: 5
+    weight: 2
     label: hidden
     settings:
       image_style: thumbnail
       image_link: ''
+      svg_attributes:
+        width: null
+        height: null
+      svg_render_as_image: true
     region: content
     third_party_settings: {  }
   uid:
@@ -67,3 +68,4 @@ content:
 hidden:
   langcode: true
   name: true
+  text_short: true
