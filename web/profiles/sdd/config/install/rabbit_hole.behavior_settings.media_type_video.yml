@@ -1,7 +1,9 @@
 langcode: en
 status: true
-dependencies: {  }
-id: media_type_local_video
+dependencies:
+  config:
+    - media.type.video
+id: media_type_video
 action: page_not_found
 allow_override: 1
 redirect: ''

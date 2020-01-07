@@ -3,7 +3,7 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.media.full
-    - field.field.media.audio.field_media_file
+    - field.field.media.audio.field_media_audio_file
     - media.type.audio
   module:
     - field_layout
@@ -19,10 +19,10 @@ targetEntityType: media
 bundle: audio
 mode: full
 content:
-  field_media_file:
+  field_media_audio_file:
     type: file_audio
     weight: 0
-    label: hidden
+    label: visually_hidden
     settings:
       controls: true
       multiple_file_display_type: tags

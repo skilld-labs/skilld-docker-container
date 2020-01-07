@@ -4,7 +4,6 @@ dependencies:
   config:
     - core.entity_form_mode.media.media_library
     - field.field.media.image.field_media_image
-    - field.field.media.image.text_short
     - image.style.media_library
     - media.type.image
   module:
@@ -22,31 +21,29 @@ bundle: image
 mode: media_library
 content:
   field_media_image:
-    weight: 0
+    type: image_focal_point
+    weight: 1
+    region: content
     settings:
       preview_image_style: media_library
       offsets: '50,50'
       progress_indicator: throbber
       preview_link: false
     third_party_settings: {  }
-    type: image_focal_point
-    region: content
-  text_short:
-    type: string_textfield
-    weight: 1
+  langcode:
+    type: language_select
+    weight: 2
     region: content
     settings:
-      size: 60
-      placeholder: ''
+      include_locked: true
     third_party_settings: {  }
   translation:
-    weight: 2
+    weight: 10
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
   created: true
-  langcode: true
   name: true
   path: true
   status: true

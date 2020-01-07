@@ -3,8 +3,8 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.media.full
-    - field.field.media.local_video.field_media_file
-    - media.type.local_video
+    - field.field.media.video.field_media_video_file
+    - media.type.video
   module:
     - field_layout
     - file
@@ -14,15 +14,15 @@ third_party_settings:
     id: layout_onecol
     settings:
       label: ''
-id: media.local_video.full
+id: media.video.full
 targetEntityType: media
-bundle: local_video
+bundle: video
 mode: full
 content:
-  field_media_file:
+  field_media_video_file:
     type: file_video
     weight: 0
-    label: hidden
+    label: visually_hidden
     settings:
       controls: true
       multiple_file_display_type: tags

@@ -4,7 +4,6 @@ dependencies:
   config:
     - core.entity_view_mode.media.media_library
     - field.field.media.image.field_media_image
-    - field.field.media.image.text_short
     - image.style.medium
     - media.type.image
   module:
@@ -23,21 +22,20 @@ mode: media_library
 content:
   thumbnail:
     type: image
+    weight: 0
+    region: content
     label: hidden
     settings:
       image_style: medium
       image_link: ''
+      svg_render_as_image: true
       svg_attributes:
         width: null
         height: null
-      svg_render_as_image: true
-    weight: 0
     third_party_settings: {  }
-    region: content
 hidden:
   created: true
   field_media_image: true
   langcode: true
   name: true
-  text_short: true
   uid: true
