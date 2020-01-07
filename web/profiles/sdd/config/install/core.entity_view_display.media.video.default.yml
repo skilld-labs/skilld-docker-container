@@ -2,29 +2,34 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.remote_video.field_media_oembed_video
-    - media.type.remote_video
+    - field.field.media.video.field_media_video_file
+    - media.type.video
   module:
     - field_layout
+    - file
     - layout_discovery
-    - media
 third_party_settings:
   field_layout:
     id: layout_onecol
     settings:
       label: ''
-id: media.remote_video.default
+id: media.video.default
 targetEntityType: media
-bundle: remote_video
+bundle: video
 mode: default
 content:
-  field_media_oembed_video:
-    type: oembed
+  field_media_video_file:
+    type: file_video
     weight: 0
     label: hidden
     settings:
-      max_width: 640
-      max_height: 360
+      controls: true
+      multiple_file_display_type: tags
+      width: 640
+      height: 360
+      autoplay: false
+      loop: false
+      muted: false
     third_party_settings: {  }
     region: content
 hidden:

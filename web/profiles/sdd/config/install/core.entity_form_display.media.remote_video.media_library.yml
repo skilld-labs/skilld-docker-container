@@ -18,14 +18,13 @@ targetEntityType: media
 bundle: remote_video
 mode: media_library
 content:
-  name:
-    type: string_textfield
-    settings:
-      size: 60
-      placeholder: ''
-    weight: 0
-    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 2
     region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
   translation:
     weight: 10
     settings: {  }
@@ -34,7 +33,7 @@ content:
 hidden:
   created: true
   field_media_oembed_video: true
-  langcode: true
+  name: true
   path: true
   status: true
   uid: true

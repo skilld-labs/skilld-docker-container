@@ -1,13 +1,12 @@
 langcode: en
 status: true
-dependencies: {  }
-id: local_video
-label: 'Local video'
-description: 'Allow to add videos hosted locally'
+id: video
+label: Video
+description: 'A locally hosted video file.'
 source: video_file
 queue_thumbnail_downloads: false
 new_revision: true
 source_configuration:
-  source_field: field_media_file
+  source_field: field_media_video_file
 field_map:
   name: name

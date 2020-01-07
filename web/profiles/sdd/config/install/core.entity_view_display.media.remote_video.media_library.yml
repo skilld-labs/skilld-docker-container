@@ -22,13 +22,13 @@ mode: media_library
 content:
   thumbnail:
     type: image
+    weight: 0
+    region: content
     label: hidden
     settings:
       image_style: medium
       image_link: ''
-    weight: 0
     third_party_settings: {  }
-    region: content
 hidden:
   created: true
   field_media_oembed_video: true

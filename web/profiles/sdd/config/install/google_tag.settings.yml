@@ -1,7 +1,8 @@
-uri: 'public://google_tag'
+uri: 'public:/'
 compact_snippet: true
 include_file: true
 rebuild_snippets: true
+flush_snippets: false
 debug_output: false
 _default_container:
   container_id: ''
@@ -12,7 +13,7 @@ _default_container:
   status_toggle: 'exclude listed'
   status_list: "403\n404"
   data_layer: dataLayer
-  include_classes: true
+  include_classes: false
   whitelist_classes: "google\nnonGooglePixels\nnonGoogleScripts\nnonGoogleIframes"
   blacklist_classes: "customScripts\ncustomPixels"
   include_environment: false

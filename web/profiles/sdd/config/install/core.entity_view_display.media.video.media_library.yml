@@ -3,9 +3,9 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.media.media_library
-    - field.field.media.local_video.field_media_file
-    - image.style.medium
-    - media.type.local_video
+    - field.field.media.video.field_media_video_file
+    - image.style.thumbnail
+    - media.type.video
   module:
     - field_layout
     - layout_discovery
@@ -15,23 +15,23 @@ third_party_settings:
     id: layout_onecol
     settings:
       label: ''
-id: media.local_video.media_library
+id: media.video.media_library
 targetEntityType: media
-bundle: local_video
+bundle: video
 mode: media_library
 content:
   thumbnail:
     type: image
+    weight: 0
+    region: content
     label: hidden
     settings:
-      image_style: medium
+      image_style: thumbnail
       image_link: ''
-    weight: 0
     third_party_settings: {  }
-    region: content
 hidden:
   created: true
-  field_media_file: true
+  field_media_video_file: true
   langcode: true
   name: true
   uid: true

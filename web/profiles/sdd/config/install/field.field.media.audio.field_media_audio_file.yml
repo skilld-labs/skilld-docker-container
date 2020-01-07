@@ -2,12 +2,12 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.media.field_media_file
+    - field.storage.media.field_media_audio_file
     - media.type.audio
   module:
     - file
-id: media.audio.field_media_file
-field_name: field_media_file
+id: media.audio.field_media_audio_file
+field_name: field_media_audio_file
 entity_type: media
 bundle: audio
 label: 'Audio file'
