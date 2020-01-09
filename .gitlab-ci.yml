@@ -3,18 +3,25 @@
 # - SONAR_HOST // Optional
 # - SONAR_TOKEN // Optional
 
-# Tags defines which runner to use (expected shell runner)
-.ra_tags_branches: &ra_tags_branches
-  tags:
-    - review-apps-4
-  only:
-    - branches
+variables:
+  GIT_DEPTH: "3"
+  THEME_PATH: "" # Update to enable front jobs
 
 image: skilldlabs/php:73
 
-variables:
-  GIT_DEPTH: "3"
-  THEME_PATH: "" # update to enable front jobs
+# Tags defines which runner to use (expected shell runner)
+.ra_tags: &ra_tags
+  tags:
+    - review-apps-4
+
+.ra_only: &ra_only
+  only:
+    - branches
+
+.ra_only_theme: &ra_only_theme
+  only:
+    variables:
+      - $THEME_PATH
 
 before_script:
   - date
@@ -47,9 +54,6 @@ sniffers:front:
   script:
     - make front-install # Dependencies are required for js imports to pass linters
     - make lintval
-  only:
-    variables:
-      - $THEME_PATH
   cache:
     key:
       files: # These paths have to be hardcoded until https://gitlab.com/gitlab-org/gitlab/issues/118466 lands or use a non-custom gitlab variable
@@ -61,7 +65,8 @@ sniffers:front:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
     paths:
       - ${THEME_PATH}/node_modules/ # Populated during yarn install
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only_theme
 
 sniffers:phpcs:
   stage: sniffers
@@ -69,7 +74,8 @@ sniffers:phpcs:
   script:
   - docker -v
   - make phpcs
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only
 
 sniffers:newlineeof:
   stage: sniffers
@@ -127,22 +133,21 @@ prepare:back:
       - vendor/
       - web/
       - drush/contrib/
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only
 
 prepare:front:
   stage: prepare
   script:
     - make front-build
-  only:
-    variables:
-      - $THEME_PATH
   dependencies:
     - sniffers:front
   artifacts:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
     paths:
       - ${THEME_PATH}/dist/ # Populated during yarn build
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only_theme
 
 
 .deploy_template: &deploy_template
@@ -174,7 +179,8 @@ prepare:front:
     - prepare:back
     - prepare:front
   allow_failure: false
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only
 
 deploy:review:
   <<: *deploy_template
@@ -201,7 +207,8 @@ stop_review:
   environment:
     name: review/$CI_COMMIT_REF_NAME
     action: stop
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only
 
 
 test:behat:
@@ -227,7 +234,8 @@ test:behat:
   dependencies:
   - deploy:review
   allow_failure: false
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only
 
 test:cinsp:
   stage: tests
@@ -241,7 +249,8 @@ test:cinsp:
   - make cinsp
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only
 
 test:drupalcheck:
   stage: tests
@@ -255,7 +264,8 @@ test:drupalcheck:
   - make drupalcheckval
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only
 
 test:contentgen:
   stage: tests
@@ -269,7 +279,8 @@ test:contentgen:
   - make contentgen
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only
   when: manual
 
 report:statusreportval:
@@ -284,7 +295,8 @@ report:statusreportval:
   - make statusreportval
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only
 
 report:watchdog:
   stage: reports
@@ -298,4 +310,5 @@ report:watchdog:
   - make watchdogval
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
+  <<: *ra_tags
+  <<: *ra_only
