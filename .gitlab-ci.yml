@@ -6,6 +6,7 @@
 variables:
   GIT_DEPTH: "3"
   THEME_PATH: "" # Update to enable front jobs
+  GIT_STRATEGY: clone # Workaround until git is updated in runner, see https://gitlab.com/gitlab-org/gitlab-foss/issues/60466
 
 image: skilldlabs/php:73
 
