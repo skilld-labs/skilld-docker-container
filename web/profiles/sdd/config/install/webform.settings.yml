@@ -82,6 +82,8 @@ assets:
   javascript: ''
 handler:
   excluded_handlers: {  }
+variant:
+  excluded_variants: {  }
 export:
   temp_directory: ''
   exporter: delimited
@@ -111,6 +113,9 @@ batch:
   default_batch_email_size: 500
 purge:
   cron_size: 100
+form:
+  filter_category: ''
+  filter_state: ''
 element:
   machine_name_pattern: a-z0-9_
   empty_message: '{Empty}'
@@ -124,14 +129,11 @@ element:
   default_empty_option: true
   default_empty_option_required: ''
   default_empty_option_optional: ''
-  default_icheck: ''
-  default_google_maps_api_key: ''
   default_algolia_places_app_id: ''
   default_algolia_places_api_key: ''
   excluded_elements:
     password: password
     password_confirm: password_confirm
-    webform_location_geocomplete: webform_location_geocomplete
 html_editor:
   disabled: false
   element_format: ''
@@ -178,8 +180,6 @@ libraries:
   excluded_libraries:
     - choices
     - jquery.chosen
-    - jquery.icheck
-    - jquery.toggles
 requirements:
   cdn: true
   bootstrap: true
