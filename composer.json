@@ -30,7 +30,6 @@
   "require": {
     "php": ">=7.0.8",
     "ckeditor/panelbutton": "^4.10",
-    "composer/installers": "^1.2",
     "cweagans/composer-patches": "^1.6.5",
     "drupal-composer/drupal-scaffold": "^2.5",
     "drupal/better_normalizers": "^1.0@beta",
@@ -72,7 +71,7 @@
     "drupal/drupal-extension": "^3.4",
     "espend/behat-placeholder-extension": "^1.1",
     "genesis/behat-fail-aid": "^2.1",
-    "mglaman/drupal-check": "^1.0.14"
+    "mglaman/drupal-check": "^1.1"
   },
   "conflict": {
     "drupal/drupal": "*"
@@ -120,7 +119,7 @@
     "composer-exit-on-patch-failure": true,
     "patches": {
       "drupal/core": {
-        "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2019-03-19/2731991-38.patch",
+        "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2019-07-30/2731991-42.patch",
         "Split Authored by and Authored on in Display Settings": "https://www.drupal.org/files/issues/2019-12-05/1399990-108-reroll.patch",
         "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch",
         "Fix multilingual site's layout edit context issue": "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
@@ -129,17 +128,17 @@
       "drush/drush": {
         "Import multiple custom translation po files": "https://patch-diff.githubusercontent.com/raw/drush-ops/drush/pull/4251.patch"
       },
+      "drupal/config_inspector": {
+        "DrupalCoreLink could not be converted to string": "https://www.drupal.org/files/issues/2019-10-02/3084666-4.patch"
+      },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
       },
       "drupal/devel": {
-        "Generate translated content": "https://www.drupal.org/files/issues/2019-12-06/devel-generate-translated-content-1277654-78.patch"
+        "Generate translated content": "https://www.drupal.org/files/issues/2020-02-16/1277654-84.devel-generate-translated-content.patch"
       },
       "drupal/block_content_permissions": {
         "Allow accessing the Custom block library page without Administer blocks permission": "https://www.drupal.org/files/issues/2019-06-20/block_content_permissions-access_listing_page-2920739-23.patch"
-      },
-      "drupal/paragraphs": {
-        "Support paragraph type icon config deployment": "https://www.drupal.org/files/issues/2019-11-25/2832021-40.patch"
       },
       "drupal/menu_link_attributes": {
         "Add missing schema for menu_link_attributes": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
@@ -149,6 +148,9 @@
       },
       "drupal/focal_point": {
         "Integrate focal point with media_library": "https://www.drupal.org/files/issues/2019-12-11/focal_point-compatibility-with-media-libary-3094478-2.patch"
+      },
+      "mglaman/drupal-check": {
+        "Added check to see if TTY is available": "https://patch-diff.githubusercontent.com/raw/mglaman/drupal-check/pull/135.patch"
       }
     }
   }
