@@ -111,7 +111,12 @@ prepare:back:
   script:
     - docker --version
     - docker-compose --version
+    - pwd
+    - ls -la
     - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
+    - echo "CI_ENVIRONMENT_SLUG=${CI_ENVIRONMENT_SLUG}"
+    - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
+    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-${CI_ENVIRONMENT_SLUG}" >> .env.default
     - make back
     - docker-compose down # PHP container was required for composer
   cache:
@@ -197,6 +202,7 @@ deploy:master:
 
 stop_review:
   stage: deploy
+  dependencies: []
   script:
     - date; pwd; ls -lahq;
     - echo "Clean-up build dir ${BUILD_DIR}"
