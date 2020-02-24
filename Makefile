@@ -83,6 +83,8 @@ ifneq ($(strip $(MODULES)),)
 	$(call php, drush en $(MODULES) -y)
 	$(call php, drush pmu $(MODULES) -y)
 endif
+	# install_import_translations() overwrites config translations so we need to reimport.
+	$(call php, drush cim -y)
 
 ## Import online & local translations
 localize:
