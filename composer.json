@@ -123,10 +123,15 @@
         "Split Authored by and Authored on in Display Settings": "https://www.drupal.org/files/issues/2019-12-05/1399990-108-reroll.patch",
         "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch",
         "Fix multilingual site's layout edit context issue": "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
-        "SQLite database locking errors cause fatal errors": "https://www.drupal.org/files/issues/1120020-59.patch"
+        "SQLite database locking errors cause fatal errors": "https://www.drupal.org/files/issues/1120020-59.patch",
+        "Error: Call to a member function getLabel() after enabling layout_builder": "https://www.drupal.org/files/issues/2019-11-14/2985882-entityfield-43.patch",
+        "Split Interface Translation permission": "https://www.drupal.org/files/issues/2020-01-14/locale-administer-locale-permission-3067056-7.patch"
       },
       "drush/drush": {
         "Import multiple custom translation po files": "https://patch-diff.githubusercontent.com/raw/drush-ops/drush/pull/4251.patch"
+      },
+      "drupal/lb_ux": {
+        "Bloc edition when Show content preview is disabled": "https://www.drupal.org/files/issues/2020-02-27/3116402.patch"
       },
       "drupal/config_inspector": {
         "DrupalCoreLink could not be converted to string": "https://www.drupal.org/files/issues/2019-10-02/3084666-4.patch"
