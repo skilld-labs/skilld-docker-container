@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize
+.PHONY: all fast allfast provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -33,6 +33,13 @@ php-0 = docker-compose exec -T php ${1}
 all: | provision back front si localize hooksymlink info
 # Install for CI deploy:review. Back & Front tasks are run in a dedicated previous step in order to leverage CI cache
 all_ci: | provision si localize hooksymlink info
+# Full site install from the scratch with DB in ram (makes data NOT persistant)
+allfast: | fast provision back front si localize hooksymlink info
+
+## Update .env to build DB in ram (makes data NOT persistant)
+fast:
+	$(shell sed -i "s|^#DB_URL=sqlite:///dev/shm/d8.sqlite|DB_URL=sqlite:///dev/shm/d8.sqlite|g"  .env)
+	$(shell sed -i "s|^DB_URL=sqlite:./../.cache/d8.sqlite|#DB_URL=sqlite:./../.cache/d8.sqlite|g"  .env)
 
 ## Provision enviroment
 provision:
