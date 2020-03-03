@@ -119,6 +119,7 @@ prepare:back:
     - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
     - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}" >> .env.default
     - make back
+  after_script:
     - docker-compose down # PHP container was required for composer
   cache:
     key:
