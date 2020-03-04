@@ -20,6 +20,7 @@ features/*.png
 config/sync/.htaccess
 mysql/
 node_modules
+web/themes/custom/*/dist/
 
 # Ignore personal directories
 .idea/

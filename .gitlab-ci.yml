@@ -5,7 +5,8 @@
 
 variables:
   GIT_DEPTH: "3"
-  THEME_PATH: "" # Update to enable front jobs
+  THEME_PATH: "" # Update to enable front jobs (web/themes/custom/XXX)
+  STORYBOOK_PATH: "" # Update to enable storybook job (themes/custom/XXX/dist/storybook/index.html)
   GIT_STRATEGY: clone # Workaround until git is updated in runner, see https://gitlab.com/gitlab-org/gitlab-foss/issues/60466
 
 image: skilldlabs/php:73
@@ -34,6 +35,7 @@ stages:
   - deploy
   - tests
   - reports
+  - document
 
 
 sniffers:clang:
@@ -57,9 +59,10 @@ sniffers:front:
     - make lintval
   cache:
     key:
-      files: # These paths have to be hardcoded until https://gitlab.com/gitlab-org/gitlab/issues/118466 lands or use a non-custom gitlab variable
-        - ${THEME_PATH}/package.json
-        - ${THEME_PATH}/yarn.lock
+      files:
+      # Until https://gitlab.com/gitlab-org/gitlab/issues/118466 lands ...
+        - web/themes/custom/XXX/package.json # ... this path has to be hardcoded
+        - web/themes/custom/XXX/yarn.lock # ... this path has to be hardcoded
     paths:
       - ${THEME_PATH}/node_modules/ # Populated during yarn install
   artifacts:
@@ -294,21 +297,6 @@ test:contentgen:
   <<: *ra_only
   when: manual
 
-test:storybook:
-  stage: tests
-  environment:
-    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
-    name: review/$CI_COMMIT_REF_NAME
-    on_stop: stop_review
-  script:
-  - cd ${BUILD_DIR}
-  - make build-storybook
-  dependencies:
-  - deploy:review
-  <<: *ra_tags
-  <<: *ra_only
-  when: manual
-
 report:statusreportval:
   stage: reports
   environment:
@@ -338,3 +326,22 @@ report:watchdog:
   - deploy:review
   <<: *ra_tags
   <<: *ra_only
+
+document:storybook:
+  stage: document
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  only:
+    variables:
+      - $STORYBOOK_PATH
+  script:
+  - cd ${BUILD_DIR}
+  - make build-storybook
+  - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
+  dependencies:
+  - deploy:review
+  <<: *ra_tags
+  <<: *ra_only
+  when: always
