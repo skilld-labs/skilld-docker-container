@@ -67,6 +67,7 @@ sniffers:front:
       - ${THEME_PATH}/node_modules/ # Populated during yarn install
   artifacts:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
+    expire_in: 1d
     paths:
       - ${THEME_PATH}/node_modules/ # Populated during yarn install
   <<: *ra_tags
@@ -140,6 +141,7 @@ prepare:back:
   dependencies: []
   artifacts:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:back"
+    expire_in: 1d
     paths:
       - vendor/
       - web/
@@ -155,6 +157,7 @@ prepare:front:
     - sniffers:front
   artifacts:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
+    expire_in: 1d
     paths:
       - ${THEME_PATH}/dist/ # Populated during yarn build
   <<: *ra_tags
