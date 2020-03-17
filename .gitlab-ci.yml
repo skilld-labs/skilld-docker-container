@@ -120,8 +120,7 @@ prepare:back:
     - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
     - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
     - echo "CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG}"
-    - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
-    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}" >> .env.default
+    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
     - make back
   after_script:
     - docker-compose down -v --remove-orphans # PHP container was required for composer
@@ -171,7 +170,6 @@ prepare:front:
     - echo "CI_ENVIRONMENT_NAME=${CI_ENVIRONMENT_NAME}"
     - echo "CI_ENVIRONMENT_SLUG=${CI_ENVIRONMENT_SLUG}"
     - echo "CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG}"
-    - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
     - echo "CI_ENVIRONMENT_URL=${CI_ENVIRONMENT_URL}"
     - echo "CI_PROJECT_PATH_SLUG=${CI_PROJECT_PATH_SLUG}"
     - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
@@ -179,7 +177,7 @@ prepare:front:
     - mkdir -p ${BUILD_DIR}
     - rsync -ah --exclude=.git --delete ./ ${BUILD_DIR}
     - cd ${BUILD_DIR}
-    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}" >> .env.default
+    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
     - echo "MAIN_DOMAIN_NAME=${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}" >> .env.default
     - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
     - docker --version
