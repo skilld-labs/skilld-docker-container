@@ -1,8 +1,8 @@
 langcode: en
 status: true
 dependencies: {  }
-id: administrator
-label: Administrator
+id: sysadmin
+label: "System administrator"
 weight: 2
 is_admin: true
 permissions: {  }
