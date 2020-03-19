@@ -78,7 +78,7 @@ endif
 	$(call php, composer drupal-scaffold)
 	$(call php, composer create-required-files)
 
-TESTER_NAME = Tester
+TESTER_NAME = tester
 ## Install drupal
 si:
 	@echo "Installing from: $(PROJECT_INSTALL)"
@@ -111,8 +111,8 @@ info:
 	$(eval CONTAINERS = $(shell docker ps -f name=$(COMPOSE_PROJECT_NAME) --format "{{ .ID }}" -f 'label=traefik.enable=true'))
 	$(foreach CONTAINER, $(CONTAINERS),$(info http://$(shell printf '%-19s \n'  $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "traefik.port"}} {{range $$p, $$conf := .NetworkSettings.Ports}}{{$$p}}{{end}} {{.Name}}' $(CONTAINER) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')) ))
 	@echo "$(RESULT)"
-	@echo "Admin - Login : \"$(ADMIN_NAME)\" - Password : \"$(ADMIN_PW)\""
-	@echo "Contributor - Login : \"$(TESTER_NAME)\" - Password : \"$(TESTER_PW)\""
+	@echo "System admin role - Login : \"$(ADMIN_NAME)\" - Password : \"$(ADMIN_PW)\""
+	@echo "Contributor role - Login : \"$(TESTER_NAME)\" - Password : \"$(TESTER_PW)\""
 
 ## Run shell in PHP container as regular user
 exec:

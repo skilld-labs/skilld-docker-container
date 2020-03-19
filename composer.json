@@ -139,9 +139,6 @@
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
       },
-      "drupal/devel": {
-        "Generate translated content": "https://www.drupal.org/files/issues/2020-02-16/1277654-84.devel-generate-translated-content.patch"
-      },
       "drupal/block_content_permissions": {
         "Allow accessing the Custom block library page without Administer blocks permission": "https://www.drupal.org/files/issues/2019-06-20/block_content_permissions-access_listing_page-2920739-23.patch"
       },
