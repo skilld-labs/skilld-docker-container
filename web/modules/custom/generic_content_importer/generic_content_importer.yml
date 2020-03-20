@@ -1,0 +1,12 @@
+name: Generic content importer
+type: module
+description: Generic import module to be used for any kind of content: structural content, test content, final content. Check README.md for more info.
+package: Custom
+core: 8.x
+core_version_requirement: ^8 || ^9
+dependencies:
+  - drupal:migrate
+  - migrate_plus:migrate_plus
+  - migrate_tools:migrate_tools
+  - migrate_source_csv:migrate_source_csv
+  - migrate_source_ui:migrate_source_ui

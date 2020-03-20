@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+id: test_content
+label: 'Test content'
+description: 'Contains content to fill lists and play user stories'
+source_type: CSV
+module: null
+shared_configuration: null
