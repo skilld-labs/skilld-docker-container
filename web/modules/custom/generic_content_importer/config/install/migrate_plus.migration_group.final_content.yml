@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+id: final_content
+label: 'Final content'
+description: 'Contains final content of data migration'
+source_type: CSV
+module: null
+shared_configuration: null
