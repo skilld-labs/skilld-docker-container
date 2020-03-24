@@ -1,9 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-id: structural_content
-label: 'Structural content'
-description: 'Contains content blocks, voc terms, menu items, etc'
-source_type: CSV
-module: null
-shared_configuration: null

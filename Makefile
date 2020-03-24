@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all fast allfast provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize content
+.PHONY: all fast allfast provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalcheckval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -30,11 +30,11 @@ php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 php-0 = docker-compose exec -T php ${1}
 
 ## Full site install from the scratch
-all: | provision back front si localize content hooksymlink info
+all: | provision back front si localize hooksymlink info
 # Install for CI deploy:review. Back & Front tasks are run in a dedicated previous step in order to leverage CI cache
-all_ci: | provision si localize content info
+all_ci: | provision si localize hooksymlink info
 # Full site install from the scratch with DB in ram (makes data NOT persistant)
-allfast: | fast provision back front si localize content hooksymlink info
+allfast: | fast provision back front si localize hooksymlink info
 
 ## Update .env to build DB in ram (makes data NOT persistant)
 fast:
@@ -89,7 +89,12 @@ ifeq ($(PROJECT_INSTALL), config)
 else
 	$(call php, drush si $(PROFILE_NAME) --db-url=$(DB_URL) --account-name=$(ADMIN_NAME) --account-mail=$(ADMIN_MAIL) --account-pass=$(ADMIN_PW) -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
 endif
+ifneq ($(strip $(MODULES)),)
+	$(call php, drush en $(MODULES) -y)
+	$(call php, drush pmu $(MODULES) -y)
 	$(call php, drush user:password "$(TESTER_NAME)" "$(TESTER_PW)")
+	
+endif
 
 ## Import online & local translations
 localize:
@@ -99,13 +104,6 @@ localize:
 	@echo "Importing custom translations..."
 	$(call php, drush locale:import:all /var/www/html/translations/ --type=customized --override=all)
 	@echo "Localization finished"
-
-## Import structural/test/real content
-content:
-	$(call php, drush migrate:import --group structural_content)
-	$(call php, drush migrate:import --group default_users)
-	$(call php, drush migrate:import --group test_content)
-	$(call php, drush migrate:import --group final_content)
 
 ## Display project's information
 info:
