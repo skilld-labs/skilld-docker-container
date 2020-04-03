@@ -1,5 +1,4 @@
 # Variables to add in Gitalb UI : Settings > CI/CD
-# - REVIEW_DOMAIN // Mandatory, should equal to DNS of available runner server with docker + docker-compose
 # - SONAR_HOST // Optional
 # - SONAR_TOKEN // Optional
 
@@ -8,6 +7,7 @@ variables:
   THEME_PATH: "" # Update to enable front jobs (web/themes/custom/XXX)
   STORYBOOK_PATH: "" # Update to enable storybook job (themes/custom/XXX/dist/storybook/index.html)
   GIT_STRATEGY: clone # Workaround until git is updated in runner, see https://gitlab.com/gitlab-org/gitlab-foss/issues/60466
+  REVIEW_DOMAIN: "XXX.XXX.com" # Mandatory, should equal to DNS of available runner server with docker + docker-compose + traefik
 
 image: skilldlabs/php:73
 
