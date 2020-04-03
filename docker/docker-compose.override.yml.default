@@ -49,6 +49,9 @@ services:
       - 'traefik.port=8025'
       - 'traefik.frontend.rule=Host:mail-${MAIN_DOMAIN_NAME}'
       - 'traefik.frontend.redirect.entryPoint=https'
+      - 'traefik.http.services.mailhog-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8025'
+      - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.tls=true'
+      - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
 
   nginx:
 # Uncomment for MacOS.
@@ -63,6 +66,8 @@ services:
       - 'traefik.port=80'
       - 'traefik.frontend.rule=Host:${MAIN_DOMAIN_NAME}'
       - 'traefik.frontend.redirect.entryPoint=https'
+      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls=true'
+      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
 
 #networks:
 #  front:
