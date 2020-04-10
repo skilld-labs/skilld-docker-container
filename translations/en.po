@@ -1,0 +1,13 @@
+# English translation of interface strings
+
+# These empty lines above are required for import to work
+msgid ""
+msgstr ""
+
+# https://www.drupal.org/project/block_content_permissions/issues/2920739#comment-13406815
+msgid ""
+"Blocks in the block library belong to <a href=\":types\">Custom block "
+"types</a>, each with its own fields and display settings. After "
+"creating a block, place it in a region from the <a "
+"href=\":blocks\">Block layout</a> page."
+msgstr " "

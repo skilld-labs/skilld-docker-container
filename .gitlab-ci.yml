@@ -1,0 +1,348 @@
+# Variables to add in Gitalb UI : Settings > CI/CD
+# - SONAR_HOST // Optional
+# - SONAR_TOKEN // Optional
+
+variables:
+  GIT_DEPTH: "3"
+  THEME_PATH: "" # Update to enable front jobs (web/themes/custom/XXX)
+  STORYBOOK_PATH: "" # Update to enable storybook job (themes/custom/XXX/dist/storybook/index.html)
+  GIT_STRATEGY: clone # Workaround until git is updated in runner, see https://gitlab.com/gitlab-org/gitlab-foss/issues/60466
+  REVIEW_DOMAIN: "XXX.XXX.com" # Mandatory, should equal to DNS of available runner server with docker + docker-compose + traefik
+
+image: skilldlabs/php:73
+
+# Tags defines which runner to use (expected shell runner)
+.ra_tags: &ra_tags
+  tags:
+    - review-apps-4
+
+.ra_only: &ra_only
+  only:
+    - branches
+
+.ra_only_theme: &ra_only_theme
+  only:
+    variables:
+      - $THEME_PATH
+
+before_script:
+  - date
+  - pwd
+
+stages:
+  - sniffers
+  - prepare
+  - deploy
+  - tests
+  - reports
+  - document
+
+
+sniffers:clang:
+  stage: sniffers
+  script:
+  - make clang
+
+sniffers:compose:
+  stage: sniffers
+  script:
+  - composer -vvv -V
+  - time composer validate --profile --strict
+
+sniffers:front:
+  stage: sniffers
+  before_script:
+  - date
+  - pwd
+  script:
+    - make front-install # Dependencies are required for js imports to pass linters
+    - make lintval
+  cache:
+    key:
+      files:
+      # Until https://gitlab.com/gitlab-org/gitlab/issues/118466 lands ...
+        - web/themes/custom/XXX/package.json # ... this path has to be hardcoded
+        - web/themes/custom/XXX/yarn.lock # ... this path has to be hardcoded
+    paths:
+      - ${THEME_PATH}/node_modules/ # Populated during yarn install
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
+    expire_in: 1d
+    paths:
+      - ${THEME_PATH}/node_modules/ # Populated during yarn install
+  <<: *ra_tags
+  <<: *ra_only_theme
+
+sniffers:phpcs:
+  stage: sniffers
+  image: skilldlabs/docker-phpcs-drupal
+  script:
+  - docker -v
+  - make phpcs
+  <<: *ra_tags
+  <<: *ra_only
+
+sniffers:newlineeof:
+  stage: sniffers
+  script:
+  - make newlineeof
+
+sniffers:hookupdate:
+  stage: sniffers
+  script:
+  - make hookupdateval
+  when: manual # Remove to run automatically when site is live
+
+sniffers:sonarqube:
+  stage: sniffers
+  image: skilldlabs/sonar-scanner:3.3
+  script:
+  - sonar-scanner
+    -Dsonar.projectKey=$CI_PROJECT_PATH_SLUG
+    -Dsonar.projectName=$CI_PROJECT_NAME
+    -Dsonar.host.url=${SONAR_HOST}
+    -Dsonar.login=${SONAR_TOKEN}
+    -Dsonar.projectBaseDir=.
+    -Dsonar.sources=.
+    -Dsonar.inclusions=settings/**,web/modules/custom/**,web/profiles/sdd/**,web/themes/custom/**
+  only:
+  - master
+  allow_failure: true
+
+
+prepare:back:
+  stage: prepare
+  script:
+    - docker --version
+    - docker-compose --version
+    - pwd
+    - ls -la
+    - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
+    - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
+    - echo "CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG}"
+    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
+    - make back
+  after_script:
+    - docker-compose down -v --remove-orphans # PHP container was required for composer
+  cache:
+    key:
+      files:
+        - composer.json
+        - composer.lock
+    paths:
+      - vendor/
+      - web/core/
+      - web/libraries/
+      - web/modules/contrib/
+      - web/profiles/contrib/
+      - web/themes/contrib/
+      - drush/contrib/
+  dependencies: []
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:back"
+    expire_in: 1d
+    paths:
+      - vendor/
+      - web/
+      - drush/contrib/
+  <<: *ra_tags
+  <<: *ra_only
+
+prepare:front:
+  stage: prepare
+  script:
+    - make front-build
+  dependencies:
+    - sniffers:front
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
+    expire_in: 1d
+    paths:
+      - ${THEME_PATH}/dist/ # Populated during yarn build
+  <<: *ra_tags
+  <<: *ra_only_theme
+
+
+.deploy_template: &deploy_template
+  stage: deploy
+  script:
+    - echo "Deploy ${CI_ENVIRONMENT_URL} review app to ${BUILD_DIR}."
+    - echo "CI_ENVIRONMENT_NAME=${CI_ENVIRONMENT_NAME}"
+    - echo "CI_ENVIRONMENT_SLUG=${CI_ENVIRONMENT_SLUG}"
+    - echo "CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG}"
+    - echo "CI_ENVIRONMENT_URL=${CI_ENVIRONMENT_URL}"
+    - echo "CI_PROJECT_PATH_SLUG=${CI_PROJECT_PATH_SLUG}"
+    - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
+    - echo "REVIEW_DOMAIN=${REVIEW_DOMAIN}"
+    - mkdir -p ${BUILD_DIR}
+    - rsync -ah --exclude=.git --delete ./ ${BUILD_DIR}
+    - cd ${BUILD_DIR}
+    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
+    - echo "MAIN_DOMAIN_NAME=${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}" >> .env.default
+    - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
+    - docker --version
+    - docker-compose --version
+    - make all_ci
+  after_script:
+    - echo "Started ${CI_ENVIRONMENT_URL} composition in ${BUILD_DIR} from Makefile."
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  dependencies:
+    - prepare:back
+    - prepare:front
+  allow_failure: false
+  <<: *ra_tags
+  <<: *ra_only
+
+deploy:review:
+  <<: *deploy_template
+  when: manual
+  except:
+  - master
+
+deploy:master:
+  <<: *deploy_template
+  when: always
+  only:
+  - master
+
+stop_review:
+  stage: deploy
+  dependencies: []
+  script:
+    - date; pwd; ls -lahq;
+    - echo "Clean-up build dir ${BUILD_DIR}"
+    - (if [ -d ${BUILD_DIR} ]; then date; cd ${BUILD_DIR}; pwd; make clean; cd -; rm -rf ${BUILD_DIR}; fi)
+    - echo "Removed previous review app ${CI_ENVIRONMENT_URL} from ${BUILD_DIR}."
+  variables:
+    GIT_STRATEGY: none
+  when: manual
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  <<: *ra_tags
+  <<: *ra_only
+
+
+test:behat:
+  stage: tests
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - make behat
+  after_script:
+  - cd ${BUILD_DIR}
+  - make browser_driver_stop
+  - rm -rf web/screenshots
+  - mkdir web/screenshots
+  - mv features/*.png web/screenshots/
+  - echo "- Screenshots are available here :" && cd web/screenshots && ls -h *.png | xargs -i echo "${CI_ENVIRONMENT_URL}/screenshots/{}"
+  retry:
+    max: 2
+    when: script_failure
+  dependencies:
+  - deploy:review
+  allow_failure: false
+  <<: *ra_tags
+  <<: *ra_only
+
+test:cinsp:
+  stage: tests
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - make cinsp
+  dependencies:
+  - deploy:review
+  <<: *ra_tags
+  <<: *ra_only
+
+test:drupalcheck:
+  stage: tests
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - make drupalcheckval
+  dependencies:
+  - deploy:review
+  <<: *ra_tags
+  <<: *ra_only
+
+test:contentgen:
+  stage: tests
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - make contentgen
+  dependencies:
+  - deploy:review
+  <<: *ra_tags
+  <<: *ra_only
+  when: manual
+
+report:statusreportval:
+  stage: reports
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - make statusreportval
+  dependencies:
+  - deploy:review
+  <<: *ra_tags
+  <<: *ra_only
+
+report:watchdog:
+  stage: reports
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - make watchdogval
+  dependencies:
+  - deploy:review
+  <<: *ra_tags
+  <<: *ra_only
+
+document:storybook:
+  stage: document
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  only:
+    variables:
+      - $STORYBOOK_PATH
+  script:
+  - cd ${BUILD_DIR}
+  - make build-storybook
+  - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
+  dependencies:
+  - deploy:review
+  <<: *ra_tags
+  <<: *ra_only
+  when: always

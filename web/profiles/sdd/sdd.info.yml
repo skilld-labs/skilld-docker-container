@@ -1,86 +1,86 @@
 name: SDD
 type: profile
-description: 'Skill drupal development installation profile'
+description: 'Skill drupal development installation profile for content projects'
 core: 8.x
 
 dependencies:
-# Core
-#  - action
-#  - aggregator
-#  - automated_cron
-#  - ban
-#  - basic_auth
-#  - big_pipe
+  - automated_cron
+  - big_pipe
   - block
   - block_content
-#  - block_place
-#  - book
+  - block_content_permissions
   - breakpoint
   - ckeditor
-#  - color
-#  - comment
-  - config #comment in prod
-#  - config_translation
-#  - contact
-#  - content_moderation
-#  - content_translation
+  - color
+  - config
+  - config_translation
   - contextual
+  - crop
   - datetime
-#  - datetime_range
+  - datetime_range
   - dblog
   - dynamic_page_cache
   - editor
   - field
-#  - field_layout
-  - field_ui #comment in prod
+  - field_layout
+  - field_ui
   - file
   - filter
-#  - forum
-#  - hal
+  - focal_point
+  - google_tag
   - help
-#  - history
+  - honeypot
   - image
-#  - inline_form_errors
-#  - language
+  - language
   - layout_discovery
   - link
-#  - locale
-  - menu_link_content
+  - locale
+  - media
+  - media_library
+  - menu_link_attributes
   - menu_ui
-#  - migrate
-#  - migrate_drupal
-#  - migrate_drupal_ui
   - node
   - options
-#  - outside_in
   - page_cache
+  - page_manager
+  - page_manager_ui
+  - panels
+  - panels_everywhere
   - path
+  - path_alias
   - quickedit
+  - rabbit_hole
   - rdf
+  - redirect
+  - redirect_404
   - responsive_image
-#  - rest
-#  - search
-#  - serialization
+  - rh_media
+  - rh_taxonomy
+  - rh_user
   - shortcut
-#  - simpletest
-#  - statistics
-#  - syslog
+  - svg_image
   - system
   - taxonomy
-#  - telephone
+  - telephone
+  - telephone_validation
   - text
+  - token
   - toolbar
-#  - tour
-#  - tracker
   - update
   - user
+  - username_enumeration_prevention
+  - views_bulk_edit
+  - views_bulk_operations
+  - views_ui
+  - webform
+  - webform_ui
+  - manage_display
+  - menu_admin_per_menu
+  - menu_link_content
+  - pathauto
+  - content_translation
   - views
-  - views_ui #comment in prod
-# Contrib modules
-  - admin_toolbar
-  - components
-# Custom modules
-#  - sdd_default_content
+  - paragraphs
 
 themes:
   - bartik
@@ -88,4 +88,4 @@ themes:
 
 keep_english: true
 'interface translation project': sdd
-'interface translation server pattern': 'profiles/sdd/%language_custom.po'
+'interface translation server pattern': 'profiles/sdd/%language.po'
