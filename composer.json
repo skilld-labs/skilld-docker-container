@@ -1,8 +1,8 @@
 {
-  "name": "skilld-labs/drupal-project",
+  "name": "skilld-labs/sdc",
   "description": "Project template for Drupal 8 projects with composer",
   "type": "project",
-  "license": "GPL-2.0+",
+  "license": "MIT",
   "authors": [
     {
       "name": "",
@@ -17,53 +17,63 @@
     {
       "type": "package",
       "package": {
-        "name": "ckeditor/colorbutton",
-        "version": "4.6.1",
-        "type": "drupal-library",
-        "dist": {
-          "url": "http://download.ckeditor.com/colorbutton/releases/colorbutton_4.6.1.zip",
-          "type": "zip"
-        }
-      }
-    },
-    {
-      "type": "package",
-      "package": {
         "name": "ckeditor/panelbutton",
-        "version": "4.6.1",
+        "version": "4.10.1",
         "type": "drupal-library",
         "dist": {
-          "url": "http://download.ckeditor.com/panelbutton/releases/panelbutton_4.6.1.zip",
+          "url": "https://download.ckeditor.com/panelbutton/releases/panelbutton_4.10.1.zip",
           "type": "zip"
         }
       }
     }
   ],
   "require": {
-    "ckeditor/colorbutton": "^4.6",
-    "ckeditor/panelbutton": "^4.6",
-    "composer/installers": "^1.2",
+    "php": ">=7.0.8",
+    "ckeditor/panelbutton": "^4.10",
     "cweagans/composer-patches": "^1.6.5",
-    "drupal-composer/drupal-scaffold": "^2.5",
-    "drupal/admin_toolbar": "^1",
-    "drupal/colorbutton": "^1",
+    "drupal/better_normalizers": "^1.0@beta",
+    "drupal/block_content_permissions": "^1.8",
     "drupal/components": "^1",
     "drupal/config_installer": "^1",
-    "drupal/core": "^8.6.3",
     "drupal/default_content": "^1",
-    "drupal/ds": "^3",
     "drupal/file_entity": "^2",
+    "drupal/focal_point": "^1.2",
+    "drupal/google_tag": "^1.2",
+    "drupal/honeypot": "^1.30",
+    "drupal/manage_display": "^1.0@alpha",
+    "drupal/menu_admin_per_menu": "^1.0",
+    "drupal/menu_link_attributes": "^1.0",
+    "drupal/page_manager": "^4.0@beta",
     "drupal/panelbutton": "^1",
+    "drupal/panels_everywhere": "^4.0@beta",
+    "drupal/paragraphs": "^1.9",
+    "drupal/pathauto": "^1.6",
+    "drupal/rabbit_hole": "^1.0@beta",
+    "drupal/redirect": "^1.4",
     "drupal/styleguide": "^1",
+    "drupal/svg_image": "^1.9",
     "drupal/swiftmailer": "^1",
+    "drupal/telephone_validation": "^2.2",
     "drupal/token": "^1",
-    "neitanod/forceutf8": "2.0.*",
-    "webflo/drupal-finder": "^1.0.0",
-    "webmozart/path-util": "^2.3",
-    "wikimedia/composer-merge-plugin": "^1.4"
+    "drupal/username_enumeration_prevention": "^1.0",
+    "drupal/views_bulk_edit": "^2.3",
+    "drupal/webform": "^5.4",
+    "drush/drush": "^10.1.0",
+    "webflo/drupal-finder": "^1.1",
+    "zaporylie/composer-drupal-optimizations": "^1.0",
+    "drupal/core-composer-scaffold": "^8.8",
+    "drupal/core-project-message": "^8.8",
+    "drupal/core-recommended": "^8.9",
+    "drupal/core-vendor-hardening": "^8.8"
   },
   "require-dev": {
-    "drupal/devel": "^1.2"
+    "dmore/behat-chrome-extension": "^1.3",
+    "drupal/config_inspector": "^1",
+    "drupal/devel": "3.x-dev",
+    "drupal/drupal-extension": "^3.4",
+    "espend/behat-placeholder-extension": "^1.1",
+    "genesis/behat-fail-aid": "^2.1",
+    "mglaman/drupal-check": "^1.1"
   },
   "conflict": {
     "drupal/drupal": "*"
@@ -80,17 +90,15 @@
   },
   "scripts": {
     "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
+    "create-required-files": "SkilldDrupal\\composer\\ScriptHandler::createRequiredFiles",
+    "list-scaffold-files": [
+      "SkilldDrupal\\composer\\ScriptHandler::listScaffoldFiles"
+    ],
     "pre-install-cmd": [
-      "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+      "SkilldDrupal\\composer\\ScriptHandler::checkComposerVersion"
     ],
     "pre-update-cmd": [
-      "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
-    ],
-    "post-install-cmd": [
-      "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
-    ],
-    "post-update-cmd": [
-      "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
+      "SkilldDrupal\\composer\\ScriptHandler::checkComposerVersion"
     ]
   },
   "extra": {
@@ -102,14 +110,49 @@
       "web/themes/contrib/{$name}": ["type:drupal-theme"],
       "drush/contrib/{$name}": ["type:drupal-drush"]
     },
+    "drupal-scaffold": {
+      "locations": {
+        "web-root": "web/"
+      },
+      "file-mapping": {
+        "[web-root]/web.config": false
+      }
+    },
     "composer-exit-on-patch-failure": true,
     "patches": {
       "drupal/core": {
-        "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2018-10-09/2731991-34.patch",
-        "Programmatically created translatable content type returns SQL error on content creation": "https://www.drupal.org/files/issues/2018-10-06/2599228-74.patch"
+        "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2019-07-30/2731991-42.patch",
+        "Split Authored by and Authored on in Display Settings": "https://www.drupal.org/files/issues/2019-12-05/1399990-108-reroll.patch",
+        "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch",
+        "Fix multilingual site's layout edit context issue": "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
+        "SQLite database locking errors cause fatal errors": "https://www.drupal.org/files/issues/1120020-59.patch",
+        "Error: Call to a member function getLabel() after enabling layout_builder": "https://www.drupal.org/files/issues/2019-11-14/2985882-entityfield-43.patch",
+        "Split Interface Translation permission": "https://www.drupal.org/files/issues/2020-01-14/locale-administer-locale-permission-3067056-7.patch",
+        "Memory fix leak on install": "https://git.drupalcode.org/project/drupal/-/commit/efa1e2aee7a3ca916bd1b5aad5d894,a80415a76a.diff"
+      },
+      "drush/drush": {
+        "Import multiple custom translation po files": "https://patch-diff.githubusercontent.com/raw/drush-ops/drush/pull/4251.patch"
+      },
+      "drupal/lb_ux": {
+        "Bloc edition when Show content preview is disabled": "https://www.drupal.org/files/issues/2020-02-27/3116402.patch"
+      },
+      "drupal/config_inspector": {
+        "DrupalCoreLink could not be converted to string": "https://www.drupal.org/files/issues/2019-10-02/3084666-4.patch"
       },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
+      },
+      "drupal/block_content_permissions": {
+        "Allow accessing the Custom block library page without Administer blocks permission": "https://www.drupal.org/files/issues/2019-06-20/block_content_permissions-access_listing_page-2920739-23.patch"
+      },
+      "drupal/menu_link_attributes": {
+        "Add missing schema for menu_link_attributes": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
+      },
+      "drupal/svg_image": {
+        "Add missing schema for svg_image": "https://www.drupal.org/files/issues/2018-12-31/missing_schema_field_formatter.patch"
+      },
+      "drupal/focal_point": {
+        "Integrate focal point with media_library": "https://www.drupal.org/files/issues/2019-12-11/focal_point-compatibility-with-media-libary-3094478-2.patch"
       }
     }
   }
