@@ -90,10 +90,10 @@ else
 	$(call php, drush si $(PROFILE_NAME) --db-url=$(DB_URL) --account-name=$(ADMIN_NAME) --account-mail=$(ADMIN_MAIL) --account-pass=$(ADMIN_PW) -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
 endif
 ifneq ($(strip $(MODULES)),)
-	$(call php, drush en $(MODULES) -y)
-	$(call php, drush pmu $(MODULES) -y)
-	$(call php, drush user:password "$(TESTER_NAME)" "$(TESTER_PW)")
-	
+##	$(call php, drush en $(MODULES) -y)
+##	$(call php, drush pmu $(MODULES) -y)
+##	$(call php, drush user:password "$(TESTER_NAME)" "$(TESTER_PW)")
+
 endif
 
 ## Import online & local translations

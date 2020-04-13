@@ -1,21 +1,21 @@
 name: SDD
 type: profile
 description: 'Skill drupal development installation profile for content projects'
-core: 8.x
+core_version_requirement: ^9
 
 dependencies:
   - automated_cron
   - big_pipe
   - block
   - block_content
-  - block_content_permissions
+#  - block_content_permissions
   - breakpoint
   - ckeditor
   - color
   - config
   - config_translation
   - contextual
-  - crop
+#  - crop
   - datetime
   - datetime_range
   - dblog
@@ -26,10 +26,10 @@ dependencies:
   - field_ui
   - file
   - filter
-  - focal_point
-  - google_tag
+#  - focal_point
+#  - google_tag
   - help
-  - honeypot
+#  - honeypot
   - image
   - language
   - layout_discovery
@@ -37,50 +37,50 @@ dependencies:
   - locale
   - media
   - media_library
-  - menu_link_attributes
+#  - menu_link_attributes
   - menu_ui
   - node
   - options
   - page_cache
-  - page_manager
-  - page_manager_ui
-  - panels
-  - panels_everywhere
+#  - page_manager
+#  - page_manager_ui
+#  - panels
+#  - panels_everywhere
   - path
   - path_alias
   - quickedit
-  - rabbit_hole
+#  - rabbit_hole
   - rdf
-  - redirect
-  - redirect_404
+#  - redirect
+#  - redirect_404
   - responsive_image
-  - rh_media
-  - rh_taxonomy
-  - rh_user
+ # - rh_media
+ # - rh_taxonomy
+ # - rh_user
   - shortcut
-  - svg_image
+ # - svg_image
   - system
   - taxonomy
   - telephone
-  - telephone_validation
+  #- telephone_validation
   - text
-  - token
+ # - token
   - toolbar
   - update
   - user
-  - username_enumeration_prevention
-  - views_bulk_edit
-  - views_bulk_operations
+ # - username_enumeration_prevention
+ # - views_bulk_edit
+ # - views_bulk_operations
   - views_ui
-  - webform
-  - webform_ui
-  - manage_display
-  - menu_admin_per_menu
+ # - webform
+ # - webform_ui
+ # - manage_display
+ # - menu_admin_per_menu
   - menu_link_content
-  - pathauto
+ # - pathauto
   - content_translation
   - views
-  - paragraphs
+  # - paragraphs
 
 themes:
   - bartik

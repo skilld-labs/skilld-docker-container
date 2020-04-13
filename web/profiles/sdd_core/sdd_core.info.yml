@@ -1,7 +1,8 @@
 name: sdd_core
 type: profile
 description: 'Skill drupal development installation profile for light projects'
-core: 8.x
+core_version_requirement: ^9
+
 
 dependencies:
 # Core
