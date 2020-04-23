@@ -69,6 +69,14 @@ services:
       - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls=true'
       - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
 
+#  solr:
+#    labels:
+#      - 'traefik.enable=true'
+#      - 'traefik.backend=${MAIN_DOMAIN_NAME}_solr'
+#      - 'traefik.port=8983'
+#      - 'traefik.frontend.rule=Host:solr-${MAIN_DOMAIN_NAME}'
+#      - 'traefik.frontend.redirect.entryPoint=https'
+
 #networks:
 #  front:
 #    driver: bridge
