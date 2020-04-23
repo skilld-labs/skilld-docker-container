@@ -11,6 +11,14 @@ services:
     restart: always
     networks:
       - front
+#    environment:
+#      REDIS_HOST: ${REDIS_HOST}
+#      REDIS_PORT: ${REDIS_PORT}
+#      REDIS_PASSWD: ${REDIS_PASSWD}
+#    depends_on:
+#      - redis
+#    links:
+#      - redis:redis
 
   nginx:
     image: ${IMAGE_NGINX}
@@ -22,6 +30,27 @@ services:
     restart: always
     networks:
       - front
+
+#  solr:
+#    image: ${IMAGE_SOLR}
+#    container_name: "${COMPOSE_PROJECT_NAME}_solr"
+#    volumes:
+#      - ./solr-conf/8.x:/solr-conf/conf
+#    entrypoint:
+#      - docker-entrypoint.sh
+#      - solr-precreate
+#      - ${COMPOSE_PROJECT_NAME}
+#      - /solr-conf
+#    networks:
+#    - front
+
+#  redis:
+#    image: ${IMAGE_REDIS}
+#    container_name: "${COMPOSE_PROJECT_NAME}_redis"
+#    command: redis-server --requirepass ${REDIS_PASSWD}
+#    restart: always
+#    networks:
+#      - front
 
 networks:
   front:
