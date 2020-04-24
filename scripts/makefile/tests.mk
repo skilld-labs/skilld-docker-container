@@ -119,7 +119,7 @@ endif
 	@echo "Running Behat scenarios against http://$(BASE_URL)"
 	$(call php, composer install -o)
 	$(call php, vendor/bin/behat -V)
-	$(call php, vendor/bin/behat --colors)
+	$(call php, vendor/bin/behat --colors) || $(call php, vendor/bin/behat --colors --rerun)
 	make browser_driver_stop
 
 ## List existing behat definitions
