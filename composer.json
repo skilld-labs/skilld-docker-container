@@ -133,9 +133,6 @@
       "drupal/lb_ux": {
         "Bloc edition when Show content preview is disabled": "https://www.drupal.org/files/issues/2020-02-27/3116402.patch"
       },
-      "drupal/config_inspector": {
-        "DrupalCoreLink could not be converted to string": "https://www.drupal.org/files/issues/2019-10-02/3084666-4.patch"
-      },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
       },
