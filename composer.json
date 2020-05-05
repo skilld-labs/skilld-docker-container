@@ -53,7 +53,7 @@
     "drupal/rabbit_hole": "^1.0@beta",
     "drupal/redirect": "^1.4",
     "drupal/styleguide": "^1",
-    "drupal/svg_image": "^1.9",
+    "drupal/svg_image": "^1.10",
     "drupal/swiftmailer": "^1",
     "drupal/telephone_validation": "^2.2",
     "drupal/token": "^1",
@@ -141,9 +141,6 @@
       },
       "drupal/menu_link_attributes": {
         "Add missing schema for menu_link_attributes": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
-      },
-      "drupal/svg_image": {
-        "Add missing schema for svg_image": "https://www.drupal.org/files/issues/2018-12-31/missing_schema_field_formatter.patch"
       },
       "drupal/focal_point": {
         "Integrate focal point with media_library": "https://www.drupal.org/files/issues/2019-12-11/focal_point-compatibility-with-media-libary-3094478-2.patch"
