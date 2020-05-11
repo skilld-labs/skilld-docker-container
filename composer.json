@@ -94,7 +94,7 @@
       "SkilldDrupal\\composer\\ScriptHandler::listScaffoldFiles"
     ],
     "pre-install-cmd": [
-      "SkilldDrupal\\composer\\ScriptHandler::checkComposerVersion"
+      "SkilldDrupal\\composer\\ScriptHandler::"
     ],
     "pre-update-cmd": [
       "SkilldDrupal\\composer\\ScriptHandler::checkComposerVersion"
