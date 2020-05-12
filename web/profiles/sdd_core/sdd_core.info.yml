@@ -81,7 +81,6 @@ dependencies:
 # Contrib modules
   - views_bulk_edit
   - views_bulk_operations
-#  - components
 # Custom modules
 #  - sdd_default_content
 
