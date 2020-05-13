@@ -35,7 +35,6 @@
     "drupal/components": "^1",
     "drupal/config_installer": "^1",
     "drupal/core-composer-scaffold": "^8.8",
-    "drupal/core-project-message": "^8.8",
     "drupal/core-recommended": "^8.9",
     "drupal/core-vendor-hardening": "^8.8",
     "drupal/default_content": "^1",
@@ -94,7 +93,7 @@
       "SkilldDrupal\\composer\\ScriptHandler::listScaffoldFiles"
     ],
     "pre-install-cmd": [
-      "SkilldDrupal\\composer\\ScriptHandler::"
+      "SkilldDrupal\\composer\\ScriptHandler::checkComposerVersion"
     ],
     "pre-update-cmd": [
       "SkilldDrupal\\composer\\ScriptHandler::checkComposerVersion"
