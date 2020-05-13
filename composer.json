@@ -13,28 +13,14 @@
     {
       "type": "composer",
       "url": "https://packages.drupal.org/8"
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "ckeditor/panelbutton",
-        "version": "4.10.1",
-        "type": "drupal-library",
-        "dist": {
-          "url": "https://download.ckeditor.com/panelbutton/releases/panelbutton_4.10.1.zip",
-          "type": "zip"
-        }
-      }
     }
   ],
   "require": {
     "php": ">=7.0.8",
-    "ckeditor/panelbutton": "^4.10",
     "cweagans/composer-patches": "^1.6.5",
     "drupal-composer/drupal-scaffold": "^2.5",
     "drupal/better_normalizers": "^1.0@beta",
     "drupal/block_content_permissions": "^1.8",
-    "drupal/components": "^1",
     "drupal/config_installer": "^1",
     "drupal/core-recommended": "^8.8.0",
     "drupal/default_content": "^1",
@@ -46,13 +32,11 @@
     "drupal/menu_admin_per_menu": "^1.0",
     "drupal/menu_link_attributes": "^1.0",
     "drupal/page_manager": "^4.0@beta",
-    "drupal/panelbutton": "^1",
     "drupal/panels_everywhere": "^4.0@beta",
     "drupal/paragraphs": "^1.9",
     "drupal/pathauto": "^1.6",
     "drupal/rabbit_hole": "^1.0@beta",
     "drupal/redirect": "^1.4",
-    "drupal/styleguide": "^1",
     "drupal/svg_image": "^1.10",
     "drupal/swiftmailer": "^1",
     "drupal/telephone_validation": "^2.2",
@@ -61,7 +45,6 @@
     "drupal/views_bulk_edit": "^2.3",
     "drupal/webform": "^5.4",
     "drush/drush": "^10.1.0",
-    "webflo/drupal-finder": "^1.1",
     "zaporylie/composer-drupal-optimizations": "^1.0"
   },
   "require-dev": {
