@@ -17,7 +17,7 @@
   ],
   "require": {
     "cweagans/composer-patches": "^1.6.5",
-    "drupal-composer/drupal-scaffold": "^2.5",
+    "drupal-composer/drupal-scaffold": "^2.6",
     "drupal/better_normalizers": "^1.0@beta",
     "drupal/block_content_permissions": "^1.8",
     "drupal/core-recommended": "^8.9",
