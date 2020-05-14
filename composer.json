@@ -2,7 +2,7 @@
   "name": "skilld-labs/sdc",
   "description": "Project template for Drupal 8 projects with composer",
   "type": "project",
-  "license": "MIT",
+  "license": "GPL-2.0+",
   "authors": [
     {
       "name": "",
@@ -16,7 +16,6 @@
     }
   ],
   "require": {
-    "php": ">=7.0.8",
     "cweagans/composer-patches": "^1.6.5",
     "drupal/better_normalizers": "^1.0@beta",
     "drupal/block_content_permissions": "^1.8",
