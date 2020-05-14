@@ -45,13 +45,16 @@ services:
       - front
     labels:
       - 'traefik.enable=true'
+      # Treafik 1.x
       - 'traefik.backend=${MAIN_DOMAIN_NAME}_mail'
-      - 'traefik.port=8025'
       - 'traefik.frontend.rule=Host:mail-${MAIN_DOMAIN_NAME}'
       - 'traefik.frontend.redirect.entryPoint=https'
-      - 'traefik.http.services.mailhog-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8025'
-      - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.tls=true'
+      - 'traefik.port=8025'
+      # Treafik 2.x
+      - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.rule=Host(`mail-${MAIN_DOMAIN_NAME}`)'
       - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
+      - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.tls=true'
+      - 'traefik.http.services.mailhog-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8025'
 
   nginx:
 # Uncomment for MacOS.
@@ -62,12 +65,29 @@ services:
 #     - ./nginx/ssl:/etc/nginx/ssl:Z
     labels:
       - 'traefik.enable=true'
+      # Treafik 1.x
       - 'traefik.backend=${MAIN_DOMAIN_NAME}_web'
-      - 'traefik.port=80'
       - 'traefik.frontend.rule=Host:${MAIN_DOMAIN_NAME}'
       - 'traefik.frontend.redirect.entryPoint=https'
-      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls=true'
+      - 'traefik.port=80'
+      # Treafik 2.x
+      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.rule=Host(`${MAIN_DOMAIN_NAME}`)'
       - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
+      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls=true'
+
+#  solr:
+#    labels:
+#      - 'traefik.enable=true'
+#      # Treafik 1.x
+#      - 'traefik.backend=${MAIN_DOMAIN_NAME}_solr'
+#      - 'traefik.frontend.rule=Host:solr-${MAIN_DOMAIN_NAME}'
+#      - 'traefik.frontend.redirect.entryPoint=https'
+#      - 'traefik.port=8983'
+#      # Treafik 2.x
+#      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.rule=Host(`solr-${MAIN_DOMAIN_NAME}`)'
+#      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
+#      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.tls=true'
+#      - 'traefik.http.services.solr-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8983'
 
 #networks:
 #  front:

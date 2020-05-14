@@ -83,7 +83,7 @@ TESTER_NAME = tester
 si:
 	@echo "Installing from: $(PROJECT_INSTALL)"
 ifeq ($(PROJECT_INSTALL), config)
-	$(call php, drush si config_installer --db-url=$(DB_URL) --account-name=$(ADMIN_NAME) --account-mail=$(ADMIN_MAIL) --account-pass=$(ADMIN_PW) -y config_installer_sync_configure_form.sync_directory=../config/sync)
+	$(call php, drush si --existing-config --db-url=$(DB_URL) --account-name=$(ADMIN_NAME) --account-mail=$(ADMIN_MAIL) --account-pass=$(ADMIN_PW) -y)
 	# install_import_translations() overwrites config translations so we need to reimport.
 	$(call php, drush cim -y)
 else
@@ -93,7 +93,7 @@ ifneq ($(strip $(MODULES)),)
 	$(call php, drush en $(MODULES) -y)
 	$(call php, drush pmu $(MODULES) -y)
 	$(call php, drush user:password "$(TESTER_NAME)" "$(TESTER_PW)")
-	
+
 endif
 
 ## Import online & local translations

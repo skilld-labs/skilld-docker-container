@@ -13,28 +13,13 @@
     {
       "type": "composer",
       "url": "https://packages.drupal.org/8"
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "ckeditor/panelbutton",
-        "version": "4.10.1",
-        "type": "drupal-library",
-        "dist": {
-          "url": "https://download.ckeditor.com/panelbutton/releases/panelbutton_4.10.1.zip",
-          "type": "zip"
-        }
-      }
     }
   ],
   "require": {
-    "ckeditor/panelbutton": "^4.10",
+    "php": ">=7.0.8",
     "cweagans/composer-patches": "^1.6.5",
     "drupal/better_normalizers": "^1.0@beta",
     "drupal/block_content_permissions": "^1.8",
-    "drupal/components": "^1",
-    "drupal/config_installer": "^1",
-    "drupal/core-composer-scaffold": "^8.8",
     "drupal/core-recommended": "^8.9",
     "drupal/core-vendor-hardening": "^8.8",
     "drupal/default_content": "^1",
@@ -46,14 +31,12 @@
     "drupal/menu_admin_per_menu": "^1.0",
     "drupal/menu_link_attributes": "^1.0",
     "drupal/page_manager": "^4.0@beta",
-    "drupal/panelbutton": "^1",
     "drupal/panels_everywhere": "^4.0@beta",
     "drupal/paragraphs": "^1.9",
     "drupal/pathauto": "^1.6",
     "drupal/rabbit_hole": "^1.0@beta",
     "drupal/redirect": "^1.4",
-    "drupal/styleguide": "^1",
-    "drupal/svg_image": "^1.9",
+    "drupal/svg_image": "^1.10",
     "drupal/swiftmailer": "^1",
     "drupal/telephone_validation": "^2.2",
     "drupal/token": "^1",
@@ -61,7 +44,6 @@
     "drupal/views_bulk_edit": "^2.3",
     "drupal/webform": "^5.4",
     "drush/drush": "^10.1.0",
-    "webflo/drupal-finder": "^1.1",
     "zaporylie/composer-drupal-optimizations": "^1.0"
   },
   "require-dev": {
@@ -137,9 +119,6 @@
       "drupal/lb_ux": {
         "Bloc edition when Show content preview is disabled": "https://www.drupal.org/files/issues/2020-02-27/3116402.patch"
       },
-      "drupal/config_inspector": {
-        "DrupalCoreLink could not be converted to string": "https://www.drupal.org/files/issues/2019-10-02/3084666-4.patch"
-      },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
       },
@@ -148,9 +127,6 @@
       },
       "drupal/menu_link_attributes": {
         "Add missing schema for menu_link_attributes": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
-      },
-      "drupal/svg_image": {
-        "Add missing schema for svg_image": "https://www.drupal.org/files/issues/2018-12-31/missing_schema_field_formatter.patch"
       },
       "drupal/focal_point": {
         "Integrate focal point with media_library": "https://www.drupal.org/files/issues/2019-12-11/focal_point-compatibility-with-media-libary-3094478-2.patch"
