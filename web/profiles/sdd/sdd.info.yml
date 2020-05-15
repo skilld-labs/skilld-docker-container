@@ -83,7 +83,7 @@ dependencies:
   - paragraphs
 
 themes:
-  - bartik
+  - claro
   - seven
 
 keep_english: true
