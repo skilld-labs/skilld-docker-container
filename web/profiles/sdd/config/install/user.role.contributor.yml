@@ -111,3 +111,4 @@ permissions:
   - 'view basic_page revisions'
   - 'view own unpublished media'
   - 'view restricted block content'
+  - 'view the administration theme'
