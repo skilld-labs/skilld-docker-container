@@ -1,7 +1,0 @@
-# French translation of custom strings
-#
-msgid "Send"
-msgstr "Envoyer"
-
-msgid "in"
-msgstr "à"
