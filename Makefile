@@ -75,7 +75,6 @@ else
 	@echo "Installing composer dependencies, without dev ones"
 	$(call php, composer install --prefer-dist -o --no-dev)
 endif
-	$(call php, composer drupal-scaffold)
 	$(call php, composer create-required-files)
 
 TESTER_NAME = tester
