@@ -16,12 +16,12 @@
     }
   ],
   "require": {
-    "php": ">=7.0.8",
     "cweagans/composer-patches": "^1.6.5",
-    "drupal-composer/drupal-scaffold": "^2.5",
+    "drupal-composer/drupal-scaffold": "^2.6",
     "drupal/better_normalizers": "^1.0@beta",
     "drupal/block_content_permissions": "^1.8",
-    "drupal/core-recommended": "^8.8.0",
+    "drupal/core-recommended": "^8.9",
+    "drupal/core-vendor-hardening": "^8.8",
     "drupal/default_content": "^1",
     "drupal/file_entity": "^2",
     "drupal/focal_point": "^1.2",
@@ -102,7 +102,6 @@
     "patches": {
       "drupal/core": {
         "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2019-07-30/2731991-42.patch",
-        "Split Authored by and Authored on in Display Settings": "https://www.drupal.org/files/issues/2019-12-05/1399990-108-reroll.patch",
         "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch",
         "Fix multilingual site's layout edit context issue": "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
         "SQLite database locking errors cause fatal errors": "https://www.drupal.org/files/issues/1120020-59.patch",
