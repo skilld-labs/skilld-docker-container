@@ -1,5 +1,6 @@
 langcode: en
 status: true
+dependencies: {  }
 id: image
 label: Image
 description: 'Use local images for reusable media.'

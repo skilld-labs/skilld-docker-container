@@ -2,16 +2,16 @@ langcode: en
 status: true
 dependencies:
   config:
-    - media.type.video
+    - paragraphs.paragraphs_type.media
   module:
     - content_translation
 third_party_settings:
   content_translation:
-    enabled: true
+    enabled: false
     bundle_settings:
       untranslatable_fields_hide: '0'
-id: media.video
-target_entity_type_id: media
-target_bundle: video
-default_langcode: current_interface
-language_alterable: true
+id: paragraph.media
+target_entity_type_id: paragraph
+target_bundle: media
+default_langcode: site_default
+language_alterable: false

@@ -1,5 +1,6 @@
 langcode: en
 status: true
+dependencies: {  }
 id: remote_video
 label: 'Remote video'
 description: 'A remotely hosted video from YouTube or Vimeo.'
