@@ -7,14 +7,7 @@ dependencies:
     - image.style.thumbnail
     - media.type.audio
   module:
-    - field_layout
-    - layout_discovery
     - svg_image
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings:
-      label: ''
 id: media.audio.media_library
 targetEntityType: media
 bundle: audio

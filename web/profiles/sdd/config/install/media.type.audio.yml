@@ -1,5 +1,6 @@
 langcode: en
 status: true
+dependencies: {  }
 id: audio
 label: Audio
 description: 'A locally hosted audio file.'

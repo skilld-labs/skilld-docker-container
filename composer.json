@@ -27,10 +27,14 @@
     "drupal/focal_point": "^1.2",
     "drupal/google_tag": "^1.2",
     "drupal/honeypot": "^1.30",
+    "drupal/layout_builder_modal": "^1.1",
+    "drupal/layout_builder_restrictions": "^2.7",
+    "drupal/layout_library": "^1.0@beta",
+    "drupal/lb_ux": "^1.0@beta",
     "drupal/manage_display": "^1.0@alpha",
     "drupal/menu_admin_per_menu": "^1.0",
     "drupal/menu_link_attributes": "^1.0",
-    "drupal/page_manager": "^4.0@beta",
+    "drupal/page_manager": "4.x-dev",
     "drupal/panels_everywhere": "^4.0@beta",
     "drupal/paragraphs": "^1.9",
     "drupal/pathauto": "^1.6",
@@ -106,13 +110,16 @@
         "Fix multilingual site's layout edit context issue": "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
         "SQLite database locking errors cause fatal errors": "https://www.drupal.org/files/issues/1120020-59.patch",
         "Error: Call to a member function getLabel() after enabling layout_builder": "https://www.drupal.org/files/issues/2019-11-14/2985882-entityfield-43.patch",
-        "Split Interface Translation permission": "https://www.drupal.org/files/issues/2020-01-14/locale-administer-locale-permission-3067056-7.patch"
+        "Split Interface Translation permission": "https://www.drupal.org/files/issues/2020-01-14/locale-administer-locale-permission-3067056-7.patch",
+        "Layout builder doesn't show new \"extra fields\"": "https://www.drupal.org/files/issues/2020-04-16/missing_extra_fields-3069578-12.patch",
+        "POST /quickedit/metadata returning HTTP 503": "https://www.drupal.org/files/issues/2020-01-09/2893407-39.patch"
       },
       "drush/drush": {
         "Import multiple custom translation po files": "https://patch-diff.githubusercontent.com/raw/drush-ops/drush/pull/4251.patch"
       },
       "drupal/lb_ux": {
-        "Bloc edition when Show content preview is disabled": "https://www.drupal.org/files/issues/2020-02-27/3116402.patch"
+        "Cog icon not showing when Preview disabled": "https://www.drupal.org/files/issues/2020-05-22/3116402-8.patch",
+        "Errors when using with modules that alter a section's contextual menu": "https://www.drupal.org/files/issues/2020-05-22/3106939-4.patch"
       },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"

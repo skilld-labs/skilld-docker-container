@@ -3,17 +3,11 @@ status: true
 dependencies:
   config:
     - field.field.node.basic_page.content
+    - field.field.node.basic_page.layout_builder__layout
     - node.type.basic_page
   module:
-    - field_layout
-    - layout_discovery
     - paragraphs
     - path
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings:
-      label: ''
 id: node.basic_page.default
 targetEntityType: node
 bundle: basic_page
@@ -95,5 +89,6 @@ content:
     region: content
     third_party_settings: {  }
 hidden:
+  layout_builder__layout: true
   sticky: true
   url_redirects: true
