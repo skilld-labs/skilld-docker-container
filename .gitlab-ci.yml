@@ -35,7 +35,6 @@ stages:
   - deploy
   - tests
   - reports
-  - document
 
 sniffers:clang:
   stage: sniffers
@@ -225,6 +224,24 @@ stop_review:
   <<: *ra_tags
   <<: *ra_only
 
+deploy:storybook:
+  stage: deploy
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  only:
+    variables:
+      - $STORYBOOK_PATH
+  script:
+  - cd ${BUILD_DIR}
+  - make build-storybook
+  - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
+  <<: *ra_tags
+  <<: *ra_only
+  <<: *ra_only_theme
+  when: always
+
 
 test:behat:
   stage: tests
@@ -328,21 +345,3 @@ report:watchdog:
   <<: *ra_tags
   <<: *ra_only
 
-document:storybook:
-  stage: document
-  environment:
-    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
-    name: review/$CI_COMMIT_REF_NAME
-    on_stop: stop_review
-  only:
-    variables:
-      - $STORYBOOK_PATH
-  script:
-  - cd ${BUILD_DIR}
-  - make build-storybook
-  - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
-  dependencies:
-  - deploy:review
-  <<: *ra_tags
-  <<: *ra_only
-  when: always
