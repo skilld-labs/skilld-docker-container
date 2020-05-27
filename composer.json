@@ -112,7 +112,10 @@
         "Error: Call to a member function getLabel() after enabling layout_builder": "https://www.drupal.org/files/issues/2019-11-14/2985882-entityfield-43.patch",
         "Split Interface Translation permission": "https://www.drupal.org/files/issues/2020-01-14/locale-administer-locale-permission-3067056-7.patch",
         "Layout builder doesn't show new \"extra fields\"": "https://www.drupal.org/files/issues/2020-04-16/missing_extra_fields-3069578-12.patch",
-        "POST /quickedit/metadata returning HTTP 503": "https://www.drupal.org/files/issues/2020-01-09/2893407-39.patch"
+        "POST /quickedit/metadata returning HTTP 503": "https://www.drupal.org/files/issues/2020-01-09/2893407-39.patch",
+        "Claro Modal dialog style update": "https://www.drupal.org/files/issues/2020-05-19/3023311-93.patch",
+        "Claro Media and media library": "https://www.drupal.org/files/issues/2020-03-30/media-and-media-library-3062751-18.patch",
+        "Callers of LayoutEntityHelperTrait::getEntitySections() do not account for the view mode": "https://www.drupal.org/files/issues/2019-06-20/3008924-5.patch"
       },
       "drush/drush": {
         "Import multiple custom translation po files": "https://patch-diff.githubusercontent.com/raw/drush-ops/drush/pull/4251.patch"
