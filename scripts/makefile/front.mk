@@ -59,29 +59,53 @@ front-build:
 	fi
 
 lintval:
-	@echo "Running theme linters..."
-	docker pull $(IMAGE_FRONT)
-	$(call frontexec, yarn run lint)
+	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
+		echo "- Theme directory found. Running theme linters..."; \
+		docker pull $(IMAGE_FRONT); \
+		$(call frontexec, node -v); \
+		$(call frontexec, yarn -v); \
+		$(call frontexec, yarn run lint); \
+	else \
+		echo "- Theme directory defined in .env file was not found. Skipping theme linters."; \
+	fi
 
 lint:
-	@echo "Running theme linters with fix..."
-	docker pull $(IMAGE_FRONT)
-	$(call frontexec, yarn install --ignore-optional --check-files --prod)
-	$(call frontexec, yarn lint-fix)
+	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
+		echo "- Theme directory found. Running theme linters with fix..."; \
+		docker pull $(IMAGE_FRONT); \
+		$(call frontexec, node -v); \
+		$(call frontexec, yarn -v); \
+		$(call frontexec, yarn install --ignore-optional --check-files --prod); \
+		$(call frontexec, yarn lint-fix); \
+	else \
+		echo "- Theme directory defined in .env file was not found. Skipping theme linters with fix."; \
+	fi
 
 storybook:
-	@echo "Running dynamic storybook..."
-	docker pull $(IMAGE_FRONT)
-	$(call frontexec, yarn install --ignore-optional --check-files)
-	$(call frontexec, yarn run build);
-	$(call frontexec-with-port, yarn storybook -p $(FRONT_PORT))
+	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
+		echo "- Theme directory found. Running dynamic storybook..."; \
+		docker pull $(IMAGE_FRONT); \
+		$(call frontexec, node -v); \
+		$(call frontexec, yarn -v); \
+		$(call frontexec, yarn install --ignore-optional --check-files); \
+		$(call frontexec, yarn run build); \
+		$(call frontexec-with-port, yarn storybook -p $(FRONT_PORT)); \
+	else \
+		echo "- Theme directory defined in .env file was not found. Skipping dynamic storybook."; \
+	fi
 
 build-storybook:
-	@echo "Export static storybook..."
-	docker pull $(IMAGE_FRONT)
-	$(call frontexec, yarn install --ignore-optional --check-files)
-	$(call frontexec, yarn run build);
-	$(call frontexec, yarn run build-storybook)
+	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
+		echo "- Theme directory found. Exporting static storybook..."; \
+		docker pull $(IMAGE_FRONT); \
+		$(call frontexec, node -v); \
+		$(call frontexec, yarn -v); \
+		$(call frontexec, yarn install --ignore-optional --check-files); \
+		$(call frontexec, yarn run build); \
+		$(call frontexec, yarn run build-storybook); \
+	else \
+		echo "- Theme directory defined in .env file was not found. Skipping dynamic storybook."; \
+	fi
 
 create-component:
 	@echo "Create component CLI dialog... It assumed that you already have 'make storybook' or 'make build-storybook' finished"
