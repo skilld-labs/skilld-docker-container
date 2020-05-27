@@ -58,10 +58,7 @@
     "drupal/upgrade_status": "^2.6",
     "espend/behat-placeholder-extension": "^1.1",
     "genesis/behat-fail-aid": "^2.1",
-    "palantirnet/drupal-rector": "^0.5.4",
-    "phpspec/prophecy": "^1.7",
-    "phpunit/phpunit": "^6.5 || ^7",
-    "symfony/phpunit-bridge": "^3.4.3"
+    "palantirnet/drupal-rector": "^0.5.4"
   },
   "conflict": {
     "drupal/drupal": "*"
