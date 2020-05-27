@@ -86,13 +86,6 @@ else
 	@echo "scripts/makefile/status-report-validation.sh file does not exist"
 endif
 
-## Validate drupal-check
-drupalcheckval:
-	@echo "Drupal-check validation..."
-	$(call php, composer install -o)
-	$(call php, vendor/bin/drupal-check -V)
-	$(call php, vendor/bin/drupal-check -ad -vv -n --no-progress web/modules/custom/)
-
 ## Validate drupal-rector
 drupalrectorval:
 	@echo "Drupal-check validation..."

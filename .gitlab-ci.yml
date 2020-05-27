@@ -284,21 +284,6 @@ test:cinsp:
   <<: *ra_tags
   <<: *ra_only
 
-test:drupalcheck:
-  stage: tests
-  environment:
-    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
-    name: review/$CI_COMMIT_REF_NAME
-    on_stop: stop_review
-  script:
-  - echo "Starting job script in ${BUILD_DIR}"
-  - cd ${BUILD_DIR}
-  - make drupalcheckval
-  dependencies:
-  - deploy:review
-  <<: *ra_tags
-  <<: *ra_only
-
 test:drupalrector:
   stage: tests
   environment:
