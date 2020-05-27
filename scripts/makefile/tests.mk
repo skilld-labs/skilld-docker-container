@@ -100,6 +100,13 @@ drupalrectorval:
 	$(call php, vendor/bin/rector -V)
 	$(call php, vendor/bin/rector process --dry-run --no-progress-bar web/modules/custom web/themes/custom)
 
+## Validate upgrade-status
+upgradestatusval:
+	@echo "Drupal-check validation..."
+	$(call php, composer install -o)
+	$(call php, drush en -y upgrade_status)
+	$(call php, drush us-a --all --ignore-contrib --ignore-uninstalled)
+
 ## Validate newline at the end of files
 newlineeof:
 ifneq ("$(wildcard scripts/makefile/newlineeof.sh)","")
