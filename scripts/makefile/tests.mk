@@ -93,6 +93,13 @@ drupalcheckval:
 	$(call php, vendor/bin/drupal-check -V)
 	$(call php, vendor/bin/drupal-check -ad -vv -n --no-progress web/modules/custom/)
 
+## Validate drupal-rector
+drupalrectorval:
+	@echo "Drupal-check validation..."
+	$(call php, composer install -o)
+	$(call php, vendor/bin/rector -V)
+	$(call php, vendor/bin/rector process --dry-run --no-progress-bar web/modules/custom web/themes/custom)
+
 ## Validate newline at the end of files
 newlineeof:
 ifneq ("$(wildcard scripts/makefile/newlineeof.sh)","")

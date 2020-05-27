@@ -13,6 +13,7 @@ parameters:
     - 'web/core/modules'
     - 'web/modules'
     - 'web/profiles'
+    - 'web/themes'
 
   exclude_paths:
   # If you would like to skip test directories, uncomment the following lines:
