@@ -2,7 +2,7 @@ langcode: en
 status: true
 dependencies: {  }
 id: sysadmin
-label: "System administrator"
+label: 'System administrator'
 weight: 2
 is_admin: true
 permissions: {  }

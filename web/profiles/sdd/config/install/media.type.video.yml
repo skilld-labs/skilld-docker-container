@@ -1,5 +1,6 @@
 langcode: en
 status: true
+dependencies: {  }
 id: video
 label: Video
 description: 'A locally hosted video file.'
