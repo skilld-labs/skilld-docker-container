@@ -5,14 +5,38 @@ dependencies:
     - field.field.paragraph.wysiwyg.wysiwyg
     - paragraphs.paragraphs_type.wysiwyg
   module:
-    - field_layout
+    - layout_builder
     - layout_discovery
+    - layout_library
     - text
 third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings:
-      label: ''
+  layout_builder:
+    allow_custom: false
+    enabled: true
+    sections:
+      -
+        layout_id: layout_onecol
+        layout_settings:
+          label: ''
+        components:
+          bfe21b85-5c60-4bc9-ace6-429d49f43cf5:
+            uuid: bfe21b85-5c60-4bc9-ace6-429d49f43cf5
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:paragraph:wysiwyg:wysiwyg'
+              formatter:
+                label: hidden
+                settings: {  }
+                third_party_settings: {  }
+                type: text_default
+            additional: {  }
+            weight: 0
+        third_party_settings: {  }
+  layout_library:
+    enable: false
 id: paragraph.wysiwyg.default
 targetEntityType: paragraph
 bundle: wysiwyg

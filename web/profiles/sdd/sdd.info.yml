@@ -22,7 +22,6 @@ dependencies:
   - dynamic_page_cache
   - editor
   - field
-  - field_layout
   - field_ui
   - file
   - filter
@@ -81,6 +80,11 @@ dependencies:
   - content_translation
   - views
   - paragraphs
+  - layout_builder
+  - lb_ux
+  - layout_builder_restrictions
+  - layout_builder_modal
+  - layout_library
 
 themes:
   - claro

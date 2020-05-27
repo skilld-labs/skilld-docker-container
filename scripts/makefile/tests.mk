@@ -56,7 +56,8 @@ endif
 ## Validate composer.json file
 compval:
 	@echo "Composer.json validation..."
-	@docker run --rm -v `pwd`:`pwd` -w `pwd` $(IMAGE_PHP) composer validate --strict
+	# Add --strict back when page_manager includes https://www.drupal.org/project/page_manager/issues/2960739 in next release.
+	@docker run --rm -v `pwd`:`pwd` -w `pwd` $(IMAGE_PHP) composer validate
 
 ## Validate hook_update_N()
 hookupdateval:

@@ -1,6 +1,6 @@
 cache:
   page:
-    max_age: 10800
+    max_age: 1800
 css:
   preprocess: true
   gzip: true

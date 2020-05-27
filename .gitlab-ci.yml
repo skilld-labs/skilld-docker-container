@@ -46,7 +46,8 @@ sniffers:compose:
   stage: sniffers
   script:
   - composer -vvv -V
-  - time composer validate --profile --strict
+  # Can't use --strict cause we need dev versions for d9 compatibility
+  - time composer validate --profile
 
 sniffers:front:
   stage: sniffers

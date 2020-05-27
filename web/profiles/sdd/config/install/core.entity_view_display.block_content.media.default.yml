@@ -2,8 +2,8 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.paragraph.media.media
-    - paragraphs.paragraphs_type.media
+    - block_content.type.media
+    - field.field.block_content.media.media
   module:
     - layout_builder
     - layout_builder_restrictions
@@ -19,21 +19,21 @@ third_party_settings:
         layout_settings:
           label: ''
         components:
-          e2f67881-614a-48c1-827c-d20c61b601ad:
-            uuid: e2f67881-614a-48c1-827c-d20c61b601ad
+          c9d7eb97-aa32-4183-bdf4-8bdff24d7406:
+            uuid: c9d7eb97-aa32-4183-bdf4-8bdff24d7406
             region: content
             configuration:
               label_display: '0'
               context_mapping:
                 entity: layout_builder.entity
-              id: 'field_block:paragraph:media:media'
+              id: 'field_block:block_content:media:media'
               formatter:
-                type: entity_reference_entity_view
                 label: hidden
                 settings:
                   view_mode: full
                   link: false
                 third_party_settings: {  }
+                type: entity_reference_entity_view
             additional: {  }
             weight: 0
         third_party_settings: {  }
@@ -45,18 +45,19 @@ third_party_settings:
       whitelisted_blocks: {  }
       blacklisted_blocks: {  }
       allowed_layouts: {  }
-id: paragraph.media.default
-targetEntityType: paragraph
+id: block_content.media.default
+targetEntityType: block_content
 bundle: media
 mode: default
 content:
   media:
-    type: entity_reference_entity_view
     weight: 0
     label: hidden
     settings:
       view_mode: full
       link: false
     third_party_settings: {  }
+    type: entity_reference_entity_view
     region: content
-hidden: {  }
+hidden:
+  langcode: true
