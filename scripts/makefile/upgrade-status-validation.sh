@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# Enable Upgrade Status module
+drush en -y upgrade_status
+
 # Search for no issues message
 REPORT=$(drush us-a --all --ignore-contrib --ignore-uninstalled)
 IS_VALID=$(echo "$REPORT" | grep "No known issues found.")
