@@ -104,6 +104,9 @@
       }
     },
     "composer-exit-on-patch-failure": true,
+    "patchLevel": {
+      "drupal/core": "-p2"
+    },
     "patches": {
       "drupal/core": {
         "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2019-07-30/2731991-42.patch",
