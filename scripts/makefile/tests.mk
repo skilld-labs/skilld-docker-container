@@ -165,5 +165,5 @@ endif
 sniffers: | clang compval phpcs newlineeof
 
 ## Run all tests & validations (including sniffers)
-tests: | sniffers cinsp drupalcheckval behat watchdogval statusreportval
+tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval
 
