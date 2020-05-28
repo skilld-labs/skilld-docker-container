@@ -95,10 +95,14 @@ drupalrectorval:
 
 ## Validate upgrade-status
 upgradestatusval:
+ifneq ("$(wildcard rector.yml)","")
 	@echo "Drupal-check validation..."
 	$(call php, composer install -o)
 	$(call php, drush en -y upgrade_status)
 	$(call php, drush us-a --all --ignore-contrib --ignore-uninstalled)
+else
+	@echo "rector.yml file does not exist"
+endif
 
 ## Validate newline at the end of files
 newlineeof:
