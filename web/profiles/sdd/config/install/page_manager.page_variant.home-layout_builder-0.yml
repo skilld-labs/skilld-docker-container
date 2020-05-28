@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - page_manager.page.home
+id: home-layout_builder-0
+label: Default
+variant: layout_builder
+variant_settings:
+  id: layout_builder
+  uuid: 945cd674-f645-4980-9cf7-1dfe60da06e9
+  label: null
+  weight: 0
+  sections:
+    -
+      layout_id: layout_onecol
+      layout_settings:
+        label: ''
+      components: {  }
+      third_party_settings: {  }
+page: home
+weight: 0
+selection_criteria: {  }
+selection_logic: and
+static_context: {  }
