@@ -88,7 +88,7 @@ endif
 
 ## Validate drupal-rector
 drupalrectorval:
-	@echo "Drupal-check validation..."
+	@echo "Drupal Rector validation..."
 	$(call php, composer install -o)
 	$(call php, vendor/bin/rector -V)
 	$(call php, vendor/bin/rector process --dry-run --no-progress-bar web/modules/custom web/themes/custom)
@@ -96,10 +96,8 @@ drupalrectorval:
 ## Validate upgrade-status
 upgradestatusval:
 ifneq ("$(wildcard rector.yml)","")
-	@echo "Drupal-check validation..."
-	$(call php, composer install -o)
-	$(call php, drush en -y upgrade_status)
-	$(call php, drush us-a --all --ignore-contrib --ignore-uninstalled)
+	@echo "Upgrade status validation..."
+	@$(call php, /bin/sh ./scripts/makefile/upgrade-status-validation.sh)
 else
 	@echo "rector.yml file does not exist"
 endif
