@@ -86,12 +86,26 @@ else
 	@echo "scripts/makefile/status-report-validation.sh file does not exist"
 endif
 
-## Validate drupal-check
-drupalcheckval:
-	@echo "Drupal-check validation..."
+## Validate drupal-rector
+drupalrectorval:
+ifneq ("$(wildcard rector.yml)","")
+	@echo "Drupal Rector validation..."
 	$(call php, composer install -o)
-	$(call php, vendor/bin/drupal-check -V)
-	$(call php, vendor/bin/drupal-check -ad -vv -n --no-progress web/modules/custom/)
+	$(call php, vendor/bin/rector -V)
+	$(call php, vendor/bin/rector process --dry-run --no-progress-bar web/modules/custom web/themes/custom)
+else
+	@echo "rector.yml file does not exist"
+endif
+
+## Validate upgrade-status
+upgradestatusval:
+ifneq ("$(wildcard scripts/makefile/upgrade-status-validation.sh)","")
+	@echo "Upgrade status validation..."
+	$(call php, composer install -o)
+	@$(call php, /bin/sh ./scripts/makefile/upgrade-status-validation.sh)
+else
+	@echo "scripts/makefile/upgrade-status-validation.sh file does not exist"
+endif
 
 ## Validate newline at the end of files
 newlineeof:
@@ -158,5 +172,5 @@ endif
 sniffers: | clang compval phpcs newlineeof
 
 ## Run all tests & validations (including sniffers)
-tests: | sniffers cinsp drupalcheckval behat watchdogval statusreportval
+tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval
 
