@@ -22,7 +22,7 @@
     "drupal/better_normalizers": "^1.0@beta",
     "drupal/block_content_permissions": "^1.8",
     "drupal/core-recommended": "^8.9",
-    "drupal/core-vendor-hardening": "^8.8",
+    "drupal/core-vendor-hardening": "^8.9",
     "drupal/default_content": "^1",
     "drupal/file_entity": "^2",
     "drupal/focal_point": "^1.2",
@@ -49,6 +49,7 @@
     "drupal/views_bulk_edit": "^2.3",
     "drupal/webform": "^5.4",
     "drush/drush": "^10.1.0",
+    "skilldlabs/drupal-cleanup": "^1",
     "zaporylie/composer-drupal-optimizations": "^1.0"
   },
   "require-dev": {
@@ -107,6 +108,19 @@
     "composer-exit-on-patch-failure": true,
     "patchLevel": {
       "drupal/core": "-p2"
+    },
+    "drupal-cleanup": {
+      "drupal-core": [
+        "modules/*/tests",
+        "modules/*/src/Tests",
+        "profiles/demo_umami",
+        "profiles/*/tests",
+        "profiles/*testing*"
+      ],
+      "drupal-module": [
+        "tests",
+        "src/Tests"
+      ]
     },
     "patches": {
       "drupal/core": {
