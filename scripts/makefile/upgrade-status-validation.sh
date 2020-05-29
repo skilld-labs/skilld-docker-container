@@ -9,10 +9,11 @@ IS_VALID=$(echo "$REPORT" | grep "No known issues found.")
 
 # Exit1 and alert if message not found
 if [ -z "$IS_VALID" ]; then
-  printf "There are \033[1mmessage(s)\033[0m in Upgrade Status report to fix :\n"
+  printf "There are \033[1missue(s)\033[0m in Upgrade Status report to fix : \n- Go to \033[1m/admin/reports/upgrade-status\033[0m for more details\n"
 	echo -e "$REPORT"
 	exit 1
 else
-  echo -e "Status report is valid : No error listed"
+	drush pmu upgrade_status -y
+	echo -e "Status report is valid : No error listed"
 	exit 0
 fi
