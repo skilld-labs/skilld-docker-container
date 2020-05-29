@@ -99,8 +99,13 @@ endif
 
 ## Validate upgrade-status
 upgradestatusval:
+ifneq ("$(wildcard scripts/makefile/upgrade-status-validation.sh)","")
 	@echo "Upgrade status validation..."
+	$(call php, composer install -o)
 	@$(call php, /bin/sh ./scripts/makefile/upgrade-status-validation.sh)
+else
+	@echo "scripts/makefile/upgrade-status-validation.sh file does not exist"
+endif
 
 ## Validate newline at the end of files
 newlineeof:
