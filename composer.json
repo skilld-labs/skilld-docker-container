@@ -16,6 +16,7 @@
     }
   ],
   "require": {
+    "composer/installers": "^1.2",
     "cweagans/composer-patches": "^1.6.5",
     "drupal-composer/drupal-scaffold": "^2.6",
     "drupal/better_normalizers": "^1.0@beta",
