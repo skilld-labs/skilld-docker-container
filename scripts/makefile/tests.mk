@@ -59,7 +59,7 @@ endif
 ## Validate composer.json file
 compval:
 	@echo "Composer.json validation..."
-	# Add --strict back when page_manager includes https://www.drupal.org/project/page_manager/issues/2960739 in next release.
+	# Can't use --strict cause we need dev versions for d9 compatibility
 	@docker run --rm -v `pwd`:`pwd` -w `pwd` $(IMAGE_PHP) composer validate
 
 ## Validate hook_update_N()

@@ -3,7 +3,7 @@ description: Creates default content fixtures for the project. This module comes
 package: Custom
 
 type: module
-core: 8.x
+core_version_requirement: ^8.7.7 || ^9
 
 dependencies:
   - default_content:default_content

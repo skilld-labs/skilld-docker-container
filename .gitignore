@@ -3,8 +3,11 @@ vendor
 web/*.*
 web/core/
 web/libraries/
+web/modules/*.*
 web/modules/contrib/
+web/themes/*.*
 web/themes/contrib/
+web/profiles/*.*
 web/profiles/contrib/config_installer/
 web/sites/
 
