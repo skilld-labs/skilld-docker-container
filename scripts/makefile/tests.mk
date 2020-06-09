@@ -29,6 +29,7 @@ ifneq ("$(wildcard scripts/git_hooks/sniffers.sh)","")
 	$(shell ln -sf ../../scripts/git_hooks/sniffers.sh .git/hooks/pre-push)
 else
 	@echo "scripts/git_hooks/sniffers.sh file does not exist"
+	@exit 1
 endif
 else
 	@echo "No git directory found, git hooks won't be installed"
@@ -41,6 +42,7 @@ ifneq ("$(wildcard scripts/makefile/baseconfig-langcode.sh)","")
 	@/bin/sh ./scripts/makefile/baseconfig-langcode.sh
 else
 	@echo "scripts/makefile/baseconfig-langcode.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate configuration schema
@@ -51,6 +53,7 @@ ifneq ("$(wildcard scripts/makefile/config-inspector-validation.sh)","")
 	@$(call php, /bin/sh ./scripts/makefile/config-inspector-validation.sh)
 else
 	@echo "scripts/makefile/config-inspector-validation.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate composer.json file
@@ -66,6 +69,7 @@ ifneq ("$(wildcard scripts/makefile/hookupdateval.sh)","")
 	@/bin/sh ./scripts/makefile/hookupdateval.sh
 else
 	@echo "scripts/makefile/hookupdateval.sh.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate watchdog logs
@@ -75,6 +79,7 @@ ifneq ("$(wildcard scripts/makefile/watchdog-validation.sh)","")
 	@$(call php, /bin/sh ./scripts/makefile/watchdog-validation.sh)
 else
 	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate status report
@@ -84,6 +89,7 @@ ifneq ("$(wildcard scripts/makefile/status-report-validation.sh)","")
 	@$(call php, /bin/sh ./scripts/makefile/status-report-validation.sh)
 else
 	@echo "scripts/makefile/status-report-validation.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate drupal-rector
@@ -95,6 +101,7 @@ ifneq ("$(wildcard rector.yml)","")
 	$(call php, vendor/bin/rector process --dry-run --no-progress-bar web/modules/custom web/themes/custom)
 else
 	@echo "rector.yml file does not exist"
+	@exit 1
 endif
 
 ## Validate upgrade-status
@@ -105,6 +112,7 @@ ifneq ("$(wildcard scripts/makefile/upgrade-status-validation.sh)","")
 	@$(call php, /bin/sh ./scripts/makefile/upgrade-status-validation.sh)
 else
 	@echo "scripts/makefile/upgrade-status-validation.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate newline at the end of files
@@ -113,6 +121,7 @@ ifneq ("$(wildcard scripts/makefile/newlineeof.sh)","")
 	@/bin/sh ./scripts/makefile/newlineeof.sh
 else
 	@echo "scripts/makefile/newlineeof.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate Behat scenarios
@@ -166,6 +175,7 @@ ifneq ("$(wildcard scripts/makefile/contentgen.sh)","")
 	@$(call php, /bin/sh ./scripts/makefile/contentgen.sh)
 else
 	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
+	@exit 1
 endif
 
 ## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
