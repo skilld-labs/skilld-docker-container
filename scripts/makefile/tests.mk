@@ -166,7 +166,10 @@ browser_driver:
 
 ## Stop browser driver
 browser_driver_stop:
-	docker stop $(COMPOSE_PROJECT_NAME)_chrome
+	if [ ! -z `docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}'` ]; then \
+		echo 'Stopping browser driver.'; \
+		docker stop $(COMPOSE_PROJECT_NAME)_chrome; \
+	fi
 
 ## Create a high number of random content
 contentgen:
