@@ -160,9 +160,6 @@
         "Errors when using with modules that alter a section's contextual menu": "https://www.drupal.org/files/issues/2020-05-22/3106939-4.patch",
         "Indicate Drupal 8/9 compatibility via core_version_requirement": "https://www.drupal.org/files/issues/2020-05-22/d9_compatibility-3138698-4.patch"
       },
-      "drupal/manage_display": {
-        "Drupal 9 compatibility": "https://www.drupal.org/files/issues/2020-04-01/manage_display.d9.3124061-2.patch"
-      },
       "drupal/menu_link_attributes": {
         "Add missing schema for menu_link_attributes": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
       },
