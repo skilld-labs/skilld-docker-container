@@ -12,15 +12,15 @@ variables:
 image: skilldlabs/php:73
 
 # Tags defines which runner to use (expected shell runner)
-.ra_tags: &ra_tags
+.runner_tag_selection: &runner_tag_selection
   tags:
     - XXX # Mandatory, should equal to tag of available runner server with docker + docker-compose + traefik
 
-.ra_only: &ra_only
+.only_branches: &only_branches
   only:
     - branches
 
-.ra_only_theme: &ra_only_theme
+.only_var_theme: &only_var_theme
   only:
     variables:
       - $THEME_PATH
@@ -40,6 +40,7 @@ sniffers:clang:
   stage: sniffers
   script:
   - make clang
+  <<: *only_branches
 
 sniffers:compose:
   stage: sniffers
@@ -47,6 +48,7 @@ sniffers:compose:
   - composer -vvv -V
   # Can't use --strict cause we need dev versions for d9 compatibility
   - time composer validate --profile
+  <<: *only_branches
 
 sniffers:front:
   stage: sniffers
@@ -69,8 +71,9 @@ sniffers:front:
     expire_in: 1d
     paths:
       - ${THEME_PATH}/node_modules/ # Populated during yarn install
-  <<: *ra_tags
-  <<: *ra_only_theme
+  <<: *runner_tag_selection
+  <<: *only_var_theme
+  <<: *only_branches
 
 sniffers:phpcs:
   stage: sniffers
@@ -78,19 +81,21 @@ sniffers:phpcs:
   script:
   - docker -v
   - make phpcs
-  <<: *ra_tags
-  <<: *ra_only
+  <<: *runner_tag_selection
+  <<: *only_branches
 
 sniffers:newlineeof:
   stage: sniffers
   script:
   - make newlineeof
+  <<: *only_branches
 
 sniffers:hookupdate:
   stage: sniffers
   script:
   - make hookupdateval
   when: manual # Remove to run automatically when site is live
+  <<: *only_branches
 
 sniffers:sonarqube:
   stage: sniffers
@@ -144,8 +149,8 @@ prepare:back:
       - vendor/
       - web/
       - drush/contrib/
-  <<: *ra_tags
-  <<: *ra_only
+  <<: *runner_tag_selection
+  <<: *only_branches
 
 prepare:front:
   stage: prepare
@@ -158,8 +163,8 @@ prepare:front:
     expire_in: 1d
     paths:
       - ${THEME_PATH}/dist/ # Populated during yarn build
-  <<: *ra_tags
-  <<: *ra_only_theme
+  <<: *runner_tag_selection
+  <<: *only_var_theme
 
 
 .deploy_template: &deploy_template
@@ -192,8 +197,8 @@ prepare:front:
     - prepare:back
     - prepare:front
   allow_failure: false
-  <<: *ra_tags
-  <<: *ra_only
+  <<: *runner_tag_selection
+  <<: *only_branches
 
 deploy:review:
   <<: *deploy_template
@@ -221,8 +226,8 @@ stop_review:
   environment:
     name: review/$CI_COMMIT_REF_NAME
     action: stop
-  <<: *ra_tags
-  <<: *ra_only
+  <<: *runner_tag_selection
+  <<: *only_branches
 
 deploy:storybook:
   stage: deploy
@@ -237,9 +242,9 @@ deploy:storybook:
   - cd ${BUILD_DIR}
   - make build-storybook
   - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
-  <<: *ra_tags
-  <<: *ra_only
-  <<: *ra_only_theme
+  <<: *runner_tag_selection
+  <<: *only_branches
+  <<: *only_var_theme
   when: always
 
 
@@ -266,8 +271,8 @@ test:behat:
   dependencies:
   - deploy:review
   allow_failure: false
-  <<: *ra_tags
-  <<: *ra_only
+  <<: *runner_tag_selection
+  <<: *only_branches
 
 test:cinsp:
   stage: tests
@@ -281,8 +286,8 @@ test:cinsp:
   - make cinsp
   dependencies:
   - deploy:review
-  <<: *ra_tags
-  <<: *ra_only
+  <<: *runner_tag_selection
+  <<: *only_branches
 
 test:drupalrector:
   stage: tests
@@ -296,8 +301,8 @@ test:drupalrector:
   - make drupalrectorval
   dependencies:
   - deploy:review
-  <<: *ra_tags
-  <<: *ra_only
+  <<: *runner_tag_selection
+  <<: *only_branches
 
 test:upgradestatus:
   stage: tests
@@ -311,8 +316,8 @@ test:upgradestatus:
   - make upgradestatusval
   dependencies:
   - deploy:review
-  <<: *ra_tags
-  <<: *ra_only
+  <<: *runner_tag_selection
+  <<: *only_branches
 
 test:contentgen:
   stage: tests
@@ -326,8 +331,8 @@ test:contentgen:
   - make contentgen
   dependencies:
   - deploy:review
-  <<: *ra_tags
-  <<: *ra_only
+  <<: *runner_tag_selection
+  <<: *only_branches
   when: manual
 
 report:statusreportval:
@@ -342,8 +347,8 @@ report:statusreportval:
   - make statusreportval
   dependencies:
   - deploy:review
-  <<: *ra_tags
-  <<: *ra_only
+  <<: *runner_tag_selection
+  <<: *only_branches
 
 report:watchdog:
   stage: reports
@@ -357,6 +362,6 @@ report:watchdog:
   - make watchdogval
   dependencies:
   - deploy:review
-  <<: *ra_tags
-  <<: *ra_only
+  <<: *runner_tag_selection
+  <<: *only_branches
 
