@@ -246,6 +246,8 @@ deploy:storybook:
   <<: *runner_tag_selection
   <<: *only_branches
   <<: *only_var_theme
+  except:
+    - tags
 
 test:behat:
   stage: tests
