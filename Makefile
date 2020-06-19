@@ -92,8 +92,15 @@ ifneq ($(strip $(MODULES)),)
 	$(call php, drush en $(MODULES) -y)
 	$(call php, drush pmu $(MODULES) -y)
 	$(call php, drush user:password "$(TESTER_NAME)" "$(TESTER_PW)")
-
 endif
+	# Uncomment for redis support.
+	# make -s redis-settings
+
+redis-settings:
+	@echo "Turn on settings.redis"
+	$(call php, chmod +w web/sites/default)
+	$(call php, cp settings/settings.redis.php web/sites/default/settings.redis.php)
+	$(call php-0, sed -i "/settings.redis.php';/s/# //g" web/sites/default/settings.php)
 
 ## Import online & local translations
 localize:
