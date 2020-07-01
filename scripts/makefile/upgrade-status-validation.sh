@@ -1,15 +1,17 @@
 #!/usr/bin/env sh
 
 # Enable Upgrade Status module
-drush en -y upgrade_status
+drush pm:enable upgrade_status -y
+
+# Clear drush cache
+drush cc drush
 
 # Search for no issues message
-REPORT=$(drush us-a --all --ignore-contrib --ignore-uninstalled)
+REPORT=$(drush upgrade_status:analyze --all --ignore-contrib --ignore-uninstalled)
 IS_INVALID=$(echo "$REPORT" | grep "FILE:")
 
 # Exit 1 and alert if at least one file was reported.
 if [ -z "$IS_INVALID" ]; then
-	drush pmu upgrade_status -y
 	echo -e "Status report is valid : No error listed"
 	exit 0
 else
