@@ -28,8 +28,17 @@
       }
     },
     {
-      "type": "vcs",
-      "url": "https://git.drupalcode.org/project/panels_everywhere.git"
+      "type": "package",
+      "package": {
+        "name": "drupal/panels_everywhere",
+        "version": "dev-8.x-4.x",
+        "type": "drupal-module",
+        "source": {
+          "url": "https://git.drupalcode.org/project/panels_everywhere.git",
+          "type": "git",
+          "reference": "8.x-4.x"
+        }
+      }
     }
   ],
   "require": {
@@ -89,6 +98,8 @@
   "config": {
     "sort-packages": true,
     "preferred-install": {
+      "drupal/lb_ux": "source",
+      "drupal/panels_everywhere": "source",
       "*": "dist"
     }
   },
