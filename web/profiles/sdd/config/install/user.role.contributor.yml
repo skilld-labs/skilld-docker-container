@@ -112,3 +112,4 @@ permissions:
   - 'view own unpublished media'
   - 'view restricted block content'
   - 'view the administration theme'
+  - 'view unpublished paragraphs'
