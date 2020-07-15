@@ -14,19 +14,16 @@ CONFIG_LIST=$($($PARSING_CMD) | grep $CONFIG_TO_PARSE | awk -F "." '{print $3}')
 
 
 # Looking for splits
-echo -e "- Looking for splits of config..."
 
 if [ "$CONFIG_COUNT" -gt "0" ]; then
 
-	echo -e "- Some splits were found : Disabling all splits..."
+	echo -e "- The following splits are available : "
 
 	for bundles in $CONFIG_LIST; do
-		drush config-set config_split.config_split.$bundles status 0 -y
+		echo "   - $bundles"
 	done
+	printf "\n"
 
 else
 	printf "- \033[1mNo split of config was\033[0m found\n"
 fi
-
-echo -e "- Clearing cache..."
-drush cr
