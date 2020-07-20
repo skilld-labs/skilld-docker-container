@@ -39,6 +39,19 @@
           "reference": "8.x-4.x"
         }
       }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "drupal/unpublished_node_permissions",
+        "version": "dev-8.x-1.x",
+        "type": "drupal-module",
+        "dist": {
+          "url": "https://git.drupalcode.org/project/unpublished_node_permissions.git",
+          "type": "git",
+          "reference": "8.x-1.x"
+        }
+      }
     }
   ],
   "require": {
@@ -48,14 +61,17 @@
     "drupal/better_exposed_filters": "^5.0@beta",
     "drupal/better_normalizers": "^1.0@beta",
     "drupal/block_content_permissions": "1.x-dev",
+    "drupal/config_override_warn": "^1.3",
     "drupal/core-composer-scaffold": "^9.0",
     "drupal/core-project-message": "^9.0",
     "drupal/core-recommended": "^9",
     "drupal/core-vendor-hardening": "^9.0",
     "drupal/default_content": "^1",
+    "drupal/disable_language": "^1.0@beta",
     "drupal/file_entity": "2.x-dev",
     "drupal/focal_point": "^1.4",
     "drupal/google_tag": "^1.2",
+    "drupal/honeypot": "^2",
     "drupal/layout_builder_modal": "^1.1",
     "drupal/layout_builder_restrictions": "^2.7",
     "drupal/layout_library": "^1.0@beta",
@@ -73,13 +89,16 @@
     "drupal/pathauto": "^1.8",
     "drupal/rabbit_hole": "^1.0.0-beta7",
     "drupal/redirect": "^1.6",
+    "drupal/schema_metatag": "^1.6",
+    "drupal/simple_sitemap": "^3.7",
     "drupal/svg_image": "^1.14",
     "drupal/swiftmailer": "^2",
     "drupal/telephone_validation": "^2.3",
     "drupal/token": "^1",
+    "drupal/unpublished_node_permissions": "dev-8.x-1.x",
     "drupal/username_enumeration_prevention": "^1.1",
     "drupal/views_bulk_edit": "2.x-dev",
-    "drupal/views_infinite_scroll": "^1.7",
+    "drupal/viewsreference": "^2.0-alpha7",
     "drupal/webform": "^6",
     "drush/drush": "^10.1.0",
     "skilldlabs/drupal-cleanup": "^1",
@@ -105,6 +124,7 @@
     "preferred-install": {
       "drupal/lb_ux": "source",
       "drupal/panels_everywhere": "source",
+      "drupal/unpublished_node_permissions": "source",
       "*": "dist"
     }
   },
@@ -190,12 +210,23 @@
         "Errors when using with modules that alter a section's contextual menu": "https://www.drupal.org/files/issues/2020-05-22/3106939-4.patch",
         "Indicate Drupal 8/9 compatibility via core_version_requirement": "https://www.drupal.org/files/issues/2020-05-22/d9_compatibility-3138698-4.patch"
       },
+      "drupal/manage_display": {
+        "Drupal 9 compatibility": "https://www.drupal.org/files/issues/2020-04-01/manage_display.d9.3124061-2.patch"
+      },
       "drupal/menu_link_attributes": {
         "Add missing schema for menu_link_attributes": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
       },
       "drupal/panels_everywhere": {
         "Drupal 9 compatibility fixes for Panels Everywhere": "https://www.drupal.org/files/issues/2020-05-14/d9-compatibility-3111407-7.patch"
-      }
-    }
-  }
+      },
+      "drupal/viewsreference": {
+        "The 'entity.manager' service is deprecated": "https://www.drupal.org/files/issues/2020-05-05/3133637-use-entity_type-service.patch",
+        "Is there any way to pass the token from the current paragraph to the view?":"https://www.drupal.org/files/issues/2019-12-07/viewsreference-argument-tokens-2985364-12.patch",
+        "Implement configuration schema for Views reference field storage+settings and widget+formatter": "https://www.drupal.org/files/issues/2020-07-06/2957529-8.patch"
+      },
+    "drupal/unpublished_node_permissions": {
+        "Drupal 9 compatibility": "https://www.drupal.org/files/issues/2020-04-28/3131665-2.patch"
+        }
+}    
+}
 }
