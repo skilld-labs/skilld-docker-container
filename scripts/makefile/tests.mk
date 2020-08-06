@@ -187,3 +187,22 @@ sniffers: | clang compval phpcs newlineeof
 ## Run all tests & validations (including sniffers)
 tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval
 
+blackfire:
+ifneq ("$(wildcard scripts/makefile/blackfire.sh)","")
+	$(call php-0, /bin/sh ./scripts/makefile/blackfire.sh)
+	$(call php-0, kill -USR2 1)
+	@echo "Blackfire extension enabled"
+else
+	@echo "scripts/makefile/blackfire.sh file does not exist"
+	@exit 1
+endif
+
+newrelic:
+ifneq ("$(wildcard scripts/makefile/newrelic.sh)","")
+	$(call php-0, /bin/sh ./scripts/makefile/newrelic.sh)
+	$(call php-0, kill -USR2 1)
+	@echo "NewRelic extension enabled"
+else
+	@echo "scripts/makefile/newrelic.sh file does not exist"
+	@exit 1
+endif
