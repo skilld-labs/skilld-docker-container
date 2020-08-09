@@ -27,7 +27,7 @@ COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 # Execute php container as regular user
 php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 # Execute php container as root user
-php-0 = docker-compose exec -T php ${1}
+php-0 = docker-compose exec -T --user 0:0 php ${1}
 
 ## Full site install from the scratch
 all: | provision back front si localize hooksymlink info
