@@ -5,7 +5,7 @@ frontexec = docker run \
 	--rm \
 	--init \
 	-u $(CUID):$(CGID) \
-	-v $(shell pwd)/web/themes/custom/$(THEME_NAME):/app \
+	-v $(CURDIR)/web/themes/custom/$(THEME_NAME):/app \
 	--workdir /app \
 	$(IMAGE_FRONT) ${1}
 
@@ -15,7 +15,7 @@ frontexec-with-port = docker run \
 	--init \
 	-p $(FRONT_PORT):$(FRONT_PORT) \
 	-u $(CUID):$(CGID) \
-	-v $(shell pwd)/web/themes/custom/$(THEME_NAME):/app \
+	-v $(CURDIR)/web/themes/custom/$(THEME_NAME):/app \
 	--workdir /app \
 	$(IMAGE_FRONT) ${1}
 
@@ -24,7 +24,7 @@ frontexec-with-interactive = docker run \
 	--rm \
 	--init \
 	-u $(CUID):$(CGID) \
-	-v $(shell pwd)/web/themes/custom/$(THEME_NAME):/app \
+	-v $(CURDIR)/web/themes/custom/$(THEME_NAME):/app \
 	--workdir /app \
 	-it \
 	$(IMAGE_FRONT) ${1}
@@ -37,7 +37,7 @@ clear-front:
 front: | front-install front-build
 
 front-install:
-	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
+	@if [ -d $(CURDIR)/web/themes/custom/$(THEME_NAME) ]; then \
 		echo "- Theme directory found. Installing yarn dependencies..."; \
 		docker pull $(IMAGE_FRONT); \
 		$(call frontexec, node -v); \
@@ -48,7 +48,7 @@ front-install:
 	fi
 
 front-build:
-	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
+	@if [ -d $(CURDIR)/web/themes/custom/$(THEME_NAME) ]; then \
 		echo "- Theme directory found. Building front assets..."; \
 		docker pull $(IMAGE_FRONT); \
 		$(call frontexec, node -v); \
@@ -59,7 +59,7 @@ front-build:
 	fi
 
 lintval:
-	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
+	@if [ -d $(CURDIR)/web/themes/custom/$(THEME_NAME) ]; then \
 		echo "- Theme directory found. Running theme linters..."; \
 		docker pull $(IMAGE_FRONT); \
 		$(call frontexec, node -v); \
@@ -70,7 +70,7 @@ lintval:
 	fi
 
 lint:
-	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
+	@if [ -d $(CURDIR)/web/themes/custom/$(THEME_NAME) ]; then \
 		echo "- Theme directory found. Running theme linters with fix..."; \
 		docker pull $(IMAGE_FRONT); \
 		$(call frontexec, node -v); \
@@ -82,7 +82,7 @@ lint:
 	fi
 
 storybook:
-	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
+	@if [ -d $(CURDIR)/web/themes/custom/$(THEME_NAME) ]; then \
 		echo "- Theme directory found. Running dynamic storybook..."; \
 		docker pull $(IMAGE_FRONT); \
 		$(call frontexec, node -v); \
@@ -95,7 +95,7 @@ storybook:
 	fi
 
 build-storybook:
-	@if [ -d $(shell pwd)/web/themes/custom/$(THEME_NAME) ]; then \
+	@if [ -d $(CURDIR)/web/themes/custom/$(THEME_NAME) ]; then \
 		echo "- Theme directory found. Exporting static storybook..."; \
 		docker pull $(IMAGE_FRONT); \
 		$(call frontexec, node -v); \

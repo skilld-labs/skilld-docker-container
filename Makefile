@@ -29,6 +29,9 @@ ifeq ($(shell docker-compose config --services | grep mysql),mysql)
 	MYSQL_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/$(COMPOSE_PROJECT_NAME)_mysql
 endif
 
+# Define current directory only once
+CURDIR=$(shell pwd)
+
 # Execute php container as regular user
 php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 # Execute php container as root user
@@ -129,21 +132,16 @@ exec0:
 down:
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
 	@docker-compose down -v --remove-orphans --rmi local
-ifneq ($(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}'), )
-	@echo 'Stoping browser driver.'
-	make -s browser_driver_stop
-endif
+	@if [ ! -z "$(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}')" ]; then \
+		echo 'Stoping browser driver.' && make -s browser_driver_stop; fi
 
 DIRS = web/core web/libraries web/modules/contrib web/profiles/contrib web/sites web/themes/contrib vendor
 
 ## Totally remove project build folder, docker containers and network
 clean: info
-ifneq ($(shell docker-compose ps -q php),'')
-	$(eval SCAFFOLD = $(shell docker-compose exec -T --user $(CUID):$(CGID) php composer run-script list-scaffold-files | grep -P '^(?!>)'))
-	@for i in $(SCAFFOLD); do if [ -e "web/$$i" ]; then echo "Removing web/$$i..."; rm -rf web/$$i; fi; done
-endif
 	make -s down
-	@for i in $(DIRS); do if [ -d "$$i" ]; then echo "Removing $$i..."; docker run --rm -v $(shell pwd):/mnt $(IMAGE_PHP) sh -c "rm -rf /mnt/$$i"; fi; done
+	$(eval SCAFFOLD = $(shell docker run --rm -v $(CURDIR):/mnt -w /mnt --user $(CUID):$(CGID) $(IMAGE_PHP) composer run-script list-scaffold-files | grep -P '^(?!>)'))
+	@docker run --rm --user 0:0 -v $(CURDIR):/mnt -w /mnt -e RMLIST="$(addprefix web/,$(SCAFFOLD)) $(DIRS)" $(IMAGE_PHP) sh -c 'for i in $$RMLIST; do rm -fr $$i && echo "Removed $$i"; done'
 ifdef MYSQL_DIR
 	@echo "Removing mysql data from $(MYSQL_DIR) ..."
 	docker run --rm --user 0:0 -v $(shell dirname $(MYSQL_DIR)):/mnt $(IMAGE_PHP) sh -c "rm -fr /mnt/`basename $(MYSQL_DIR)`"

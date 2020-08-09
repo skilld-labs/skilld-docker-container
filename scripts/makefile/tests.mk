@@ -1,8 +1,8 @@
 # Function for code sniffer images.
 phpcsexec = docker run --rm \
-	-v $(shell pwd)/web/profiles/$(PROFILE_NAME):/work/profile \
-	-v $(shell pwd)/web/modules/custom:/work/modules \
-	-v $(shell pwd)/web/themes/custom:/work/themes \
+	-v $(CURDIR)/web/profiles/$(PROFILE_NAME):/work/profile \
+	-v $(CURDIR)/web/modules/custom:/work/modules \
+	-v $(CURDIR)/web/themes/custom:/work/themes \
 	skilldlabs/docker-phpcs-drupal ${1} -s --colors \
 	--standard=Drupal,DrupalPractice \
 	--extensions=php,module,inc,install,profile,theme,yml,txt,md,js \
@@ -60,7 +60,7 @@ endif
 compval:
 	@echo "Composer.json validation..."
 	# Can't use --strict cause we need dev versions for d9 compatibility
-	@docker run --rm -v `pwd`:`pwd` -w `pwd` $(IMAGE_PHP) composer validate
+	@docker run --rm -v $(CURDIR):/mnt -w /mnt $(IMAGE_PHP) composer validate
 
 ## Validate hook_update_N()
 hookupdateval:
