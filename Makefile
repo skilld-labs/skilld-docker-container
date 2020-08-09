@@ -24,6 +24,11 @@ CGID ?= $(LOCAL_GID)
 # Define network name.
 COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 
+# Determine mysql data directory if defined
+ifeq ($(shell docker-compose config --services | grep mysql),mysql)
+	MYSQL_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/$(COMPOSE_PROJECT_NAME)_mysql
+endif
+
 # Execute php container as regular user
 php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 # Execute php container as root user
@@ -51,8 +56,8 @@ ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
 	$(info Please review your project settings and run `make all` again.)
 	exit 1
 endif
-ifeq ($(shell docker-compose config --services | grep mysql),mysql)
-	mkdir -p $(DB_DATA_DIR)/$(COMPOSE_PROJECT_NAME)_mysql
+ifdef MYSQL_DIR
+	mkdir -p $(MYSQL_DIR) && chmod 777 $(MYSQL_DIR)
 endif
 	make -s down
 	@echo "Updating containers..."
@@ -139,7 +144,10 @@ ifneq ($(shell docker-compose ps -q php),'')
 endif
 	make -s down
 	@for i in $(DIRS); do if [ -d "$$i" ]; then echo "Removing $$i..."; docker run --rm -v $(shell pwd):/mnt $(IMAGE_PHP) sh -c "rm -rf /mnt/$$i"; fi; done
-	if [ -d $(DB_DATA_DIR) ]; then echo "Removing mysql data $(DB_DATA_DIR) ..."; docker run --rm --user 0:0 -v $(shell pwd):/mnt/2rm $(IMAGE_PHP) sh -c "rm -rf /mnt/2rm/$(DB_DATA_DIR)"; fi
+ifdef MYSQL_DIR
+	@echo "Removing mysql data from $(MYSQL_DIR) ..."
+	docker run --rm --user 0:0 -v $(shell dirname $(MYSQL_DIR)):/mnt $(IMAGE_PHP) sh -c "rm -fr /mnt/`basename $(MYSQL_DIR)`"
+endif
 ifeq ($(CLEAR_FRONT_PACKAGES), yes)
 	make clear-front
 endif
@@ -165,5 +173,4 @@ dev:
 ## Run drush command in PHP container. To pass arguments use double dash: "make drush dl devel -- -y"
 drush:
 	$(call php, $(filter-out "$@",$(MAKECMDGOALS)))
-	$(info "To pass arguments use double dash: "make drush dl devel -- -y"")
-
+	$(info "To pass arguments use double dash: "make drush en devel -- -y"")
