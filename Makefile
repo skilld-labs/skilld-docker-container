@@ -24,9 +24,13 @@ CGID ?= $(LOCAL_GID)
 # Define network name.
 COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 
-# Determine mysql data directory if defined
-ifeq ($(shell docker-compose config --services | grep mysql),mysql)
-	MYSQL_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/$(COMPOSE_PROJECT_NAME)_mysql
+SDC_SERVICES=$(shell docker-compose config --services)
+# Determine database data directory if defined
+ifeq ($(findstring mysql,$(SDC_SERVICES)),mysql)
+	DB_MOUNT_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/$(COMPOSE_PROJECT_NAME)_mysql
+endif
+ifeq ($(findstring postgresql,$(SDC_SERVICES)),postgresql)
+	DB_MOUNT_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/$(COMPOSE_PROJECT_NAME)_pgsql
 endif
 
 # Define current directory only once
@@ -59,8 +63,8 @@ ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
 	$(info Please review your project settings and run `make all` again.)
 	exit 1
 endif
-ifdef MYSQL_DIR
-	mkdir -p $(MYSQL_DIR) && chmod 777 $(MYSQL_DIR)
+ifdef DB_MOUNT_DIR
+	$(shell [ ! -d $(DB_MOUNT_DIR) ] && mkdir -p $(DB_MOUNT_DIR) && chmod 777 $(DB_MOUNT_DIR))
 endif
 	make -s down
 	@echo "Updating containers..."
@@ -148,9 +152,9 @@ clean: info
 	make -s down
 	$(eval SCAFFOLD = $(shell docker run --rm -v $(CURDIR):/mnt -w /mnt --user $(CUID):$(CGID) $(IMAGE_PHP) composer run-script list-scaffold-files | grep -P '^(?!>)'))
 	@docker run --rm --user 0:0 -v $(CURDIR):/mnt -w /mnt -e RMLIST="$(addprefix web/,$(SCAFFOLD)) $(DIRS)" $(IMAGE_PHP) sh -c 'for i in $$RMLIST; do rm -fr $$i && echo "Removed $$i"; done'
-ifdef MYSQL_DIR
-	@echo "Removing mysql data from $(MYSQL_DIR) ..."
-	docker run --rm --user 0:0 -v $(shell dirname $(MYSQL_DIR)):/mnt $(IMAGE_PHP) sh -c "rm -fr /mnt/`basename $(MYSQL_DIR)`"
+ifdef DB_MOUNT_DIR
+	@echo "Clean-up database data from $(DB_MOUNT_DIR) ..."
+	docker run --rm --user 0:0 -v $(shell dirname $(DB_MOUNT_DIR)):/mnt $(IMAGE_PHP) sh -c "rm -fr /mnt/`basename $(DB_MOUNT_DIR)`"
 endif
 ifeq ($(CLEAR_FRONT_PACKAGES), yes)
 	make clear-front
