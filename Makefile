@@ -71,7 +71,7 @@ endif
 	docker-compose pull
 	@echo "Build and run containers..."
 	docker-compose up -d --remove-orphans
-	$(call php-0, apk add --no-cache graphicsmagick tzdata $(ADD_PHP_EXT))
+	$(call php-0, apk add --no-cache tzdata $(ADD_PHP_EXT))
 	# Set up timezone
 	$(call php-0, cp /usr/share/zoneinfo/Europe/Paris /etc/localtime)
 	$(call php-0, kill -USR2 1)

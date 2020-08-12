@@ -167,8 +167,8 @@ browser_driver:
 
 ## Stop browser driver
 browser_driver_stop:
+	@echo 'Stopping browser driver...'
 	if [ ! -z `docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}'` ]; then \
-		echo 'Stopping browser driver.'; \
 		docker stop $(COMPOSE_PROJECT_NAME)_chrome; \
 	fi
 

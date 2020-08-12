@@ -180,7 +180,7 @@ prepare:front:
     - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
     - echo "REVIEW_DOMAIN=${REVIEW_DOMAIN}"
     - mkdir -p ${BUILD_DIR}
-    - rsync -ah --exclude=.git --delete ./ ${BUILD_DIR}
+    - rsync -ah --exclude=.git --exclude=.cache --delete ./ ${BUILD_DIR}
     - cd ${BUILD_DIR}
     - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
     - echo "MAIN_DOMAIN_NAME=${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}" >> .env.default

@@ -38,7 +38,7 @@ services:
 #      - front
 
 #  adminer:
-#    image: dockette/adminer:mysql-php7
+#    image: adminer:standalone
 #    container_name: "${COMPOSE_PROJECT_NAME}_adminer"
 #    links:
 #      - mysql:mysql
