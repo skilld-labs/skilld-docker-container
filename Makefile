@@ -75,7 +75,7 @@ endif
 
 ## Install backend dependencies
 back:
-	docker-compose up -d --remove-orphans php # PHP container is required for composer
+	docker-compose up -d --remove-orphans --no-deps php # PHP container is required for composer
 ifneq ($(strip $(ADD_PHP_EXT)),)
 # Install additional php extensions as this goal used in CI (todo stop doing it)
 	$(call php-0, apk add --no-cache $(ADD_PHP_EXT))
