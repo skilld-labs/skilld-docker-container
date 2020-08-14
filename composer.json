@@ -190,6 +190,9 @@
       },
       "drupal/panels_everywhere": {
         "Drupal 9 compatibility fixes for Panels Everywhere": "https://www.drupal.org/files/issues/2020-05-14/d9-compatibility-3111407-7.patch"
+      },
+      "drupal/upgrade_status": {
+        "Exclude node_modules from scan": "https://www.drupal.org/files/issues/2020-08-14/3162997-8.patch"
       }
     }
   }
