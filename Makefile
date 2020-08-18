@@ -74,6 +74,7 @@ endif
 ## Install backend dependencies
 back:
 	docker-compose up -d --remove-orphans php # PHP container is required for composer
+	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
 ifeq ($(INSTALL_DEV_DEPENDENCIES), TRUE)
 	@echo "INSTALL_DEV_DEPENDENCIES=$(INSTALL_DEV_DEPENDENCIES)"
 	@echo "Installing composer dependencies, including dev ones"
