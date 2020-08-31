@@ -4,6 +4,7 @@ FRONT_PORT?=65200
 frontexec = docker run \
 	--rm \
 	--init \
+	--env YARN_CACHE_FOLDER=/app/$(YARN_CACHE_FOLDER) \
 	-u $(CUID):$(CGID) \
 	-v $(CURDIR)/web/themes/custom/$(THEME_NAME):/app \
 	--workdir /app \
@@ -13,6 +14,7 @@ frontexec = docker run \
 frontexec-with-port = docker run \
 	--rm \
 	--init \
+	--env YARN_CACHE_FOLDER=/app/$(YARN_CACHE_FOLDER) \
 	-p $(FRONT_PORT):$(FRONT_PORT) \
 	-u $(CUID):$(CGID) \
 	-v $(CURDIR)/web/themes/custom/$(THEME_NAME):/app \
@@ -23,6 +25,7 @@ frontexec-with-port = docker run \
 frontexec-with-interactive = docker run \
 	--rm \
 	--init \
+	--env YARN_CACHE_FOLDER=/app/$(YARN_CACHE_FOLDER) \
 	-u $(CUID):$(CGID) \
 	-v $(CURDIR)/web/themes/custom/$(THEME_NAME):/app \
 	--workdir /app \
@@ -53,6 +56,7 @@ front-build:
 		docker pull $(IMAGE_FRONT); \
 		$(call frontexec, node -v); \
 		$(call frontexec, yarn -v); \
+		$(call frontexec, yarn install --ignore-optional --check-files --prod); \
 		$(call frontexec, yarn build --verbose); \
 	else \
 		echo "- Theme directory defined in .env file was not found. Skipping front-build."; \
