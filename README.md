@@ -117,6 +117,7 @@ networks:
 * `make front` - Builds frontend tasks.
 * `make lint` - Runs frontend linters.
 * `make storybook` - Runs storybook in current theme.
+* `make blackfire` - Adds and enables blackfire.io php extension, needs [configuration](https://blackfire.io/docs/configuration/php) in docker-composer override.yml.
 
 #### Additional goals
 
