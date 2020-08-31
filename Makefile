@@ -74,6 +74,8 @@ endif
 	$(call php-0, apk add --no-cache tzdata $(ADD_PHP_EXT))
 	# Set up timezone
 	$(call php-0, cp /usr/share/zoneinfo/Europe/Paris /etc/localtime)
+	# Install newrelic PHP extension if NEW_RELIC_LICENSE_KEY defined
+	make -s newrelic
 	$(call php-0, kill -USR2 1)
 	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
 
