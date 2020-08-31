@@ -6,11 +6,13 @@ services:
   php:
     environment:
       COMPOSER_MEMORY_LIMIT: "-1"
+      COMPOSER_HOME: /home/www-data/.composer
 #      BLACKFIRE_CLIENT_ID: x
 #      BLACKFIRE_CLIENT_TOKEN: x
 #      NEW_RELIC_LICENSE_KEY: x
 #      NEW_RELIC_APPNAME: "${COMPOSE_PROJECT_NAME}"
     volumes:
+      - "${COMPOSER_HOME_CACHE}:/home/www-data/.composer:z"
       - "./90-mail.ini:/etc/php7/conf.d/90-mail.ini:z"
 #    depends_on:
 #      - mysql

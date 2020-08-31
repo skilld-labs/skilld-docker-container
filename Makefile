@@ -70,19 +70,23 @@ endif
 	@echo "Updating containers..."
 	docker-compose pull
 	@echo "Build and run containers..."
+	mkdir -p $(COMPOSER_HOME_CACHE)
 	docker-compose up -d --remove-orphans
 	$(call php-0, apk add --no-cache graphicsmagick tzdata $(ADD_PHP_EXT))
 	# Set up timezone
 	$(call php-0, cp /usr/share/zoneinfo/Europe/Paris /etc/localtime)
+	$(call php-0, sh -c '[ ! -z "$$COMPOSER_HOME" -a -d $$COMPOSER_HOME  ] && chown -R $(CUID):$(CGID) $$COMPOSER_HOME')
 	$(call php-0, kill -USR2 1)
 	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
 
 ## Install backend dependencies
 back:
+	mkdir -p $(COMPOSER_HOME_CACHE)
 	docker-compose up -d --remove-orphans --no-deps php # PHP container is required for composer
 ifneq ($(strip $(ADD_PHP_EXT)),)
 # Install additional php extensions as this goal used in CI (todo stop doing it)
 	$(call php-0, apk add --no-cache $(ADD_PHP_EXT))
+	$(call php-0, sh -c '[ ! -z "$$COMPOSER_HOME" -a -d $$COMPOSER_HOME  ] && chown -R $(CUID):$(CGID) $$COMPOSER_HOME')
 endif
 ifeq ($(INSTALL_DEV_DEPENDENCIES), TRUE)
 	@echo "INSTALL_DEV_DEPENDENCIES=$(INSTALL_DEV_DEPENDENCIES)"
@@ -155,6 +159,10 @@ clean: info
 ifdef DB_MOUNT_DIR
 	@echo "Clean-up database data from $(DB_MOUNT_DIR) ..."
 	docker run --rm --user 0:0 -v $(shell dirname $(DB_MOUNT_DIR)):/mnt $(IMAGE_PHP) sh -c "rm -fr /mnt/`basename $(DB_MOUNT_DIR)`"
+endif
+ifdef COMPOSER_HOME_CACHE
+	@echo "Clean-up composer cache from $(COMPOSER_HOME_CACHE) ..."
+	docker run --rm --user 0:0 -v $(shell dirname $(abspath $(COMPOSER_HOME_CACHE))):/mnt $(IMAGE_PHP) sh -c "rm -fr /mnt/`basename $(COMPOSER_HOME_CACHE)`"
 endif
 ifeq ($(CLEAR_FRONT_PACKAGES), yes)
 	make clear-front
