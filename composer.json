@@ -152,7 +152,8 @@
       "drupal-module": [
         "tests",
         "src/Tests"
-      ]
+      ],
+      "exclude": []
     },
     "patches": {
       "drupal/core": {
