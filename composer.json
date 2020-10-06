@@ -12,20 +12,8 @@
   "repositories": [
     {
       "type": "composer",
+      "exclude": ["drupal/panels_everywhere"],
       "url": "https://packages.drupal.org/8"
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "drupal/lb_ux",
-        "version": "dev-8.x-1.x",
-        "type": "drupal-module",
-        "source": {
-          "url": "https://git.drupalcode.org/project/lb_ux.git",
-          "type": "git",
-          "reference": "8.x-1.x"
-        }
-      }
     },
     {
       "type": "package",
@@ -58,7 +46,7 @@
     "drupal/layout_builder_modal": "^1.1",
     "drupal/layout_builder_restrictions": "^2.7",
     "drupal/layout_library": "^1.0@beta",
-    "drupal/lb_ux": "dev-8.x-1.x",
+    "drupal/lb_ux": "dev-1.x",
     "drupal/manage_display": "^1.0@alpha",
     "drupal/menu_admin_per_menu": "^1.1",
     "drupal/menu_link_attributes": "1.x-dev",
