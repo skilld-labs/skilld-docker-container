@@ -14,19 +14,6 @@
       "type": "composer",
       "exclude": ["drupal/panels_everywhere"],
       "url": "https://packages.drupal.org/8"
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "drupal/panels_everywhere",
-        "version": "dev-8.x-4.x",
-        "type": "drupal-module",
-        "source": {
-          "url": "https://git.drupalcode.org/project/panels_everywhere.git",
-          "type": "git",
-          "reference": "8.x-4.x"
-        }
-      }
     }
   ],
   "require": {
@@ -52,7 +39,7 @@
     "drupal/menu_link_attributes": "1.x-dev",
     "drupal/page_manager": "^4.0.0-beta6",
     "drupal/panels": "^4.6",
-    "drupal/panels_everywhere": "dev-8.x-4.x",
+    "drupal/panels_everywhere": "^4@beta",
     "drupal/paragraphs": "^1.11",
     "drupal/pathauto": "^1.8",
     "drupal/rabbit_hole": "^1.0.0-beta7",
@@ -175,9 +162,6 @@
       },
       "drupal/menu_link_attributes": {
         "Add missing schema for menu_link_attributes": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
-      },
-      "drupal/panels_everywhere": {
-        "Drupal 9 compatibility fixes for Panels Everywhere": "https://www.drupal.org/files/issues/2020-05-14/d9-compatibility-3111407-7.patch"
       },
       "drupal/upgrade_status": {
         "Exclude node_modules from scan": "https://www.drupal.org/files/issues/2020-08-14/3162997-8.patch"
