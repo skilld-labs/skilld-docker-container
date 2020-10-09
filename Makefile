@@ -67,13 +67,19 @@ endif
 	docker-compose pull
 	@echo "Build and run containers..."
 	docker-compose up -d --remove-orphans
-	$(call php-0, apk add --no-cache graphicsmagick $(ADD_PHP_EXT))
+	$(call php-0, apk add --no-cache graphicsmagick tzdata $(ADD_PHP_EXT))
+	# Set up timezone
+	$(call php-0, cp /usr/share/zoneinfo/Europe/Paris /etc/localtime)
 	$(call php-0, kill -USR2 1)
 	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
 
 ## Install backend dependencies
 back:
 	docker-compose up -d --remove-orphans php # PHP container is required for composer
+ifneq ($(strip $(ADD_PHP_EXT)),)
+# Install additional php extensions as this goal used in CI (todo stop doing it)
+	$(call php-0, apk add --no-cache $(ADD_PHP_EXT))
+endif
 ifeq ($(INSTALL_DEV_DEPENDENCIES), TRUE)
 	@echo "INSTALL_DEV_DEPENDENCIES=$(INSTALL_DEV_DEPENDENCIES)"
 	@echo "Installing composer dependencies, including dev ones"
