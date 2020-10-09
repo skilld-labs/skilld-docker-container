@@ -5,6 +5,7 @@
 variables:
   GIT_DEPTH: "3"
   THEME_PATH: "" # Update to enable front jobs (web/themes/custom/XXX)
+  YARN_CACHE_FOLDER: ".cache/yarn"
   STORYBOOK_PATH: "" # Update to enable storybook job (themes/custom/XXX/dist/storybook/index.html)
   GIT_STRATEGY: clone # Workaround until git is updated in runner, see https://gitlab.com/gitlab-org/gitlab-foss/issues/60466
   REVIEW_DOMAIN: "XXX.XXX.com" # Mandatory, should equal to DNS of available runner server with docker + docker-compose + traefik
@@ -21,9 +22,18 @@ image: skilldlabs/php:73
     - branches
 
 .only_var_theme: &only_var_theme
+  cache:
+    key:
+      files:
+      # Until https://gitlab.com/gitlab-org/gitlab/issues/118466 lands ...
+        - web/themes/custom/XXX/package.json # ... this path has to be hardcoded
+        - web/themes/custom/XXX/yarn.lock # ... this path has to be hardcoded
+    paths:
+      - ${THEME_PATH}/${YARN_CACHE_FOLDER}/ # Populated during yarn install
   only:
     variables:
       - $THEME_PATH
+      - $YARN_CACHE_FOLDER
 
 before_script:
   - date
@@ -58,14 +68,6 @@ sniffers:front:
   script:
     - make front-install # Dependencies are required for js imports to pass linters
     - make lintval
-  cache:
-    key:
-      files:
-      # Until https://gitlab.com/gitlab-org/gitlab/issues/118466 lands ...
-        - web/themes/custom/XXX/package.json # ... this path has to be hardcoded
-        - web/themes/custom/XXX/yarn.lock # ... this path has to be hardcoded
-    paths:
-      - ${THEME_PATH}/node_modules/ # Populated during yarn install
   artifacts:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
     expire_in: 1d
