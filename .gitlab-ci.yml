@@ -257,7 +257,7 @@ test:behat:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - make behat
+  - BEHAT_ARGS='--colors -f pretty -o std -f junit -o features/junit' make behat
   after_script:
   - cd ${BUILD_DIR}
   - make browser_driver_stop
@@ -265,6 +265,7 @@ test:behat:
   - mkdir web/screenshots
   - mv features/*.png web/screenshots/
   - echo "- Screenshots are available here :" && cd web/screenshots && ls -h *.png | xargs -i echo "${CI_ENVIRONMENT_URL}/screenshots/{}"
+  - mv ${BUILD_DIR}/features/junit ${CI_PROJECT_DIR}
   retry:
     max: 2
     when: script_failure
@@ -273,6 +274,13 @@ test:behat:
   allow_failure: false
   <<: *runner_tag_selection
   <<: *only_branches
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+      - junit/*.xml
+    reports:
+      junit: junit/*.xml
 
 test:cinsp:
   stage: tests
