@@ -8,6 +8,8 @@ services:
       COMPOSER_MEMORY_LIMIT: "-1"
 #      BLACKFIRE_CLIENT_ID: x
 #      BLACKFIRE_CLIENT_TOKEN: x
+#      NEW_RELIC_LICENSE_KEY: x
+#      NEW_RELIC_APPNAME: "${COMPOSE_PROJECT_NAME}"
     volumes:
       - "./90-mail.ini:/etc/php7/conf.d/90-mail.ini:z"
 #    depends_on:
@@ -26,6 +28,12 @@ services:
 #      BLACKFIRE_SERVER_ID: x
 #      BLACKFIRE_SERVER_TOKEN: x
 #      BLACKFIRE_LOG_LEVEL: 1
+#    networks:
+#      - front
+
+#  newrelic:
+#    image: newrelic/php-daemon
+#    container_name: "${COMPOSE_PROJECT_NAME}_newrelic"
 #    networks:
 #      - front
 

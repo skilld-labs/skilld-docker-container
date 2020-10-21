@@ -118,6 +118,7 @@ networks:
 * `make lint` - Runs frontend linters.
 * `make storybook` - Runs storybook in current theme.
 * `make blackfire` - Adds and enables blackfire.io php extension, needs [configuration](https://blackfire.io/docs/configuration/php) in docker-composer override.yml.
+* `make newrelic` - Adds and enables newrelic.com php extension, needs [configuration](https://docs.newrelic.com/docs/agents/php-agent/getting-started/introduction-new-relic-php#configuration) in docker-composer.override.yml.
 
 #### Additional goals
 
