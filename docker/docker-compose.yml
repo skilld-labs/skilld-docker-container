@@ -1,4 +1,4 @@
-version: "2.1"
+version: "2.4"
 
 services:
 
@@ -47,7 +47,7 @@ services:
 #  redis:
 #    image: ${IMAGE_REDIS}
 #    container_name: "${COMPOSE_PROJECT_NAME}_redis"
-#    command: redis-server --requirepass ${REDIS_PASSWD}
+#    command: redis-server --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWD}
 #    restart: always
 #    networks:
 #      - front
