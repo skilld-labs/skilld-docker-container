@@ -33,6 +33,7 @@ stages:
   - sniffers
   - prepare
   - deploy
+  - storybook
   - tests
   - reports
 
@@ -196,7 +197,6 @@ prepare:front:
   dependencies:
     - prepare:back
     - prepare:front
-  allow_failure: false
   <<: *runner_tag_selection
   <<: *only_branches
 
@@ -230,7 +230,7 @@ stop_review:
   <<: *only_branches
 
 deploy:storybook:
-  stage: deploy
+  stage: storybook
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
@@ -245,8 +245,6 @@ deploy:storybook:
   <<: *runner_tag_selection
   <<: *only_branches
   <<: *only_var_theme
-  when: always
-
 
 test:behat:
   stage: tests
