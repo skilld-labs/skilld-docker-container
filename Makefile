@@ -90,11 +90,11 @@ endif
 ifeq ($(INSTALL_DEV_DEPENDENCIES), TRUE)
 	@echo "INSTALL_DEV_DEPENDENCIES=$(INSTALL_DEV_DEPENDENCIES)"
 	@echo "Installing composer dependencies, including dev ones"
-	$(call php, composer install --prefer-dist -o)
+	$(call php, composer install --no-interaction --prefer-dist -o)
 else
 	@echo "INSTALL_DEV_DEPENDENCIES set to FALSE or missing from .env"
 	@echo "Installing composer dependencies, without dev ones"
-	$(call php, composer install --prefer-dist -o --no-dev)
+	$(call php, composer install --no-interaction --prefer-dist -o --no-dev)
 endif
 	$(call php, composer create-required-files)
 
@@ -166,7 +166,7 @@ endif
 ## Enable development mode and disable caching
 dev:
 	@echo "Dev tasks..."
-	$(call php, composer install --prefer-dist -o)
+	$(call php, composer install --no-interaction --prefer-dist -o)
 	@$(call php-0, chmod +w web/sites/default)
 	@$(call php, cp web/sites/default/default.services.yml web/sites/default/services.yml)
 	@$(call php, sed -i -e 's/debug: false/debug: true/g' web/sites/default/services.yml)
