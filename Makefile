@@ -82,6 +82,7 @@ endif
 ## Install backend dependencies
 back:
 	docker-compose up -d --remove-orphans --no-deps php # PHP container is required for composer
+	$(call php, composer global require -o --update-no-dev --no-suggest "hirak/prestissimo:^0.3")
 ifneq ($(strip $(ADD_PHP_EXT)),)
 # Install additional php extensions as this goal used in CI (todo stop doing it)
 	$(call php-0, apk add --no-cache $(ADD_PHP_EXT))
