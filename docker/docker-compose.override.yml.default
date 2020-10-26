@@ -1,6 +1,20 @@
 version: "2.4"
 
+x-service-defaults:
+  &service-defaults
+  restart: always
+  networks:
+    - front
+
+x-service-rewrelic:
+  &service-newrelic
+  newrelic:
+    <<: *service-defaults
+    image: newrelic/php-daemon
+    container_name: "${COMPOSE_PROJECT_NAME}_newrelic"
+
 services:
+#  <<: *service-newrelic
 
 # Override base service.
   php:
@@ -8,7 +22,6 @@ services:
       COMPOSER_MEMORY_LIMIT: "-1"
 #      BLACKFIRE_CLIENT_ID: x
 #      BLACKFIRE_CLIENT_TOKEN: x
-#      NEW_RELIC_LICENSE_KEY: x
 #      NEW_RELIC_APPNAME: "${COMPOSE_PROJECT_NAME}"
     volumes:
       - "./90-mail.ini:/etc/php7/conf.d/90-mail.ini:z"
@@ -22,32 +35,25 @@ services:
 # Then download extension using "make blackfire"
 
 #  blackfire:
+#    <<: *service-defaults
 #    image: blackfire/blackfire
 #    container_name: "${COMPOSE_PROJECT_NAME}_blackfire"
 #    environment:
 #      BLACKFIRE_SERVER_ID: x
 #      BLACKFIRE_SERVER_TOKEN: x
 #      BLACKFIRE_LOG_LEVEL: 1
-#    networks:
-#      - front
-
-#  newrelic:
-#    image: newrelic/php-daemon
-#    container_name: "${COMPOSE_PROJECT_NAME}_newrelic"
-#    networks:
-#      - front
 
 #  adminer:
+#    <<: *service-defaults
 #    image: adminer:standalone
 #    container_name: "${COMPOSE_PROJECT_NAME}_adminer"
 #    links:
 #      - mysql:mysql
 #    depends_on:
 #      - mysql
-#    networks:
-#      - front
 
 #  mysql:
+#    <<: *service-defaults
 #    image: percona:5.7
 #    container_name: "${COMPOSE_PROJECT_NAME}_mysql"
 #    volumes:
@@ -57,11 +63,9 @@ services:
 #      MYSQL_USER: d8
 #      MYSQL_PASSWORD: d8
 #      MYSQL_ROOT_PASSWORD: d8root
-#    restart: always
-#    networks:
-#      - front
 
 #  postgresql:
+#    <<: *service-defaults
 #    image: postgres:12.2-alpine
 #    container_name: "${COMPOSE_PROJECT_NAME}_pgsql"
 #    volumes:
@@ -71,16 +75,11 @@ services:
 #      POSTGRES_USER: d9
 #      POSTGRES_PASSWORD: d9root
 #      PGDATA: /var/lib/postgresql/data
-#    restart: always
-#    networks:
-#      - front
 
   mailhog:
+    <<: *service-defaults
     image: skilldlabs/mailhog
     container_name: "${COMPOSE_PROJECT_NAME}_mail"
-    restart: always
-    networks:
-      - front
     labels:
       - 'traefik.enable=true'
       # Treafik 1.x
@@ -127,10 +126,3 @@ services:
 #      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.tls=true'
 #      - 'traefik.http.services.solr-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8983'
 
-#networks:
-#  front:
-#    driver: bridge
-#    ipam:
-#      driver: default
-#      config:
-#        - subnet: "${IPRANGE}"
