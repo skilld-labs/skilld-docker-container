@@ -17,6 +17,7 @@ docker/docker-compose.override.yml
 behat.yml
 features/*.html
 features/*.png
+features/junit/
 .cache/
 .editorconfig
 .gitattributes

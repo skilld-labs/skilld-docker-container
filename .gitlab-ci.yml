@@ -1,12 +1,13 @@
 # Variables to add in Gitalb UI : Settings > CI/CD
 # - SONAR_HOST // Optional
 # - SONAR_TOKEN // Optional
+# - NEW_RELIC_LICENSE_KEY // Optional
 
 variables:
-  GIT_DEPTH: "3"
+  GIT_DEPTH: "10"
   THEME_PATH: "" # Update to enable front jobs (web/themes/custom/XXX)
   STORYBOOK_PATH: "" # Update to enable storybook job (themes/custom/XXX/dist/storybook/index.html)
-  GIT_STRATEGY: clone # Workaround until git is updated in runner, see https://gitlab.com/gitlab-org/gitlab-foss/issues/60466
+  GIT_STRATEGY: fetch
   REVIEW_DOMAIN: "XXX.XXX.com" # Mandatory, should equal to DNS of available runner server with docker + docker-compose + traefik
 
 image: skilldlabs/php:73
@@ -33,6 +34,7 @@ stages:
   - sniffers
   - prepare
   - deploy
+  - storybook
   - tests
   - reports
 
@@ -179,7 +181,7 @@ prepare:front:
     - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
     - echo "REVIEW_DOMAIN=${REVIEW_DOMAIN}"
     - mkdir -p ${BUILD_DIR}
-    - rsync -ah --exclude=.git --delete ./ ${BUILD_DIR}
+    - rsync -ah --exclude=.git --exclude=.cache --delete ./ ${BUILD_DIR}
     - cd ${BUILD_DIR}
     - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
     - echo "MAIN_DOMAIN_NAME=${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}" >> .env.default
@@ -196,7 +198,6 @@ prepare:front:
   dependencies:
     - prepare:back
     - prepare:front
-  allow_failure: false
   <<: *runner_tag_selection
   <<: *only_branches
 
@@ -230,7 +231,7 @@ stop_review:
   <<: *only_branches
 
 deploy:storybook:
-  stage: deploy
+  stage: storybook
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
@@ -245,8 +246,6 @@ deploy:storybook:
   <<: *runner_tag_selection
   <<: *only_branches
   <<: *only_var_theme
-  when: always
-
 
 test:behat:
   stage: tests
@@ -257,7 +256,7 @@ test:behat:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - make behat
+  - BEHAT_ARGS='--colors -f pretty -o std -f junit -o features/junit' make behat
   after_script:
   - cd ${BUILD_DIR}
   - make browser_driver_stop
@@ -265,14 +264,21 @@ test:behat:
   - mkdir web/screenshots
   - mv features/*.png web/screenshots/
   - echo "- Screenshots are available here :" && cd web/screenshots && ls -h *.png | xargs -i echo "${CI_ENVIRONMENT_URL}/screenshots/{}"
+  - mv ${BUILD_DIR}/features/junit ${CI_PROJECT_DIR}
   retry:
     max: 2
     when: script_failure
   dependencies:
   - deploy:review
-  allow_failure: false
   <<: *runner_tag_selection
   <<: *only_branches
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+      - junit/*.xml
+    reports:
+      junit: junit/*.xml
 
 test:cinsp:
   stage: tests

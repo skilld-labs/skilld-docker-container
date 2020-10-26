@@ -6,7 +6,7 @@ phpcsexec = docker run --rm \
 	skilldlabs/docker-phpcs-drupal ${1} -s --colors \
 	--standard=Drupal,DrupalPractice \
 	--extensions=php,module,inc,install,profile,theme,yml,txt,md,js \
-	--ignore=*.css,libraries/*,dist/*,README.md,README.txt,node_modules/*,work/themes/**.js,work/themes/**.md \
+	--ignore=*.css,libraries/*,dist/*,styleguide/*,README.md,README.txt,node_modules/*,work/themes/**.js,work/themes/**.md \
 	.
 
 ## Validate codebase with phpcs sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards
@@ -125,6 +125,7 @@ else
 endif
 
 ## Validate Behat scenarios
+BEHAT_ARGS ?= --colors
 behat:
 	@echo "Getting base url"
 ifdef REVIEW_DOMAIN
@@ -143,7 +144,7 @@ endif
 	@echo "Running Behat scenarios against http://$(BASE_URL)"
 	$(call php, composer install -o)
 	$(call php, vendor/bin/behat -V)
-	$(call php, vendor/bin/behat --colors) || $(call php, vendor/bin/behat --colors --rerun)
+	$(call php, vendor/bin/behat $(BEHAT_ARGS)) || $(call php, vendor/bin/behat $(BEHAT_ARGS) --rerun)
 	make browser_driver_stop
 
 ## List existing behat definitions
@@ -166,8 +167,8 @@ browser_driver:
 
 ## Stop browser driver
 browser_driver_stop:
+	@echo 'Stopping browser driver...'
 	if [ ! -z `docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}'` ]; then \
-		echo 'Stopping browser driver.'; \
 		docker stop $(COMPOSE_PROJECT_NAME)_chrome; \
 	fi
 
@@ -187,3 +188,22 @@ sniffers: | clang compval phpcs newlineeof
 ## Run all tests & validations (including sniffers)
 tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval
 
+blackfire:
+ifneq ("$(wildcard scripts/makefile/blackfire.sh)","")
+	$(call php-0, /bin/sh ./scripts/makefile/blackfire.sh)
+	$(call php-0, kill -USR2 1)
+	@echo "Blackfire extension enabled"
+else
+	@echo "scripts/makefile/blackfire.sh file does not exist"
+	@exit 1
+endif
+
+newrelic:
+ifdef NEW_RELIC_LICENSE_KEY
+	$(call php-0, /bin/sh ./scripts/makefile/newrelic.sh $(NEW_RELIC_LICENSE_KEY) '$(COMPOSE_PROJECT_NAME)')
+	$(call php, sed -i -e 's/#  <<: \*service-newrelic/  <<: \*service-newrelic/g' docker/docker-compose.override.yml)
+	docker-compose up -d
+	@echo "NewRelic PHP extension enabled"
+else
+	@echo "NewRelic install skipped as NEW_RELIC_LICENSE_KEY is not set"
+endif

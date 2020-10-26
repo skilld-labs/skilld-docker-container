@@ -36,8 +36,8 @@
 ## Quickstart
 
 * Install docker for <a href="https://docs.docker.com/install/" target="_blank">Linux</a>, <a href="https://docs.docker.com/docker-for-mac/install/" target="_blank">Mac</a>, <a href="https://docs.docker.com/docker-for-windows/install/" target="_blank">Windows</a>
-  *  Check <a href="https://docs.docker.com/install/linux/linux-postinstall/" target="_blank">post-installation steps for Linux</a>
-* Install <a href="https://docs.docker.com/compose/install/" target="_blank">docker compose</a>
+  *  Check <a href="https://docs.docker.com/install/linux/linux-postinstall/" target="_blank">post-installation steps for Linux</a> version 17.12.0 or later
+* Install <a href="https://docs.docker.com/compose/install/" target="_blank">docker compose</a> version 1.21.0 or later
 
 * Copy **.env.default** to **.env**, more information about enviroment file can be found <a href="https://docs.docker.com/compose/env-file/" target="_blank">docs.docker.com</a>
 * Copy **docker-compose.override.yml.default** to **docker-compose.override.yml**, update parts you want to overwrite.
@@ -117,6 +117,8 @@ networks:
 * `make front` - Builds frontend tasks.
 * `make lint` - Runs frontend linters.
 * `make storybook` - Runs storybook in current theme.
+* `make blackfire` - Adds and enables blackfire.io php extension, needs [configuration](https://blackfire.io/docs/configuration/php) in docker-composer override.yml.
+* `make newrelic` - Adds and enables newrelic.com php extension, needs [configuration](https://docs.newrelic.com/docs/agents/php-agent/getting-started/introduction-new-relic-php#configuration) `NEW_RELIC_LICENSE_KEY` environment variable defined with valid license key.
 
 #### Additional goals
 
