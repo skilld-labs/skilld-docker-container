@@ -22,6 +22,6 @@ drush dcer media <media id> --folder=modules/custom/project_default_content/cont
 6. Use _sed_ commands to replace UID and UUID values of admin author in files of all exported content : 
       - `cd web/modules/custom/project_default_content/content/`
      - `find . -type f -exec sed -i 's/\/user\\\/1/\/user\\\/2/g' {} +`
-     - `find . -type f -exec sed -i 's/UUID_OF_ADMIN_USER/4bad48eb-ff5b-45b4-b30c-ecabff09591a/' {} +`
+     - `find . -type f -exec sed -i 's/UUID_OF_ADMIN_USER/4bad48eb-ff5b-45b4-b30c-ecabff09591a/g' {} +`
 7. Exported default content will be created at build and it's author should be `default_content_author`
 
