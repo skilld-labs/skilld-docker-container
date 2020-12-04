@@ -67,8 +67,6 @@ ifdef DB_MOUNT_DIR
 	$(shell [ ! -d $(DB_MOUNT_DIR) ] && mkdir -p $(DB_MOUNT_DIR) && chmod 777 $(DB_MOUNT_DIR))
 endif
 	make -s down
-	@echo "Updating containers..."
-	docker-compose pull
 	@echo "Build and run containers..."
 	docker-compose up -d --remove-orphans
 	$(call php-0, apk add --no-cache tzdata $(ADD_PHP_EXT))
