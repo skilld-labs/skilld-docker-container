@@ -25,6 +25,8 @@ config/sync/.htaccess
 mysql/
 node_modules
 web/themes/custom/*/dist/
+private-files/*/
+*.sql
 
 # Ignore personal directories
 .idea/

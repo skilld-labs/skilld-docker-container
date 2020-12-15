@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all fast allfast provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalrectorval upgradestatusval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize
+.PHONY: all fast allfast provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalrectorval upgradestatusval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize local-settings
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -111,7 +111,16 @@ ifneq ($(strip $(MODULES)),)
 	$(call php, drush en $(MODULES) -y)
 	$(call php, drush pmu $(MODULES) -y)
 	$(call php, drush user:password "$(TESTER_NAME)" "$(TESTER_PW)")
+endif
+	make -s local-settings
 
+local-settings:
+ifneq ("$(wildcard settings/settings.local.php)","")
+	@echo "Turn on settings.local"
+	$(call php, chmod +w web/sites/default)
+	$(call php, cp settings/settings.local.php web/sites/default/settings.local.php)
+	$(call php-0, sed -i "/settings.local.php';/s/# //g" web/sites/default/settings.php)
+	$(call php, drush cr)
 endif
 
 ## Import online & local translations
