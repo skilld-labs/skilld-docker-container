@@ -129,14 +129,11 @@
     },
     "patches": {
       "drupal/core": {
-        "Setting required on radios marks all options required": "https://www.drupal.org/files/issues/2020-05-26/2731991-50.patch",
         "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch",
         "Fix multilingual site's layout edit context issue": "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
         "SQLite database locking errors cause fatal errors": "https://www.drupal.org/files/issues/1120020-59.patch",
         "Error: Call to a member function getLabel() after enabling layout_builder": "https://www.drupal.org/files/issues/2019-11-14/2985882-entityfield-43.patch",
-        "Layout builder doesn't show new \"extra fields\"": "https://www.drupal.org/files/issues/2020-04-16/missing_extra_fields-3069578-12.patch",
         "POST /quickedit/metadata returning HTTP 503": "https://www.drupal.org/files/issues/2020-01-09/2893407-39.patch",
-        "Claro Media and media library": "https://www.drupal.org/files/issues/2020-03-30/media-and-media-library-3062751-18.patch",
         "Callers of LayoutEntityHelperTrait::getEntitySections() do not account for the view mode": "https://www.drupal.org/files/issues/2019-06-20/3008924-5.patch",
         "Claro + layout builder messages display additional icon in top left corner": "https://www.drupal.org/files/issues/2020-05-28/claro_layout_builder_extra_icon-3143237-4.patch",
         "Expose Layout Builder data to REST and JSON:API" : "https://www.drupal.org/files/issues/2020-07-07/2942975-116.patch"
