@@ -36,6 +36,7 @@ dependencies:
   - locale
   - media
   - media_library
+  - mailsystem
   - menu_link_attributes
   - menu_ui
   - node
@@ -59,6 +60,7 @@ dependencies:
   - shortcut
   - svg_image
   - system
+  - swiftmailer
   - taxonomy
   - telephone
   - telephone_validation
@@ -69,7 +71,6 @@ dependencies:
   - user
   - username_enumeration_prevention
   - views_bulk_edit
-  - views_bulk_operations
   - views_ui
   - webform
   - webform_ui
@@ -79,6 +80,7 @@ dependencies:
   - pathauto
   - content_translation
   - views
+  - views_bulk_operations
   - paragraphs
   - layout_builder
   - lb_ux
