@@ -121,9 +121,9 @@
         "profiles/demo_umami",
         "profiles/*/tests",
         "profiles/*testing*",
-        "core/lib/Drupal/Core/Test",
-        "core/scripts/test",
-        "core/tests"
+        "lib/Drupal/Core/Test",
+        "scripts/test",
+        "tests"
       ],
       "drupal-module": [
         "tests",
