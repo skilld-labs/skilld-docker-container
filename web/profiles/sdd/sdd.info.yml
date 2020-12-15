@@ -13,6 +13,7 @@ dependencies:
   - ckeditor
   - color
   - config
+  - config_override_warn
   - config_translation
   - contextual
   - crop
