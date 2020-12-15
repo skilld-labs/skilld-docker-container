@@ -49,6 +49,7 @@
     "drupal/token": "^1",
     "drupal/username_enumeration_prevention": "^1.1",
     "drupal/views_bulk_edit": "2.x-dev",
+    "drupal/views_bulk_operations": "^3.9",
     "drupal/webform": "^6",
     "drush/drush": "^10.1.0",
     "skilldlabs/drupal-cleanup": "^1",
