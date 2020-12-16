@@ -198,6 +198,7 @@ prepare:front:
   dependencies:
     - prepare:back
     - prepare:front
+  allow_failure: false # https://gitlab.com/gitlab-org/gitlab-foss/-/issues/25892#note_26909808
   <<: *runner_tag_selection
   <<: *only_branches
 
@@ -243,11 +244,11 @@ deploy:storybook:
   - cd ${BUILD_DIR}
   - make build-storybook
   - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
+  except:
+    - tags
   <<: *runner_tag_selection
   <<: *only_branches
   <<: *only_var_theme
-  except:
-    - tags
 
 test:behat:
   stage: tests
