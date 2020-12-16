@@ -10,6 +10,7 @@ drush cc drush
 REPORT=$(drush upgrade_status:analyze --all --ignore-contrib --ignore-uninstalled)
 IS_INVALID=$(echo "$REPORT" | grep "FILE:")
 
+drush pmu upgrade_status -y
 # Exit 1 and alert if at least one file was reported.
 if [ -z "$IS_INVALID" ]; then
 	echo -e "Status report is valid : No error listed"
