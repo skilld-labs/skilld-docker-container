@@ -62,7 +62,7 @@
     "drupal/devel": "^4",
     "drupal/drupal-extension": "^4",
     "drupal/upgrade_rector": "^1",
-    "drupal/upgrade_status": "^2.9",
+    "drupal/upgrade_status": "^3",
     "espend/behat-placeholder-extension": "^1.1",
     "genesis/behat-fail-aid": "^2.1"
   },
