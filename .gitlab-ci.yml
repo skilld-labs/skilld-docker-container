@@ -328,6 +328,33 @@ test:upgradestatus:
   <<: *runner_tag_selection
   <<: *only_branches
 
+test:lighthouse:
+  stage: tests
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+    - echo "Starting job script in ${BUILD_DIR}"
+    - cd ${BUILD_DIR}
+    - cat lighthouserc.yml
+    - docker run --tty --rm --init -d -v `pwd`:`pwd` -w `pwd` -u $(id -u):$(id -g) --entrypoint="/bin/bash" --name "${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse" cypress/browsers:node14.15.0-chrome86-ff82
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse node -v
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse npm -v
+    - docker exec --tty -u root ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse npm install -g @lhci/cli@0.6.x
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci --version
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci healthcheck
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci collect --url=https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci assert
+  after_script:
+    - if [ -n `docker ps -f 'name=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse' --format '{{.Names}}'` ]; then echo 'Stopping container'; docker rm --force ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse; fi
+    - cd ${BUILD_DIR}
+    - if [ -d .lighthouseci/ ]; then cp -rf .lighthouseci/ web/; echo "- Reports are available here :" && for i in $(find web/.lighthouseci/ -name "*.html"); do basename $i;done | xargs -i echo "${CI_ENVIRONMENT_URL}/.lighthouseci/{}"; fi
+  dependencies:
+  - deploy:review
+  <<: *runner_tag_selection
+  <<: *only_branches
+
 test:contentgen:
   stage: tests
   environment:

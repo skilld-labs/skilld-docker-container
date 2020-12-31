@@ -27,6 +27,8 @@ node_modules
 web/themes/custom/*/dist/
 private-files/*/
 *.sql
+.lighthouseci/
+web/.lighthouseci/
 
 # Ignore personal directories
 .idea/
