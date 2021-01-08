@@ -36,6 +36,7 @@
     "drupal/layout_builder_modal": "^1.1",
     "drupal/layout_builder_restrictions": "^2.7",
     "drupal/layout_library": "^1.0@beta",
+    "drupal/layout_paragraphs": "^1.0@beta",
     "drupal/lb_ux": "1.x-dev",
     "drupal/manage_display": "^1.0@alpha",
     "drupal/menu_admin_per_menu": "^1.1",

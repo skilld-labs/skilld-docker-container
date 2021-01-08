@@ -87,6 +87,7 @@ dependencies:
   - views_bulk_operations
   - paragraphs
   - layout_builder
+  - layout_paragraphs
   - lb_ux
   - layout_builder_restrictions
   - layout_builder_modal
