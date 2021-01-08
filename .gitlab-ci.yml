@@ -10,7 +10,7 @@ variables:
   GIT_STRATEGY: fetch
   REVIEW_DOMAIN: "XXX.XXX.com" # Mandatory, should equal to DNS of available runner server with docker + docker-compose + traefik
 
-image: skilldlabs/php:73
+image: skilldlabs/php:74
 
 # Tags defines which runner to use (expected shell runner)
 .runner_tag_selection: &runner_tag_selection
