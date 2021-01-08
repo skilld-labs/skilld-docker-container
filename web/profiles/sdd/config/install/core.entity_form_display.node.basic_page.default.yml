@@ -6,7 +6,7 @@ dependencies:
     - field.field.node.basic_page.layout_builder__layout
     - node.type.basic_page
   module:
-    - paragraphs
+    - layout_paragraphs
     - path
 id: node.basic_page.default
 targetEntityType: node
@@ -14,22 +14,12 @@ bundle: basic_page
 mode: default
 content:
   content:
-    type: paragraphs
+    type: layout_paragraphs
     weight: 1
     settings:
-      title: Paragraph
-      title_plural: Paragraphs
-      edit_mode: closed_expand_nested
-      closed_mode: summary
-      autocollapse: none
-      closed_mode_threshold: 0
-      add_mode: modal
-      form_display_mode: default
-      default_paragraph_type: _none
-      features:
-        add_above: '0'
-        collapse_edit_all: collapse_edit_all
-        duplicate: duplicate
+      preview_view_mode: default
+      nesting_depth: 0
+      require_layouts: 0
     third_party_settings: {  }
     region: content
   created:
