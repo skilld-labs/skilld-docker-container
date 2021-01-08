@@ -29,6 +29,8 @@
     "drupal/file_entity": "2.x-dev",
     "drupal/focal_point": "^1.4",
     "drupal/formblock": "^2.0@beta",
+    "drupal/gin": "^3.0@alpha",
+    "drupal/gin_login": "^1.0@RC",
     "drupal/google_tag": "^1.2",
     "drupal/honeypot": "^2",
     "drupal/layout_builder_modal": "^1.1",
