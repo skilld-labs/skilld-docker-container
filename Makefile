@@ -113,7 +113,7 @@ ifneq ($(strip $(MODULES)),)
 	$(eval TESTER_ROLE := "contributor")
 	$(call php, drush user:create $(TESTER_NAME))
 	$(call php, drush user:role:add $(TESTER_ROLE) $(TESTER_NAME))
-	$(call php, drush user:password $(TESTER_NAME) $(TESTER_PW))
+	$(call php, drush user:password $(TESTER_NAME) "$(TESTER_PW)")
 endif
 	make -s local-settings
 
