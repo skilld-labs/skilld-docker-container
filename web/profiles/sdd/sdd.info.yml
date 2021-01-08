@@ -27,6 +27,7 @@ dependencies:
   - file
   - filter
   - focal_point
+  - formblock
   - google_tag
   - help
   - honeypot
