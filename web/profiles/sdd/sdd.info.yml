@@ -28,6 +28,8 @@ dependencies:
   - filter
   - focal_point
   - formblock
+  - gin_login
+  - gin_toolbar
   - google_tag
   - help
   - honeypot
@@ -93,6 +95,7 @@ dependencies:
 themes:
   - claro
   - seven
+  - gin
 
 keep_english: true
 'interface translation project': sdd
