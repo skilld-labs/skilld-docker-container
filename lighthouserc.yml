@@ -8,7 +8,7 @@ ci:
       - URL_TO_TEST # Overriden by CLI argument
   assert:
     includePassedAssertions: true
-    preset: lighthouse:no-pwa # lighthouse:recommended but without PWA audits
+    # preset: lighthouse:no-pwa # lighthouse:recommended but without PWA audits
     assertions: # Additional to preset
       categories:performance:
         - error
@@ -21,7 +21,5 @@ ci:
         - minScore: 0.9
       categories:seo:
         - error
-        - minScore: 0.9
-  upload:
-    target: temporary-public-storage
+        - minScore: 0.8
 
