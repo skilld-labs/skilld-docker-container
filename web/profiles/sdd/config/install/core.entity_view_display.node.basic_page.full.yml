@@ -60,17 +60,19 @@ third_party_settings:
             uuid: 7f79b02b-dc5d-41ae-bacc-cdb83d50d873
             region: content
             configuration:
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
               id: 'field_block:node:basic_page:content'
+              label: Content
+              provider: layout_builder
+              label_display: '0'
               formatter:
-                type: entity_reference_revisions_entity_view
                 label: hidden
+                type: layout_paragraphs
                 settings:
                   view_mode: default
-                  link: ''
                 third_party_settings: {  }
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
             additional: {  }
             weight: 2
         third_party_settings: {  }
