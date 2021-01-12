@@ -96,6 +96,8 @@ else
 endif
 	$(call php, composer create-required-files)
 
+$(eval TESTER_NAME := "tester")
+$(eval TESTER_ROLE := "contributor")
 ## Install drupal
 si:
 	@echo "Installing from: $(PROJECT_INSTALL)"
@@ -109,8 +111,6 @@ endif
 ifneq ($(strip $(MODULES)),)
 	$(call php, drush en $(MODULES) -y)
 	$(call php, drush pmu $(MODULES) -y)
-	$(eval TESTER_NAME := "tester")
-	$(eval TESTER_ROLE := "contributor")
 	$(call php, drush user:create $(TESTER_NAME))
 	$(call php, drush user:role:add $(TESTER_ROLE) $(TESTER_NAME))
 	$(call php, drush user:password $(TESTER_NAME) "$(TESTER_PW)")
