@@ -48,6 +48,7 @@
     "drupal/pathauto": "^1.8",
     "drupal/rabbit_hole": "^1.0.0-beta7",
     "drupal/redirect": "^1.6",
+    "drupal/role_delegation": "^1.1",
     "drupal/svg_image": "^1.14",
     "drupal/swiftmailer": "^2",
     "drupal/telephone_validation": "^2.3",

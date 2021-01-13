@@ -26,6 +26,7 @@ permissions:
   - 'administer redirects'
   - 'administer shortcuts'
   - 'administer users'
+  - 'assign contributor role'
   - 'cancel account'
   - 'change own username'
   - 'create audio media'
