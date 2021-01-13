@@ -101,7 +101,7 @@ Feature: Generic tests
         Given I am logged in as a user with the "<role_machine_name>" role
         When I go to "node/add/basic_page"
         And I fill in "Title" with "Test node created by user with <role_machine_name> role"
-        And I press the "edit-submit" button
+        And I press the "edit-submit--2" button
         When I go to "admin/content"
         And I take a screenshot
         Then I should see "Test node created by user with <role_machine_name> role"
