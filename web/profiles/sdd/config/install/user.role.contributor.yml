@@ -106,6 +106,9 @@ permissions:
   - 'update media'
   - 'use menu link attributes'
   - 'use text format basic_html'
+  - userprotect.account.edit
+  - userprotect.mail.edit
+  - userprotect.pass.edit
   - 'view all media revisions'
   - 'view all revisions'
   - 'view any webform submission'

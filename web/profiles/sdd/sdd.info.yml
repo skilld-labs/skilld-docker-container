@@ -75,6 +75,7 @@ dependencies:
   - update
   - user
   - username_enumeration_prevention
+  - userprotect
   - views_bulk_edit
   - views_ui
   - webform

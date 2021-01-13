@@ -54,6 +54,7 @@
     "drupal/telephone_validation": "^2.3",
     "drupal/token": "^1",
     "drupal/username_enumeration_prevention": "^1.1",
+    "drupal/userprotect": "^1.1",
     "drupal/views_bulk_edit": "2.x-dev",
     "drupal/views_bulk_operations": "^3.9",
     "drupal/webform": "^6",
