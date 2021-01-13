@@ -1,0 +1,24 @@
+gin_login.settings:
+  type: config_object
+  label: 'Gin Login Configuration Form'
+  mapping:
+    logo:
+      type: mapping
+      label: 'Logo image'
+      mapping:
+        use_default:
+          type: boolean
+          label: 'Use default logo'
+        path:
+          type: string
+          label: 'Path to custom logo'
+    brand_image:
+      type: mapping
+      label: 'Brand image'
+      mapping:
+        use_default:
+          type: boolean
+          label: 'Use random image'
+        path:
+          type: string
+          label: 'Path to custom brand image'
