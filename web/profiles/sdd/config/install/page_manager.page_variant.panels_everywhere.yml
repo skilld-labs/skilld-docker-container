@@ -91,6 +91,11 @@ variant_settings:
   uuid: fc2d657c-de2b-4aa7-bcf3-2d42692dd1e6
 page: site_template
 weight: 0
-selection_criteria: {  }
+selection_criteria:
+  -
+    id: request_path
+    pages: "/user/login\r\n/user/password\r\n/user/register"
+    negate: true
+    context_mapping: {  }
 selection_logic: and
 static_context: {  }

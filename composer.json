@@ -168,6 +168,9 @@
       "drupal/menu_link_attributes": {
         "Add missing schema for menu_link_attributes": "https://patch-diff.githubusercontent.com/raw/yannickoo/menu_link_attributes/pull/52.patch"
       },
+      "drupal/gin_login": {
+        "Add missing schema for gin_login": "https://www.drupal.org/files/issues/2021-01-13/gin_login-config_schema-3192526-8.patch"
+      },
       "drupal/upgrade_status": {
         "Exclude node_modules from scan": "https://www.drupal.org/files/issues/2020-08-14/3162997-8.patch"
       }
