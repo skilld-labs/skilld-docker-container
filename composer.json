@@ -70,7 +70,8 @@
     "drupal/upgrade_rector": "^1",
     "drupal/upgrade_status": "^3",
     "espend/behat-placeholder-extension": "^1.1",
-    "genesis/behat-fail-aid": "^2.1"
+    "genesis/behat-fail-aid": "^2.1",
+    "phpunit/phpunit": "^9"
   },
   "conflict": {
     "drupal/drupal": "*"
@@ -136,7 +137,9 @@
         "tests",
         "src/Tests"
       ],
-      "exclude": []
+      "exclude": [
+        "web/core/tests"
+      ]
     },
     "patches": {
       "drupal/core": {
