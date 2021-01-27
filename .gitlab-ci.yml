@@ -152,11 +152,11 @@ prepare:back:
       - web/
       - drush/contrib/
   <<: *runner_tag_selection
-  <<: *only_branches
 
 prepare:front:
   stage: prepare
   script:
+    - make front-install
     - make front-build
   dependencies:
     - sniffers:front
