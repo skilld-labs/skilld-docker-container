@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all fast allfast provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalrectorval upgradestatusval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize local-settings
+.PHONY: all fast allfast provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalrectorval upgradestatusval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize local-settings redis-settings
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -116,6 +116,7 @@ ifneq ($(strip $(MODULES)),)
 	$(call php, drush user:password $(TESTER_NAME) "$(TESTER_PW)")
 endif
 	make -s local-settings
+	#make -s redis-settings
 
 local-settings:
 ifneq ("$(wildcard settings/settings.local.php)","")
@@ -125,6 +126,11 @@ ifneq ("$(wildcard settings/settings.local.php)","")
 	$(call php-0, sed -i "/settings.local.php';/s/# //g" web/sites/default/settings.php)
 	$(call php, drush cr)
 endif
+
+redis-settings:
+	@echo "Turn on Redis settings"
+	$(call php-0, chmod -R +w web/sites/)
+	$(call php, cat settings/settings.redis.php >> web/sites/default/settings.php)
 
 ## Import online & local translations
 localize:
