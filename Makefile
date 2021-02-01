@@ -127,10 +127,15 @@ ifneq ("$(wildcard settings/settings.local.php)","")
 	$(call php, drush cr)
 endif
 
+REDIS_IS_INSTALLED := $(shell grep "redis.connection" web/sites/*/settings.php | tail -1 | wc -l || echo "0")
 redis-settings:
+ifeq ($(REDIS_IS_INSTALLED), 1)
+	@echo "Redis settings already installed, nothing to do"
+else
 	@echo "Turn on Redis settings"
 	$(call php-0, chmod -R +w web/sites/)
 	$(call php, cat settings/settings.redis.php >> web/sites/default/settings.php)
+endif
 
 ## Import online & local translations
 localize:
