@@ -17,6 +17,7 @@ services:
 #      REDIS_PASSWD: ${REDIS_PASSWD}
 #    depends_on:
 #      - redis
+#      - solr
 #    links:
 #      - redis:redis
 
