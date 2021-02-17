@@ -15,6 +15,7 @@ dependencies:
   - config
   - config_override_warn
   - config_translation
+  - content_translation
   - contextual
   - crop
   - datetime
@@ -35,13 +36,22 @@ dependencies:
   - honeypot
   - image
   - language
+  - layout_builder
+  - layout_builder_modal
+  - layout_builder_restrictions
   - layout_discovery
+  - layout_library
+  - layout_paragraphs
+  - lb_ux
   - link
   - locale
+  - mailsystem
+  - manage_display
   - media
   - media_library
-  - mailsystem
+  - menu_admin_per_menu
   - menu_link_attributes
+  - menu_link_content
   - menu_ui
   - node
   - options
@@ -50,8 +60,10 @@ dependencies:
   - page_manager_ui
   - panels
   - panels_everywhere
+  - paragraphs
   - path
   - path_alias
+  - pathauto
   - quickedit
   - rabbit_hole
   - rdf
@@ -64,8 +76,8 @@ dependencies:
   - role_delegation
   - shortcut
   - svg_image
-  - system
   - swiftmailer
+  - system
   - taxonomy
   - telephone
   - telephone_validation
@@ -76,29 +88,17 @@ dependencies:
   - user
   - username_enumeration_prevention
   - userprotect
+  - views
   - views_bulk_edit
+  - views_bulk_operations
   - views_ui
   - webform
   - webform_ui
-  - manage_display
-  - menu_admin_per_menu
-  - menu_link_content
-  - pathauto
-  - content_translation
-  - views
-  - views_bulk_operations
-  - paragraphs
-  - layout_builder
-  - layout_paragraphs
-  - lb_ux
-  - layout_builder_restrictions
-  - layout_builder_modal
-  - layout_library
 
 themes:
   - claro
-  - seven
   - gin
+  - seven
 
 keep_english: true
 'interface translation project': sdd
