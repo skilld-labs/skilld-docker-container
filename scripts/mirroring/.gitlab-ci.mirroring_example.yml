@@ -6,9 +6,6 @@ stages:
 
 .mirroring_template: &mirroring_template
   stage: mirror
-  dependencies:
-    - prepare:front # Where front dependencies are installed and assets are builded
-    - prepare:back # Where back dependencies are installed
   allow_failure: true
   retry:
     max: 2
@@ -20,21 +17,21 @@ Mirror to repo XXX:
   - date; pwd; ls -lah;
   - mkdir -p ~/.ssh
   - ls -lah ~
-  - echo "$REMOTE_REPO_PRIVATE_KEY" > ~/.ssh/id_rsa
+  - echo "$MIRRORING_REMOTE_REPO_PRIVATE_KEY" > ~/.ssh/id_rsa
   - chmod 0600 ~/.ssh/id_rsa
   - ls -lah ~/.ssh
   - apk add --no-cache openssh-client git rsync
-  - ssh-keyscan -H "$REMOTE_REPO_IP" >> ~/.ssh/known_hosts
+  - ssh-keyscan -H "$MIRRORING_REMOTE_REPO_IP" >> ~/.ssh/known_hosts
   - git version
   - rsync --version
-  - export TARGET_GIT_REPO="${REMOTE_REPO_URL_1}" # Gitlab custom variable to update for each repo to mirror
-  - echo -e "TARGET_GIT_REPO = $TARGET_GIT_REPO"
-  - export REMOTE_REPO_TYPE="${REMOTE_REPO_TYPE}"
-  - echo -e "REMOTE_REPO_TYPE = $REMOTE_REPO_TYPE"
+  - export MIRRORING_TARGET_GIT_REPO="${MIRRORING_REMOTE_REPO_URL_1}" # Gitlab custom variable to update for each repo to mirror
+  - echo -e "MIRRORING_TARGET_GIT_REPO = $MIRRORING_TARGET_GIT_REPO"
+  - export MIRRORING_REMOTE_REPO_TYPE="${MIRRORING_REMOTE_REPO_TYPE}"
+  - echo -e "MIRRORING_REMOTE_REPO_TYPE = $MIRRORING_REMOTE_REPO_TYPE"
   - chmod +x scripts/mirroring/mirror_current_branch.sh
   - ./scripts/mirroring/mirror_current_branch.sh
   - echo " - End of CI script"
 
-Mirror to repo YYY: # Job can then be duplicated to clone to multiples repos (just use a different REMOTE_REPO_URL_N variable for each)
+Mirror to repo YYY: # Job can then be duplicated to clone to multiples repos (just use a different MIRRORING_REMOTE_REPO_URL_N variable for each)
   ...
 

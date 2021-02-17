@@ -20,12 +20,11 @@ Why not use the built-in mirroring functionality Gitlab-ci and other repository 
 - `mirror_current_branch.sh`
 
 1. Define a mirroring CI job like "Mirror to repo XXX" in .gitlab-ci.yml, as shown in .gitlab-ci.mirroring_example.yml
-   - To include artefact dependencies in mirroring, this CI job should be positioned after all dependencies have been built and installed and use the [dependencies](https://docs.gitlab.com/ee/ci/yaml/#dependencies) key word
 1. In Gitlab UI, add the following custom CI/CD variables :
-   - REMOTE_REPO_IP : IP or domain name of target git repos
-   - REMOTE_REPO_PRIVATE_KEY : SSH private key matching public key added to git user
-   - REMOTE_REPO_TYPE : Possible values : "PLATFORM.SH" only for now, or leave empty if appropriate
-   - REMOTE_REPO_URL_1 : Git repo to which mirror current branch (you can have multiple ones)
+   - MIRRORING_REMOTE_REPO_IP : IP or domain name of target git repos
+   - MIRRORING_REMOTE_REPO_PRIVATE_KEY : SSH private key matching public key added to git user
+   - MIRRORING_REMOTE_REPO_TYPE : Possible values : "PLATFORM.SH" only for now, or leave empty if appropriate
+   - MIRRORING_REMOTE_REPO_URL_1 : Git repo to which mirror current branch (you can have multiple ones)
    - GIT_USER_EMAIL : Email to be used by git user (used to commit)
    - GIT_USER_NAME : Name to be used by git user (used to commit)
 
