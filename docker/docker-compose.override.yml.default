@@ -112,6 +112,25 @@ services:
       - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
       - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls=true'
 
+#  apache:
+#  Uncomment for MacOS.
+#     ports:
+#     - "8088:80"
+#  Mount local folder with ssl keys.
+#     volumes:
+#      - ./apache/ssl:/etc/apache2/ssl:Z
+#    labels:
+#      - 'traefik.enable=true'
+#      # Treafik 1.x
+#      - 'traefik.backend=${MAIN_DOMAIN_NAME}_web'
+#      - 'traefik.frontend.rule=Host:${MAIN_DOMAIN_NAME}'
+#      - 'traefik.frontend.redirect.entryPoint=https'
+#      - 'traefik.port=80'
+#      # Treafik 2.x
+#      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.rule=Host(`${MAIN_DOMAIN_NAME}`)'
+#      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
+#      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.tls=true'
+
 #  solr:
 #    labels:
 #      - 'traefik.enable=true'
