@@ -28,6 +28,10 @@ default:
         mode: default
         autoClean: true
     Drupal\DrupalExtension:
+      # text:
+      #   log_in: "Log in"
+      #   password_field: "Password"
+      #   username_field: "Login by username/email address"
       blackbox: ~
       api_driver: 'drupal'
       drupal:
