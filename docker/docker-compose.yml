@@ -33,6 +33,15 @@ services:
     volumes_from:
       - php
 
+#  apache:
+#    <<: *service-defaults
+#    image: ${IMAGE_APACHE}
+#    container_name: "${COMPOSE_PROJECT_NAME}_web"
+#    depends_on:
+#      - php
+#    volumes_from:
+#      - php
+
 #  solr:
 #    <<: *service-defaults
 #    image: ${IMAGE_SOLR}
