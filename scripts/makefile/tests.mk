@@ -207,3 +207,6 @@ ifdef NEW_RELIC_LICENSE_KEY
 else
 	@echo "NewRelic install skipped as NEW_RELIC_LICENSE_KEY is not set"
 endif
+
+xdebug:
+	$(call php-0, /bin/sh ./scripts/makefile/xdebug.sh $(filter-out $@, $(MAKECMDGOALS)))
