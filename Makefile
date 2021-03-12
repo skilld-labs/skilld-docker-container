@@ -1,7 +1,7 @@
 # Add utility functions and scripts to the container
 include scripts/makefile/*.mk
 
-.PHONY: all fast allfast provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalrectorval upgradestatusval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize local-settings redis-settings
+.PHONY: all fast allfast provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalrectorval upgradestatusval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize local-settings redis-settings content
 .DEFAULT_GOAL := help
 
 # https://stackoverflow.com/a/6273809/1826109
@@ -108,15 +108,20 @@ ifeq ($(PROJECT_INSTALL), config)
 else
 	$(call php, drush si $(PROFILE_NAME) --db-url="$(DB_URL)" --account-name="$(ADMIN_NAME)" --account-mail="$(ADMIN_MAIL)" --account-pass="$(ADMIN_PW)" -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
 endif
-ifneq ($(strip $(MODULES)),)
-	$(call php, drush en $(MODULES) -y)
-	$(call php, drush pmu $(MODULES) -y)
 	$(call php, drush user:create "$(TESTER_NAME)")
 	$(call php, drush user:role:add $(TESTER_ROLE) "$(TESTER_NAME)")
 	$(call php, drush user:password "$(TESTER_NAME)" "$(TESTER_PW)")
-endif
+	make content
 	make -s local-settings
 	#make -s redis-settings
+
+content:
+ifneq ($(strip $(MODULES)),)
+	$(call php, drush en $(MODULES) -y)
+	$(call php, drush pmu $(MODULES) -y)
+endif
+	$(call php, drush migrate_generator:generate_migrations /var/www/html/content --update)
+	$(call php, drush migrate:import --all --group=migrate_generator_group)
 
 local-settings:
 ifneq ("$(wildcard settings/settings.local.php)","")

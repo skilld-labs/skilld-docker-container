@@ -41,6 +41,7 @@
     "drupal/manage_display": "^1.0@alpha",
     "drupal/menu_admin_per_menu": "^1.1",
     "drupal/menu_link_attributes": "^1.1",
+    "drupal/migrate_generator": "^1.0",
     "drupal/page_manager": "^4.0.0-beta6",
     "drupal/panels": "^4.6",
     "drupal/panels_everywhere": "^4.0@beta",
