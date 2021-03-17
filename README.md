@@ -48,29 +48,30 @@
 
 #### Used variables
 
-| Variable name   | Description             | Default value |
-| --------------- | ----------------------- | ------------- |
-| COMPOSE_FILE   | Path to a Compose file(s) | `./docker/docker-compose.yml:./docker/docker-compose.override.yml` |
-| COMPOSE_PROJECT_NAME   | Your project name | - |
-| PROFILE_NAME   | Profile used for site install | sdd |
-| MODULES   | Additional modules to enable after site install | project_default_content |
-| THEME_NAME  | Name of theme directory in /web/themes | `NA` |
-| SITE_NAME  | Site name | Example |
-| SITE_MAIL  | Site e-mail address | admin@example.com |
-| ADMIN_NAME  | Admin username | admin |
-| ADMIN_PW  | Admin password | admin |
-| ADMIN_MAIL  | Admin e-mail address | admin@example.com |
-| PROJECT_INSTALL | Way to install site - from straight or existing config | - |
-| IMAGE_PHP | Php image to use | `skilldlabs/php:72-fpm` |
-| IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.14.1` |
-| IMAGE_APACHE | Image to use for apache container | `skilldlabs/skilld-docker-apache` |
-| IMAGE_FRONT | Image to use for front tasks | `skilldlabs/frontend:zen` |
-| IMAGE_DRIVER | Image to use for automated testing webdriver | `zenika/alpine-chrome` |
-| ADD_PHP_EXT | Additional php extension to install | - |
-| MAIN_DOMAIN_NAME | Domain name used for traefik | `docker.localhost` |
-| DB_URL | Url to connect to database | `sqlite:///dev/shm/d8.sqlite` |
-| DB_DATA_DIR | Full path to database storage | `/dev/shm` |
-| CLEAR_FRONT_PACKAGES | Set it to `no` to keep `/node_nodules` directory in theme after `make front` task to save build time. | yes |
+| Variable name        | Description                                                                                           | Default value                                                      |
+| ---------------      | -----------------------                                                                               | -------------                                                      |
+| COMPOSE_FILE         | Path to a Compose file(s)                                                                             | `./docker/docker-compose.yml:./docker/docker-compose.override.yml` |
+| COMPOSE_PROJECT_NAME | Your project name                                                                                     | -                                                                  |
+| PROFILE_NAME         | Profile used for site install                                                                         | sdd                                                                |
+| MODULES              | Additional modules to enable after site install                                                       | project_default_content                                            |
+| THEME_NAME           | Name of theme directory in /web/themes                                                                | `NA`                                                               |
+| SITE_NAME            | Site name                                                                                             | Example                                                            |
+| SITE_MAIL            | Site e-mail address                                                                                   | admin@example.com                                                  |
+| ADMIN_NAME           | Admin username                                                                                        | admin                                                              |
+| ADMIN_PW             | Admin password                                                                                        | admin                                                              |
+| ADMIN_MAIL           | Admin e-mail address                                                                                  | admin@example.com                                                  |
+| PROJECT_INSTALL      | Way to install site - from straight or existing config                                                | -                                                                  |
+| IMAGE_PHP            | Php image to use                                                                                      | `skilldlabs/php:72-fpm`                                            |
+| IMAGE_NGINX          | Image to use for nginx container                                                                      | `skilldlabs/nginx:1.14.1`                                          |
+| IMAGE_APACHE         | Image to use for apache container                                                                     | `skilldlabs/skilld-docker-apache`                                  |
+| IMAGE_FRONT          | Image to use for front tasks                                                                          | `skilldlabs/frontend:zen`                                          |
+| IMAGE_DRIVER         | Image to use for automated testing webdriver                                                          | `zenika/alpine-chrome`                                             |
+| ADD_PHP_EXT          | Additional php extension to install                                                                   | -                                                                  |
+| MAIN_DOMAIN_NAME     | Domain name used for traefik                                                                          | `docker.localhost`                                                 |
+| DB_URL               | Url to connect to database                                                                            | `sqlite:///dev/shm/d8.sqlite`                                      |
+| DB_DATA_DIR          | Full path to database storage                                                                         | `/dev/shm`                                                         |
+| CLEAR_FRONT_PACKAGES | Set it to `no` to keep `/node_nodules` directory in theme after `make front` task to save build time. | yes                                                                |
+| SHM_SIZE             | Defines php container shm_size, used when building in "fast" mode.                                    | `total host ram / 4` when fast is used, otherwise defaults to 64m  |
 
 #### Persistent Mysql
 
