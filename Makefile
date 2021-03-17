@@ -81,8 +81,6 @@ endif
 ## Install backend dependencies
 back:
 	docker-compose up -d --remove-orphans --no-deps php # PHP container is required for composer
-	# Set composer2 as default
-	$(call php-0, ln -fs composer2 /usr/bin/composer)
 ifneq ($(strip $(ADD_PHP_EXT)),)
 # Install additional php extensions as this goal used in CI (todo stop doing it)
 	$(call php-0, apk add --no-cache $(ADD_PHP_EXT))
