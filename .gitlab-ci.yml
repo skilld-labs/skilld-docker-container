@@ -337,7 +337,7 @@ test:lighthouse:
   after_script:
     - if [ -n `docker ps -f 'name=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse' --format '{{.Names}}'` ]; then echo 'Stopping container'; docker rm --force ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse; fi
     - cd ${BUILD_DIR}
-    - if [ -d .lighthouseci/ ]; then cp -rf .lighthouseci/ web/; echo "- Reports are available here :" && for i in $(find web/.lighthouseci/ -name "*.html"); do basename $i;done | xargs -i echo "${CI_ENVIRONMENT_URL}/.lighthouseci/{}"; fi
+    - if [ -d .lighthouseci ]; then mv .lighthouseci web/lighthouseci; echo "- Reports are available here :" && for i in $(find web/lighthouseci/ -name "*.html"); do basename $i;done | xargs -i echo "${CI_ENVIRONMENT_URL}/lighthouseci/{}"; fi
   dependencies:
   - deploy:review
   <<: *runner_tag_selection
