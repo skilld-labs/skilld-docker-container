@@ -116,12 +116,18 @@ endif
 	#make -s redis-settings
 
 content:
-ifneq ($(strip $(MODULES)),)
-	$(call php, drush en $(MODULES) -y)
-	$(call php, drush pmu $(MODULES) -y)
+ifneq ($(strip $(DC_MODULES)),)
+	$(call php, drush en $(DC_MODULES) -y)
+	$(call php, drush pmu $(DC_MODULES) -y)
 endif
+ifneq ($(strip $(MG_MODULES)),)
+	$(call php, drush en $(MG_MODULES) -y)
 	$(call php, drush migrate_generator:generate_migrations /var/www/html/content --update)
 	$(call php, drush migrate:import --all --group=migrate_generator_group)
+	$(call php, drush pmu $(MG_MODULES) -y)
+	@echo "Deleting configs created by migrate_generator..." # https://dgo.to/3205125
+	for i in $(shell docker-compose exec --user $(CUID):$(CGID) php drush config:status --state=Any --format=list | grep -E 'migrate_plus.migration.migrate_generator|migrate_plus.migration_group.migrate_generator_group') ; do $(call php, drush config:delete -y $$i) ; done
+endif
 
 local-settings:
 ifneq ("$(wildcard settings/settings.local.php)","")
