@@ -183,7 +183,7 @@ else
 endif
 
 ## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
-sniffers: | clang compval phpcs newlineeof
+sniffers: | clang compval phpcs newlineeof #hookupdateval
 
 ## Run all tests & validations (including sniffers)
 tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval
