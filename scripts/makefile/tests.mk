@@ -62,13 +62,13 @@ compval:
 	# Can't use --strict cause we need dev versions for d9 compatibility
 	@docker run --rm -v $(CURDIR):/mnt -w /mnt $(IMAGE_PHP) composer validate
 
-## Validate hook_update_N()
+## Validate if hook_update_N() are required
 hookupdateval:
 ifneq ("$(wildcard scripts/makefile/hookupdateval.sh)","")
 	@echo "hook_update_N() validation..."
 	@/bin/sh ./scripts/makefile/hookupdateval.sh
 else
-	@echo "scripts/makefile/hookupdateval.sh.sh file does not exist"
+	@echo "scripts/makefile/hookupdateval.sh file does not exist"
 	@exit 1
 endif
 
