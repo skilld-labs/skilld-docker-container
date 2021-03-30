@@ -1,3 +1,10 @@
+## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
+sniffers: | clang compval phpcs newlineeof patchval #hookupdateval
+
+## Run all tests & validations (including sniffers)
+tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval
+
+
 # Function for code sniffer images.
 phpcsexec = docker run --rm \
 	-v $(CURDIR)/web/profiles/$(PROFILE_NAME):/work/profile \
@@ -124,6 +131,16 @@ else
 	@exit 1
 endif
 
+## Validate that no custom patch is added to repo
+patchval:
+ifneq ("$(wildcard scripts/makefile/patchval.sh)","")
+	@echo "Patch validation..."
+	@/bin/sh ./scripts/makefile/patchval.sh
+else
+	@echo "scripts/makefile/patchval.sh file does not exist"
+	@exit 1
+endif
+
 ## Validate Behat scenarios
 BEHAT_ARGS ?= --colors
 behat:
@@ -181,12 +198,6 @@ else
 	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
 	@exit 1
 endif
-
-## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
-sniffers: | clang compval phpcs newlineeof #hookupdateval
-
-## Run all tests & validations (including sniffers)
-tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval
 
 blackfire:
 ifneq ("$(wildcard scripts/makefile/blackfire.sh)","")

@@ -107,7 +107,19 @@ sniffers:hookupdate:
       - branches
       - merge_requests
     variables:
-      - $RUN_HOOKUPDATE_CI_JOB == "TRUE"
+      - $RUN_HOOKUPDATE_CI_JOB == "TRUE" # To enable once site is live and cannot be rebuilt anymore
+
+sniffers:patch:
+  stage: sniffers
+  script:
+  - make patchval
+  except:
+    variables:
+      - $RUN_PATCHVAL_CI_JOB == "FALSE" # To use only in case of private packages and if patching upstream is not possible at all
+  only:
+    refs:
+      - branches
+      - merge_requests
 
 sniffers:sonarqube:
   stage: sniffers
