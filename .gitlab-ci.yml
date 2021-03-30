@@ -14,7 +14,7 @@ variables:
 image: skilldlabs/php:74
 
 # Tags defines which runner to use (expected shell runner)
-.runner_tag_selection: &runner_tag_selection
+.runner_tag_selection:
   tags:
     - XXX # Mandatory, should equal to tag of available runner server with docker + docker-compose + traefik
 
