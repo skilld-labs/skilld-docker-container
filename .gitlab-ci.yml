@@ -18,15 +18,6 @@ image: skilldlabs/php:74
   tags:
     - XXX # Mandatory, should equal to tag of available runner server with docker + docker-compose + traefik
 
-.only_branches: &only_branches
-  only:
-    - branches
-
-.only_var_theme: &only_var_theme
-  only:
-    variables:
-      - $THEME_PATH
-
 before_script:
   - date
   - pwd
@@ -43,7 +34,9 @@ sniffers:clang:
   stage: sniffers
   script:
   - make clang
-  <<: *only_branches
+  only:
+    - branches
+    - merge_requests
 
 sniffers:compose:
   stage: sniffers
@@ -51,13 +44,15 @@ sniffers:compose:
   - composer -vvv -V
   # Can't use --strict cause we need dev versions for d9 compatibility
   - time composer validate --profile
-  <<: *only_branches
+  only:
+    - branches
+    - merge_requests
 
 sniffers:front:
   stage: sniffers
   before_script:
-  - date
-  - pwd
+    - date
+    - pwd
   script:
     - make front-install # Dependencies are required for js imports to pass linters
     - make lintval
@@ -74,9 +69,15 @@ sniffers:front:
     expire_in: 1d
     paths:
       - ${THEME_PATH}/node_modules/ # Populated during yarn install
-  <<: *runner_tag_selection
-  <<: *only_var_theme
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    refs:
+      - branches
+      - merge_requests
+      - tags
+    variables:
+      - $THEME_PATH
+
 
 sniffers:phpcs:
   stage: sniffers
@@ -84,23 +85,41 @@ sniffers:phpcs:
   script:
   - docker -v
   - make phpcs
-  <<: *runner_tag_selection
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
 sniffers:newlineeof:
   stage: sniffers
   script:
   - make newlineeof
-  <<: *only_branches
+  only:
+    - branches
+    - merge_requests
 
 sniffers:hookupdate:
   stage: sniffers
   script:
   - make hookupdateval
   only:
+    refs:
+      - branches
+      - merge_requests
     variables:
-      - $RUN_HOOKUPDATE_CI_JOB == "TRUE"
-  <<: *only_branches
+      - $RUN_HOOKUPDATE_CI_JOB == "TRUE" # To enable once site is live and cannot be rebuilt anymore
+
+sniffers:patch:
+  stage: sniffers
+  script:
+  - make patchval
+  except:
+    variables:
+      - $RUN_PATCHVAL_CI_JOB == "FALSE" # To use only in case of private packages and if patching upstream is not possible at all
+  only:
+    refs:
+      - branches
+      - merge_requests
 
 sniffers:sonarqube:
   stage: sniffers
@@ -154,7 +173,11 @@ prepare:back:
       - vendor/
       - web/
       - drush/contrib/
-  <<: *runner_tag_selection
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
+    - tags
 
 prepare:front:
   stage: prepare
@@ -168,8 +191,14 @@ prepare:front:
     expire_in: 1d
     paths:
       - ${THEME_PATH}/dist/ # Populated during yarn build
-  <<: *runner_tag_selection
-  <<: *only_var_theme
+  extends: .runner_tag_selection
+  only:
+    refs:
+      - branches
+      - merge_requests
+      - tags
+    variables:
+      - $THEME_PATH
 
 
 .deploy_template: &deploy_template
@@ -202,8 +231,11 @@ prepare:front:
     - prepare:back
     - prepare:front
   allow_failure: false # https://gitlab.com/gitlab-org/gitlab-foss/-/issues/25892#note_26909808
-  <<: *runner_tag_selection
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
+
 
 deploy:review:
   <<: *deploy_template
@@ -231,8 +263,10 @@ stop_review:
   environment:
     name: review/$CI_COMMIT_REF_NAME
     action: stop
-  <<: *runner_tag_selection
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
 deploy:storybook:
   stage: storybook
@@ -240,18 +274,19 @@ deploy:storybook:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
-  only:
-    variables:
-      - $STORYBOOK_PATH
   script:
   - cd ${BUILD_DIR}
   - make build-storybook
   - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
   except:
     - tags
-  <<: *runner_tag_selection
-  <<: *only_branches
-  <<: *only_var_theme
+  extends: .runner_tag_selection
+  only:
+    refs:
+      - branches
+      - merge_requests
+    variables:
+      - $STORYBOOK_PATH
 
 test:behat:
   stage: tests
@@ -276,8 +311,10 @@ test:behat:
     when: script_failure
   dependencies:
   - deploy:review
-  <<: *runner_tag_selection
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
   artifacts:
     expire_in: 1 week
     when: always
@@ -298,8 +335,10 @@ test:cinsp:
   - make cinsp
   dependencies:
   - deploy:review
-  <<: *runner_tag_selection
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
 test:drupalrector:
   stage: tests
@@ -313,8 +352,10 @@ test:drupalrector:
   - make drupalrectorval
   dependencies:
   - deploy:review
-  <<: *runner_tag_selection
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
 test:lighthouse:
   stage: tests
@@ -340,8 +381,10 @@ test:lighthouse:
     - if [ -d .lighthouseci ]; then mv .lighthouseci web/lighthouseci; echo "- Reports are available here :" && for i in $(find web/lighthouseci/ -name "*.html"); do basename $i;done | xargs -i echo "${CI_ENVIRONMENT_URL}/lighthouseci/{}"; fi
   dependencies:
   - deploy:review
-  <<: *runner_tag_selection
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
 test:contentgen:
   stage: tests
@@ -355,8 +398,10 @@ test:contentgen:
   - make contentgen
   dependencies:
   - deploy:review
-  <<: *runner_tag_selection
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
   when: manual
 
 report:statusreportval:
@@ -371,8 +416,10 @@ report:statusreportval:
   - make statusreportval
   dependencies:
   - deploy:review
-  <<: *runner_tag_selection
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
 test:upgradestatus:
   stage: reports
@@ -386,8 +433,10 @@ test:upgradestatus:
   - make upgradestatusval
   dependencies:
   - deploy:review
-  <<: *runner_tag_selection
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
 report:watchdog:
   stage: reports
@@ -401,6 +450,8 @@ report:watchdog:
   - make watchdogval
   dependencies:
   - deploy:review
-  <<: *runner_tag_selection
-  <<: *only_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 

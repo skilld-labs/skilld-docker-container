@@ -1,3 +1,10 @@
+## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
+sniffers: | clang compval phpcs newlineeof patchval #hookupdateval
+
+## Run all tests & validations (including sniffers)
+tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval
+
+
 # Function for code sniffer images.
 phpcsexec = docker run --rm \
 	-v $(CURDIR)/web/profiles/$(PROFILE_NAME):/work/profile \
@@ -62,13 +69,13 @@ compval:
 	# Can't use --strict cause we need dev versions for d9 compatibility
 	@docker run --rm -v $(CURDIR):/mnt -w /mnt $(IMAGE_PHP) composer validate
 
-## Validate hook_update_N()
+## Validate if hook_update_N() are required
 hookupdateval:
 ifneq ("$(wildcard scripts/makefile/hookupdateval.sh)","")
 	@echo "hook_update_N() validation..."
 	@/bin/sh ./scripts/makefile/hookupdateval.sh
 else
-	@echo "scripts/makefile/hookupdateval.sh.sh file does not exist"
+	@echo "scripts/makefile/hookupdateval.sh file does not exist"
 	@exit 1
 endif
 
@@ -121,6 +128,16 @@ ifneq ("$(wildcard scripts/makefile/newlineeof.sh)","")
 	@/bin/sh ./scripts/makefile/newlineeof.sh
 else
 	@echo "scripts/makefile/newlineeof.sh file does not exist"
+	@exit 1
+endif
+
+## Validate that no custom patch is added to repo
+patchval:
+ifneq ("$(wildcard scripts/makefile/patchval.sh)","")
+	@echo "Patch validation..."
+	@/bin/sh ./scripts/makefile/patchval.sh
+else
+	@echo "scripts/makefile/patchval.sh file does not exist"
 	@exit 1
 endif
 
@@ -181,12 +198,6 @@ else
 	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
 	@exit 1
 endif
-
-## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
-sniffers: | clang compval phpcs newlineeof #hookupdateval
-
-## Run all tests & validations (including sniffers)
-tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval
 
 blackfire:
 ifneq ("$(wildcard scripts/makefile/blackfire.sh)","")
