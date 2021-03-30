@@ -69,6 +69,8 @@ endif
 	make -s down
 	@echo "Build and run containers..."
 	docker-compose up -d --remove-orphans
+	# Set composer2 as default
+	$(call php-0, ln -fs composer2 /usr/bin/composer)
 	$(call php-0, apk add --no-cache tzdata $(ADD_PHP_EXT))
 	# Set up timezone
 	$(call php-0, cp /usr/share/zoneinfo/Europe/Paris /etc/localtime)
