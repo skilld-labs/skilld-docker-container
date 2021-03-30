@@ -143,6 +143,7 @@
     },
     "patches": {
       "drupal/core": {
+        "Let GDToolkit support WEBP image format": "patches/2340699-webp-110-127.patch",
         "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch",
         "Fix multilingual site's layout edit context issue": "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
         "SQLite database locking errors cause fatal errors": "https://www.drupal.org/files/issues/1120020-59.patch",
