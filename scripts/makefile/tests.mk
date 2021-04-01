@@ -1,8 +1,8 @@
 ## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
-sniffers: | clang compval phpcs newlineeof patchval #hookupdateval
+sniffers: | clang compval phpcs newlineeof #hookupdateval
 
 ## Run all tests & validations (including sniffers)
-tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval
+tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval patchval
 
 
 # Function for code sniffer images.
@@ -135,7 +135,8 @@ endif
 patchval:
 ifneq ("$(wildcard scripts/makefile/patchval.sh)","")
 	@echo "Patch validation..."
-	@/bin/sh ./scripts/makefile/patchval.sh
+	@$(call php-0, apk add --no-cache -q jq)
+	@$(call php, /bin/sh ./scripts/makefile/patchval.sh)
 else
 	@echo "scripts/makefile/patchval.sh file does not exist"
 	@exit 1
