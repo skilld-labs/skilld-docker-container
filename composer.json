@@ -59,7 +59,7 @@
     "drupal/views_bulk_edit": "2.x-dev",
     "drupal/views_bulk_operations": "^3.9",
     "drupal/webform": "^6",
-    "drush/drush": "^10.1.0",
+    "drush/drush": "^10.4.1",
     "skilldlabs/drupal-cleanup": "^1"
   },
   "require-dev": {
