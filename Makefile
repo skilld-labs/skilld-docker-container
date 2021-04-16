@@ -98,8 +98,8 @@ else
 endif
 	$(call php, composer create-required-files)
 
-$(eval TESTER_NAME := "tester")
-$(eval TESTER_ROLE := "contributor")
+$(eval TESTER_NAME := tester)
+$(eval TESTER_ROLE := contributor)
 ## Install drupal
 si:
 	@echo "Installing from: $(PROJECT_INSTALL)"
@@ -111,7 +111,7 @@ else
 	$(call php, drush si $(PROFILE_NAME) --db-url="$(DB_URL)" --account-name="$(ADMIN_NAME)" --account-mail="$(ADMIN_MAIL)" --account-pass="$(ADMIN_PW)" -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
 endif
 	$(call php, drush user:create "$(TESTER_NAME)")
-	$(call php, drush user:role:add $(TESTER_ROLE) "$(TESTER_NAME)")
+	$(call php, drush user:role:add "$(TESTER_ROLE)" "$(TESTER_NAME)")
 	$(call php, drush user:password "$(TESTER_NAME)" "$(TESTER_PW)")
 	make content
 	make -s local-settings
@@ -140,7 +140,7 @@ ifneq ("$(wildcard settings/settings.local.php)","")
 	$(call php, drush cr)
 endif
 
-REDIS_IS_INSTALLED := $(shell grep "redis.connection" web/sites/*/settings.php | tail -1 | wc -l || echo "0")
+REDIS_IS_INSTALLED := $(shell grep "redis.connection" web/sites/default/settings.php | tail -1 | wc -l || echo "0")
 redis-settings:
 ifeq ($(REDIS_IS_INSTALLED), 1)
 	@echo "Redis settings already installed, nothing to do"
