@@ -1,6 +1,6 @@
 page:
-  403: ''
-  404: ''
+  403: /403
+  404: /404
   front: '/user/login?destination=/admin/content'
 admin_compact_mode: false
 weight_select_max: 100

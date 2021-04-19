@@ -189,7 +189,10 @@ content:
       linked: true
     third_party_settings: {  }
 hidden:
+  created: true
   langcode: true
   layout_builder__layout: true
   links: true
+  promoted_to_403_page: true
+  promoted_to_404_page: true
   uid: true

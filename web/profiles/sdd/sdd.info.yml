@@ -18,6 +18,7 @@ dependencies:
   - content_translation
   - contextual
   - crop
+  - custom_pub
   - datetime
   - datetime_range
   - dblog

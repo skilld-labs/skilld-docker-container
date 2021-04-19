@@ -25,6 +25,7 @@
     "drupal/core-project-message": "^9.0",
     "drupal/core-recommended": "^9",
     "drupal/core-vendor-hardening": "^9.0",
+    "drupal/custom_pub": "^1.0@beta",
     "drupal/default_content": "^1",
     "drupal/file_entity": "2.x-dev",
     "drupal/focal_point": "^1.4",
