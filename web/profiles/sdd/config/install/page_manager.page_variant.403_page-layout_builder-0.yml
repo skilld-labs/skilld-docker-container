@@ -2,13 +2,13 @@ langcode: en
 status: true
 dependencies:
   config:
-    - page_manager.page.home
-id: home-layout_builder-0
+    - page_manager.page.403_page
+id: 403_page-layout_builder-0
 label: Default
 variant: layout_builder
 variant_settings:
   id: layout_builder
-  uuid: 945cd674-f645-4980-9cf7-1dfe60da06e9
+  uuid: 0ebc93de-e837-43d6-81fa-e8dce5270595
   label: null
   weight: 0
   sections:
@@ -18,10 +18,10 @@ variant_settings:
         label: ''
       components:
         -
-          uuid: abcb5020-16b1-4cf9-8c0d-310f9caf3be8
+          uuid: bbe5a8ad-7f70-4097-9196-bdf35d39a118
           region: content
           configuration:
-            id: 'views_block:promoted-promoted_to_frontpage'
+            id: 'views_block:promoted-promoted_to_403_page'
             label: ''
             provider: views
             label_display: '0'
@@ -31,7 +31,7 @@ variant_settings:
           additional: {  }
           weight: 0
       third_party_settings: {  }
-page: home
+page: 403_page
 weight: 0
 selection_criteria: {  }
 selection_logic: and

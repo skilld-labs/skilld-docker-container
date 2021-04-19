@@ -17,7 +17,7 @@ variant_settings:
     -
       layout_id: layout_onecol
       layout_settings:
-        label: ''
+        label: 'Section : Content'
       components:
         223dc175-e93a-439e-ba53-d1ea581e9941:
           uuid: 223dc175-e93a-439e-ba53-d1ea581e9941
