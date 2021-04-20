@@ -17,7 +17,7 @@ Why not use the built-in registry functionality Gitlab-ci and other repository s
 
 2 files are required : 
 - `.gitlab-ci.yml`
-- `Dockerfile`
+- `scripts/delivery-docker/Dockerfile`
 
 1. Define a delivery CI job like "Delivery 1" in .gitlab-ci.yml, as shown in .gitlab-ci.delivery_via_docker_example.yml
    - To include artefact dependencies, this CI job should be positioned after all dependencies have been built and installed and use the [dependencies](https://docs.gitlab.com/ee/ci/yaml/#dependencies) key word

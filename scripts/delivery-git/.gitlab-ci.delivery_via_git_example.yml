@@ -1,5 +1,5 @@
 # Example of .gitlab-ci.yml jobs
-# Use with scripts/delivery/deliver_current_tag_via_git.sh
+# Use with scripts/delivery-git/deliver_current_tag_via_git.sh
 
 stages:
   - deliver
@@ -37,8 +37,8 @@ Delivery to hoster:
   - echo -e "TARGET_GIT_REPO_BRANCH = $TARGET_GIT_REPO_BRANCH"
   - export TARGET_GIT_REPO_TYPE="${DELIVERY_REMOTE_REPO_TYPE}"
   - echo -e "TARGET_GIT_REPO_TYPE = $TARGET_GIT_REPO_TYPE"
-  - chmod +x scripts/delivery/deliver_current_tag_via_git.sh
-  - ./scripts/delivery/deliver_current_tag_via_git.sh
+  - chmod +x scripts/delivery-git/deliver_current_tag_via_git.sh
+  - ./scripts/delivery-git/deliver_current_tag_via_git.sh
   - echo " - End of CI script"
   artifacts:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:delivery"
