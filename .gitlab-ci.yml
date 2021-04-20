@@ -137,8 +137,10 @@ prepare:back:
     - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
     - echo "CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG}"
     - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
+    - docker network prune -f # Remove unused networks (not referenced by any containers)
     - make back
   after_script:
+    - docker network prune -f # Remove unused networks (not referenced by any containers)
     - docker-compose down -v --remove-orphans # PHP container was required for composer
   cache:
     key:
