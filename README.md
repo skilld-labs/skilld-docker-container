@@ -109,6 +109,7 @@ networks:
 * `make clean` - Totally remove project build folder, files, docker containers and network.
 * `make si` - Install/reinstall site.
 * `make info` - Show project services IP addresses.
+* `make diff` - Show changes in overrides (needs local `diff` command).
 * `make exec` - `docker exec` into php container.
 * `make exec0` - `docker exec` into php container as root.
 * `make dev` - Devel + kint setup, and config for Twig debug mode, disable aggregation.
