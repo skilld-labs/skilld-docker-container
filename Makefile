@@ -176,8 +176,8 @@ endif
 
 ## Output diff between local and versioned files
 diff:
-	diff --color .env .env.default || true; echo ""
-	diff --color docker/docker-compose.override.yml docker/docker-compose.override.yml.default || true; echo ""
+	diff -u0 --color .env .env.default || true; echo ""
+	diff -u0 --color docker/docker-compose.override.yml docker/docker-compose.override.yml.default || true; echo ""
 
 
 ## Run shell in PHP container as regular user
