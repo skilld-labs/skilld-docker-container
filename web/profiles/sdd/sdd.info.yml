@@ -72,6 +72,7 @@ dependencies:
   - redirect_404
   - responsive_image
   - rh_media
+  - rh_node
   - rh_taxonomy
   - rh_user
   - role_delegation
