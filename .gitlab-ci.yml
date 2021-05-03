@@ -158,11 +158,15 @@ prepare:back:
   dependencies: []
   artifacts:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:back"
-    expire_in: 1d
+    expire_in: 12 hrs
     paths:
       - vendor/
       - web/
-      - drush/contrib/
+      - drush/
+    exclude:
+      - web/modules/custom/
+      - web/themes/custom/
+      - web/profiles/sdd/
   extends: .runner_tag_selection
   only:
     - branches
@@ -178,7 +182,7 @@ prepare:front:
     - sniffers:front
   artifacts:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
-    expire_in: 1d
+    expire_in: 12 hrs
     paths:
       - ${THEME_PATH}/dist/ # Populated during yarn build
   extends: .runner_tag_selection
