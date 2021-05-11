@@ -97,9 +97,15 @@ services:
 # Uncomment for MacOS.
 #    ports:
 #    - "8088:80"
-# Mount local folder with ssl keys.
-#    volumes:
-#     - ./nginx/ssl:/etc/nginx/ssl:Z
+    build: skilld-docker-nginx/18
+#    image: skilld-docker-nginx/18
+
+    ports:
+      - 443:443
+      - 80:80
+    # Mount local folder with ssl keys.
+    volumes:
+     - ./nginx/ssl:/etc/nginx/ssl:Z
     labels:
       - 'traefik.enable=true'
       # Treafik 1.x
