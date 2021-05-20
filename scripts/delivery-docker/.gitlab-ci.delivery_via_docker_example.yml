@@ -16,9 +16,9 @@ stages:
   except:
     - branches
   after_script:
-    - docker rmi -f ${CI_PROJECT_NAME}-artifact:${CI_COMMIT_REF_NAME}
-    - docker rmi -f ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1}/${CI_PROJECT_NAME}-artifact:${CI_COMMIT_REF_NAME}
-    - docker images --quiet --filter=dangling=true | xargs --no-run-if-empty docker rmi -f
+    - docker rmi -f ${CI_PROJECT_NAME}/artifact:${CI_COMMIT_REF_NAME}
+    - docker rmi -f ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1}/${CI_PROJECT_NAME}/artifact:${CI_COMMIT_REF_NAME}
+    - docker images --quiet --filter=dangling=true | xargs --no-run-if-empty docker rmi -f 2> /dev/null
     - docker images
 
 delivery:
@@ -33,13 +33,13 @@ delivery:
   - echo ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1}
   - echo ${DELIVERY_REPOSITORIES_USERNAME}
   - docker info
-  - docker build -t ${CI_PROJECT_NAME}-artifact:${CI_COMMIT_REF_NAME} -f scripts/delivery-docker/Dockerfile . --no-cache --force-rm --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` --build-arg BUILD_URL="${CI_PROJECT_URL}" --build-arg BUILD_DESC="Drupal build artifact" --build-arg BUILD_NAME="${CI_PROJECT_NAME}" --build-arg BUILD_MAINTAINER="${CI_PROJECT_NAME}/mgmt@skilld.cloud"
-  - docker tag ${CI_PROJECT_NAME}-artifact:${CI_COMMIT_REF_NAME} ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1}/${CI_PROJECT_NAME}-artifact:${CI_COMMIT_REF_NAME}
-  - docker tag ${CI_PROJECT_NAME}-artifact:${CI_COMMIT_REF_NAME} ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1}/${CI_PROJECT_NAME}-artifact:latest
-  - docker inspect ${CI_PROJECT_NAME}-artifact:${CI_COMMIT_REF_NAME}
+  - docker build -t ${CI_PROJECT_NAME}/artifact:${CI_COMMIT_REF_NAME} -f scripts/delivery-docker/Dockerfile . --no-cache --force-rm --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` --build-arg BUILD_URL="${CI_PROJECT_URL}" --build-arg BUILD_DESC="Drupal build artifact" --build-arg BUILD_NAME="${CI_PROJECT_NAME}" --build-arg BUILD_MAINTAINER="${CI_PROJECT_NAME}/mgmt@skilld.cloud"
+  - docker tag ${CI_PROJECT_NAME}/artifact:${CI_COMMIT_REF_NAME} ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1}/${CI_PROJECT_NAME}/artifact:${CI_COMMIT_REF_NAME}
+  - docker tag ${CI_PROJECT_NAME}/artifact:${CI_COMMIT_REF_NAME} ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1}/${CI_PROJECT_NAME}/artifact:latest
+  - docker inspect ${CI_PROJECT_NAME}/artifact:${CI_COMMIT_REF_NAME}
   - docker login ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1} --username ${DELIVERY_REPOSITORIES_USERNAME} --password ${DELIVERY_REPOSITORIES_PASSWORD}
-  - docker push ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1}/${CI_PROJECT_NAME}-artifact:${CI_COMMIT_REF_NAME}
-  - docker push ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1}/${CI_PROJECT_NAME}-artifact:latest
+  - docker push ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1}/${CI_PROJECT_NAME}/artifact:${CI_COMMIT_REF_NAME}
+  - docker push ${DELIVERY_REPOSITORIES_DOCKER_REGISTRY_DOMAIN_1}/${CI_PROJECT_NAME}/artifact:latest
   - echo " - End of CI job"
   artifacts:
     name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:delivery"
