@@ -1,6 +1,10 @@
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  config:
+    - core.entity_view_mode.media.full
+  module:
+    - media
 name: 'Restricted HTML'
 format: restricted_html
 weight: 0
@@ -11,7 +15,7 @@ filters:
     status: true
     weight: -10
     settings:
-      allowed_html: '<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type> <li> <dl> <dt> <dd> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <p> <u> <s> <sup> <sub> <span lang dir> <table> <caption> <tbody> <thead> <tfoot> <th> <td> <tr> <hr>'
+      allowed_html: '<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type> <li> <dl> <dt> <dd> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <p> <u> <s> <sup> <sub> <span lang dir> <table> <caption> <tbody> <thead> <tfoot> <th> <td> <tr> <hr> <drupal-media data-entity-type data-entity-uuid>'
       filter_html_help: true
       filter_html_nofollow: false
   filter_autop:
@@ -27,3 +31,12 @@ filters:
     weight: 0
     settings:
       filter_url_length: 72
+  media_embed:
+    id: media_embed
+    provider: media
+    status: true
+    weight: 100
+    settings:
+      default_view_mode: full
+      allowed_view_modes: {  }
+      allowed_media_types: {  }

@@ -11,7 +11,7 @@ LOG_COUNT=$(drush watchdog-show --filter="severity~=#($MESSAGES_SEVERITY)#" --fo
 # Exit1 and alert if logs
 if [ "$LOG_COUNT" -gt "0" ]; then
 	printf "There are \033[1m$LOG_COUNT messages\033[0m in logs to fix :\n"
-	drush watchdog-show --filter="severity~=#($MESSAGES_SEVERITY)#" --format=string
+	drush watchdog-show --filter="severity~=#($MESSAGES_SEVERITY)#" --format=string --extended --count=100
 	exit 1
 else
 	echo -e "Watchdog is valid : No message of high severity in logs ($MESSAGES_SEVERITY)"

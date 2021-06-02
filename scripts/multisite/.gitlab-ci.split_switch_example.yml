@@ -1,0 +1,52 @@
+# Example of .gitlab-ci.yml jobs
+# Use with config_split.mk and config_split_disable_all.sh
+
+## Overhead config
+
+stages:
+  - deploy
+
+# Tags defines which runner to use (expected shell runner)
+.ra_tags: &ra_tags
+  tags:
+    - XXX # Mandatory, should equal to tag of available runner server with docker + docker-compose + traefik
+
+.ra_only: &ra_only
+  only:
+    - branches
+
+## Multisite config
+
+Enable split default:
+  stage: deploy
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - pwd
+  - make split default
+  when: manual
+  <<: *ra_tags
+  <<: *ra_only
+
+Enable split first:
+  stage: deploy
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - pwd
+  - make split first # Vary for each site
+  when: manual
+  <<: *ra_tags
+  <<: *ra_only
+
+Enable split second: # Job can then be duplicated to navigate between to multiple set of config (just use a different make split command for each)
+  ...
+

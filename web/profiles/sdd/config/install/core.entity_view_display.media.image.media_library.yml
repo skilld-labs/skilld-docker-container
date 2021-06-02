@@ -4,18 +4,10 @@ dependencies:
   config:
     - core.entity_view_mode.media.media_library
     - field.field.media.image.field_media_image
-    - field.field.media.image.text_short
     - image.style.medium
     - media.type.image
   module:
-    - field_layout
-    - image
-    - layout_discovery
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings:
-      label: ''
+    - svg_image
 id: media.image.media_library
 targetEntityType: media
 bundle: image
@@ -23,17 +15,20 @@ mode: media_library
 content:
   thumbnail:
     type: image
+    weight: 0
+    region: content
     label: hidden
     settings:
       image_style: medium
       image_link: ''
-    weight: 0
+      svg_render_as_image: true
+      svg_attributes:
+        width: null
+        height: null
     third_party_settings: {  }
-    region: content
 hidden:
   created: true
   field_media_image: true
   langcode: true
   name: true
-  text_short: true
   uid: true

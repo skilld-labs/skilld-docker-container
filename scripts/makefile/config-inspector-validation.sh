@@ -12,6 +12,7 @@ if [ "$ERROR_COUNT" -gt "0" ]; then
 	echo -e "\nConfiguration is not valid : \n- Go to \033[1m/admin/config/development/configuration/inspect\033[0m for more details\n"
 	exit 1
 else
+	drush pmu config_inspector -y
 	echo -e "Configuration is valid"
 	exit 0
 fi

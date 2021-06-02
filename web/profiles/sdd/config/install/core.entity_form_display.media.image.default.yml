@@ -3,19 +3,11 @@ status: true
 dependencies:
   config:
     - field.field.media.image.field_media_image
-    - field.field.media.image.text_short
-    - image.style.thumbnail
+    - image.style.media_library
     - media.type.image
   module:
-    - field_layout
-    - image
-    - layout_discovery
+    - focal_point
     - path
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings:
-      label: ''
 id: media.image.default
 targetEntityType: media
 bundle: image
@@ -23,36 +15,30 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: 5
+    weight: 10
     region: content
     settings: {  }
     third_party_settings: {  }
   field_media_image:
-    weight: 1
     settings:
+      preview_image_style: media_library
+      offsets: '50,50'
       progress_indicator: throbber
-      preview_image_style: thumbnail
+      preview_link: false
     third_party_settings: {  }
-    type: image_image
+    type: image_focal_point
+    weight: 0
     region: content
   langcode:
     type: language_select
-    weight: 3
+    weight: 2
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
-  name:
-    type: string_textfield
-    weight: 0
-    region: content
-    settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
   path:
     type: path
-    weight: 7
+    weight: 30
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -60,30 +46,23 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 8
+    weight: 100
     region: content
     third_party_settings: {  }
-  text_short:
-    weight: 2
-    settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: string_textfield
-    region: content
   translation:
-    weight: 6
+    weight: 10
     region: content
     settings: {  }
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 4
+    weight: 5
     settings:
       match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
-      match_limit: 10
     region: content
     third_party_settings: {  }
-hidden: {  }
+hidden:
+  name: true

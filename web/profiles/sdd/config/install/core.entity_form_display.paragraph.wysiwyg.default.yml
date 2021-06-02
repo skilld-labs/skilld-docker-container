@@ -5,14 +5,7 @@ dependencies:
     - field.field.paragraph.wysiwyg.wysiwyg
     - paragraphs.paragraphs_type.wysiwyg
   module:
-    - field_layout
-    - layout_discovery
     - text
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings:
-      label: ''
 id: paragraph.wysiwyg.default
 targetEntityType: paragraph
 bundle: wysiwyg

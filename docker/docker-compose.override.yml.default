@@ -1,30 +1,60 @@
-version: "2.1"
+version: "2.4"
+
+x-service-defaults:
+  &service-defaults
+  restart: always
+  networks:
+    - front
+
+x-service-rewrelic:
+  &service-newrelic
+  newrelic:
+    <<: *service-defaults
+    image: newrelic/php-daemon
+    container_name: "${COMPOSE_PROJECT_NAME}_newrelic"
 
 services:
+#  <<: *service-newrelic
 
 # Override base service.
   php:
     environment:
       COMPOSER_MEMORY_LIMIT: "-1"
+#      BLACKFIRE_CLIENT_ID: x
+#      BLACKFIRE_CLIENT_TOKEN: x
+#      NEW_RELIC_APPNAME: "${COMPOSE_PROJECT_NAME}"
     volumes:
       - "./90-mail.ini:/etc/php7/conf.d/90-mail.ini:z"
 #    depends_on:
 #      - mysql
+#      - postgresql
 # Uncomment next line if you need PHP XDebug.
 #    command: php-fpm7 -F -d zend_extension=xdebug.so
 
+# Get access keys from https://blackfire.io/my/profiles
+# Then download extension using "make blackfire"
+
+#  blackfire:
+#    <<: *service-defaults
+#    image: blackfire/blackfire
+#    container_name: "${COMPOSE_PROJECT_NAME}_blackfire"
+#    environment:
+#      BLACKFIRE_SERVER_ID: x
+#      BLACKFIRE_SERVER_TOKEN: x
+#      BLACKFIRE_LOG_LEVEL: 1
+
 #  adminer:
-#    image: dockette/adminer:mysql-php7
+#    <<: *service-defaults
+#    image: adminer:standalone
 #    container_name: "${COMPOSE_PROJECT_NAME}_adminer"
 #    links:
 #      - mysql:mysql
 #    depends_on:
 #      - mysql
-#    networks:
-#      - front
 
 #  mysql:
-#    image: percona:5.7.22
+#    <<: *service-defaults
+#    image: percona:5.7
 #    container_name: "${COMPOSE_PROJECT_NAME}_mysql"
 #    volumes:
 #      - ${DB_DATA_DIR}/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:Z
@@ -33,22 +63,35 @@ services:
 #      MYSQL_USER: d8
 #      MYSQL_PASSWORD: d8
 #      MYSQL_ROOT_PASSWORD: d8root
-#    restart: always
-#    networks:
-#      - front
+
+#  postgresql:
+#    <<: *service-defaults
+#    image: postgres:12.2-alpine
+#    container_name: "${COMPOSE_PROJECT_NAME}_pgsql"
+#    volumes:
+#      - ${DB_DATA_DIR}/${COMPOSE_PROJECT_NAME}_pgsql:/var/lib/postgresql/data:Z
+#    environment:
+#      POSTGRES_DB: d9
+#      POSTGRES_USER: d9
+#      POSTGRES_PASSWORD: d9root
+#      PGDATA: /var/lib/postgresql/data
 
   mailhog:
+    <<: *service-defaults
     image: skilldlabs/mailhog
     container_name: "${COMPOSE_PROJECT_NAME}_mail"
-    restart: always
-    networks:
-      - front
     labels:
       - 'traefik.enable=true'
+      # Treafik 1.x
       - 'traefik.backend=${MAIN_DOMAIN_NAME}_mail'
-      - 'traefik.port=8025'
       - 'traefik.frontend.rule=Host:mail-${MAIN_DOMAIN_NAME}'
       - 'traefik.frontend.redirect.entryPoint=https'
+      - 'traefik.port=8025'
+      # Treafik 2.x
+      - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.rule=Host(`mail-${MAIN_DOMAIN_NAME}`)'
+      - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
+      - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.tls=true'
+      - 'traefik.http.services.mailhog-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8025'
 
   nginx:
 # Uncomment for MacOS.
@@ -59,15 +102,46 @@ services:
 #     - ./nginx/ssl:/etc/nginx/ssl:Z
     labels:
       - 'traefik.enable=true'
+      # Treafik 1.x
       - 'traefik.backend=${MAIN_DOMAIN_NAME}_web'
-      - 'traefik.port=80'
       - 'traefik.frontend.rule=Host:${MAIN_DOMAIN_NAME}'
       - 'traefik.frontend.redirect.entryPoint=https'
+      - 'traefik.port=80'
+      # Treafik 2.x
+      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.rule=Host(`${MAIN_DOMAIN_NAME}`)'
+      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
+      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls=true'
 
-#networks:
-#  front:
-#    driver: bridge
-#    ipam:
-#      driver: default
-#      config:
-#        - subnet: "${IPRANGE}"
+#  apache:
+#  Uncomment for MacOS.
+#     ports:
+#     - "8088:80"
+#  Mount local folder with ssl keys.
+#     volumes:
+#      - ./apache/ssl:/etc/apache2/ssl:Z
+#    labels:
+#      - 'traefik.enable=true'
+#      # Treafik 1.x
+#      - 'traefik.backend=${MAIN_DOMAIN_NAME}_web'
+#      - 'traefik.frontend.rule=Host:${MAIN_DOMAIN_NAME}'
+#      - 'traefik.frontend.redirect.entryPoint=https'
+#      - 'traefik.port=80'
+#      # Treafik 2.x
+#      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.rule=Host(`${MAIN_DOMAIN_NAME}`)'
+#      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
+#      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.tls=true'
+
+#  solr:
+#    labels:
+#      - 'traefik.enable=true'
+#      # Treafik 1.x
+#      - 'traefik.backend=${MAIN_DOMAIN_NAME}_solr'
+#      - 'traefik.frontend.rule=Host:solr-${MAIN_DOMAIN_NAME}'
+#      - 'traefik.frontend.redirect.entryPoint=https'
+#      - 'traefik.port=8983'
+#      # Treafik 2.x
+#      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.rule=Host(`solr-${MAIN_DOMAIN_NAME}`)'
+#      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
+#      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.tls=true'
+#      - 'traefik.http.services.solr-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8983'
+

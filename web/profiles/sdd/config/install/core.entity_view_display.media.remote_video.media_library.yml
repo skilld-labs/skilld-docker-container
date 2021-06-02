@@ -7,14 +7,7 @@ dependencies:
     - image.style.medium
     - media.type.remote_video
   module:
-    - field_layout
-    - image
-    - layout_discovery
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings:
-      label: ''
+    - svg_image
 id: media.remote_video.media_library
 targetEntityType: media
 bundle: remote_video
@@ -22,13 +15,13 @@ mode: media_library
 content:
   thumbnail:
     type: image
+    weight: 0
+    region: content
     label: hidden
     settings:
       image_style: medium
       image_link: ''
-    weight: 0
     third_party_settings: {  }
-    region: content
 hidden:
   created: true
   field_media_oembed_video: true

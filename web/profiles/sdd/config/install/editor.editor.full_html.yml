@@ -22,6 +22,7 @@ settings:
             - Strike
             - Superscript
             - Subscript
+            - '-'
             - RemoveFormat
             - JustifyLeft
             - JustifyCenter
@@ -32,8 +33,9 @@ settings:
             - Table
             - SpecialChar
             - ShowBlocks
+            - DrupalMediaLibrary
         -
-          name: Links
+          name: Linking
           items:
             - DrupalLink
             - DrupalUnlink
@@ -67,5 +69,5 @@ image_upload:
   directory: inline-images
   max_size: ''
   max_dimensions:
-    width: null
-    height: null
+    width: 0
+    height: 0

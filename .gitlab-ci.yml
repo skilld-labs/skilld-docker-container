@@ -1,20 +1,22 @@
-# Variables to add in Gitalb UI : Settings > CI/CI
-# - REVIEW_DOMAIN // Mandatory, should equal to DNS of available runner server with docker + docker-compose
+# Variables to add in Gitalb UI : Settings > CI/CD
 # - SONAR_HOST // Optional
 # - SONAR_TOKEN // Optional
-
-# Tags defines which runner to use (expected shell runner)
-.ra_tags_branches: &ra_tags_branches
-  tags:
-    - review-apps-4
-  only:
-    - branches
-
-image: skilldlabs/php:73
+# - NEW_RELIC_LICENSE_KEY // Optional
+# - RUN_HOOKUPDATE_CI_JOB // Optional
 
 variables:
-  GIT_DEPTH: "3"
-  THEME_PATH: "" # update to enable front jobs
+  GIT_DEPTH: "10"
+  THEME_PATH: "" # Update to enable front jobs (web/themes/custom/XXX)
+  STORYBOOK_PATH: "" # Update to enable storybook job (themes/custom/XXX/dist/storybook/index.html)
+  GIT_STRATEGY: fetch
+  REVIEW_DOMAIN: "XXX.XXX.com" # Mandatory, should equal to DNS of available runner server with docker + docker-compose + traefik
+
+image: skilldlabs/php:74
+
+# Tags defines which runner to use (expected shell runner)
+.runner_tag_selection:
+  tags:
+    - XXX # Mandatory, should equal to tag of available runner server with docker + docker-compose + traefik
 
 before_script:
   - date
@@ -24,61 +26,88 @@ stages:
   - sniffers
   - prepare
   - deploy
+  - storybook
   - tests
   - reports
-
 
 sniffers:clang:
   stage: sniffers
   script:
   - make clang
+  only:
+    - branches
+    - merge_requests
 
 sniffers:compose:
   stage: sniffers
   script:
   - composer -vvv -V
-  - time composer validate --profile --strict
+  # Can't use --strict cause we need dev versions for d9 compatibility
+  - time composer validate --profile
+  only:
+    - branches
+    - merge_requests
 
 sniffers:front:
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}-front
-    paths:
-      - ${THEME_PATH}/node_modules/
   stage: sniffers
-  image: node:lts-alpine
   before_script:
-  - date
-  - pwd
-  - node -v
-  - yarn -v
+    - date
+    - pwd
   script:
-    - cd ${THEME_PATH}
-    - yarn install --no-optional --prod
-    - yarn run lint
+    - make front-install # Dependencies are required for js imports to pass linters
+    - make lintval
+  cache:
+    key:
+      files:
+      # Until https://gitlab.com/gitlab-org/gitlab/issues/118466 lands ...
+        - web/themes/custom/XXX/package.json # ... this path has to be hardcoded
+        - web/themes/custom/XXX/yarn.lock # ... this path has to be hardcoded
+    paths:
+      - ${THEME_PATH}/node_modules/ # Populated during yarn install
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
+    expire_in: 1d
+    paths:
+      - ${THEME_PATH}/node_modules/ # Populated during yarn install
+  extends: .runner_tag_selection
   only:
+    refs:
+      - branches
+      - merge_requests
+      - tags
     variables:
       - $THEME_PATH
+
 
 sniffers:phpcs:
   stage: sniffers
   image: skilldlabs/docker-phpcs-drupal
   script:
-  - ls -lah
   - docker -v
   - make phpcs
-  <<: *ra_tags_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
 sniffers:newlineeof:
   stage: sniffers
   script:
-  - ls -lah
   - make newlineeof
+  only:
+    - branches
+    - merge_requests
 
 sniffers:hookupdate:
   stage: sniffers
   script:
   - make hookupdateval
-  when: manual # Remove to run automatically when site is live
+  only:
+    refs:
+      - branches
+      - merge_requests
+    variables:
+      - $RUN_HOOKUPDATE_CI_JOB == "TRUE" # To enable once site is live and cannot be rebuilt anymore
 
 sniffers:sonarqube:
   stage: sniffers
@@ -96,55 +125,96 @@ sniffers:sonarqube:
   - master
   allow_failure: true
 
-prepare:front:
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}-front
-    paths:
-      - ${THEME_PATH}/node_modules/
+
+prepare:back:
   stage: prepare
   script:
-  - make front
-  artifacts:
-    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA"
+    - docker --version
+    - docker-compose --version
+    - pwd
+    - ls -la
+    - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
+    - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
+    - echo "CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG}"
+    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
+    - docker network prune -f # Remove unused networks (not referenced by any containers)
+    - make back
+  after_script:
+    - docker network prune -f # Remove unused networks (not referenced by any containers)
+    - docker-compose down -v --remove-orphans # PHP container was required for composer
+  cache:
+    key:
+      files:
+        - composer.json
+        - composer.lock
     paths:
-      - ${THEME_PATH}/dist/
+      - vendor/
+      - web/core/
+      - web/libraries/
+      - web/modules/contrib/
+      - web/profiles/contrib/
+      - web/themes/contrib/
+      - drush/contrib/
+  dependencies: []
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:back"
+    expire_in: 12 hrs
+    paths:
+      - vendor/
+      - web/
+      - drush/
+    exclude:
+      - web/modules/custom/
+      - web/themes/custom/
+      - web/profiles/sdd/
+  extends: .runner_tag_selection
   only:
+    - branches
+    - merge_requests
+    - tags
+
+prepare:front:
+  stage: prepare
+  script:
+    - make front-install
+    - make front-build
+  dependencies:
+    - sniffers:front
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:front"
+    expire_in: 12 hrs
+    paths:
+      - ${THEME_PATH}/dist/ # Populated during yarn build
+  extends: .runner_tag_selection
+  only:
+    refs:
+      - branches
+      - merge_requests
+      - tags
     variables:
       - $THEME_PATH
-  <<: *ra_tags_branches
 
-.job_deploy_commit_template: &job_deploy_commit
+
+.deploy_template: &deploy_template
   stage: deploy
-  before_script:
-    - date; pwd; ls -lahq;
-    - echo "Clean-up build dir ${BUILD_DIR}"
-    # Always down previous environment.
-    - (if [ -d ${BUILD_DIR} ]; then date; cd ${BUILD_DIR}; pwd; make clean; cd -; rm -rf ${BUILD_DIR}; fi)
-  script:
-    - echo "Removed previous review app ${CI_ENVIRONMENT_URL} from ${BUILD_DIR}."
-  dependencies:
-    - sniffers:phpcs
-  <<: *ra_tags_branches
-
-deploy:review:
-  <<: *job_deploy_commit
   script:
     - echo "Deploy ${CI_ENVIRONMENT_URL} review app to ${BUILD_DIR}."
     - echo "CI_ENVIRONMENT_NAME=${CI_ENVIRONMENT_NAME}"
     - echo "CI_ENVIRONMENT_SLUG=${CI_ENVIRONMENT_SLUG}"
+    - echo "CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG}"
     - echo "CI_ENVIRONMENT_URL=${CI_ENVIRONMENT_URL}"
     - echo "CI_PROJECT_PATH_SLUG=${CI_PROJECT_PATH_SLUG}"
     - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
     - echo "REVIEW_DOMAIN=${REVIEW_DOMAIN}"
     - mkdir -p ${BUILD_DIR}
-    - rsync -ah --exclude=.git --delete ./ ${BUILD_DIR}
+    - rsync -ah --exclude=.git --exclude=.cache --delete ./ ${BUILD_DIR}
     - cd ${BUILD_DIR}
-    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-${CI_ENVIRONMENT_SLUG}" >> .env.default
+    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
     - echo "MAIN_DOMAIN_NAME=${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}" >> .env.default
     - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
     - docker --version
     - docker-compose --version
-    - make all MAKE_ENV=ci
+    - make all_ci
   after_script:
     - echo "Started ${CI_ENVIRONMENT_URL} composition in ${BUILD_DIR} from Makefile."
   environment:
@@ -152,19 +222,65 @@ deploy:review:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   dependencies:
+    - prepare:back
     - prepare:front
+  allow_failure: false # https://gitlab.com/gitlab-org/gitlab-foss/-/issues/25892#note_26909808
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
+
+
+deploy:review:
+  <<: *deploy_template
   when: manual
-  allow_failure: false
+  except:
+  - master
+
+deploy:master:
+  <<: *deploy_template
+  when: always
+  only:
+  - master
 
 stop_review:
-  <<: *job_deploy_commit
+  stage: deploy
+  dependencies: []
+  script:
+    - date; pwd; ls -lahq;
+    - echo "Clean-up build dir ${BUILD_DIR}"
+    - (if [ -d ${BUILD_DIR} ]; then date; cd ${BUILD_DIR}; pwd; make clean; cd -; rm -rf ${BUILD_DIR}; fi)
+    - echo "Removed previous review app ${CI_ENVIRONMENT_URL} from ${BUILD_DIR}."
   variables:
     GIT_STRATEGY: none
   when: manual
   environment:
     name: review/$CI_COMMIT_REF_NAME
     action: stop
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
+deploy:storybook:
+  stage: storybook
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - cd ${BUILD_DIR}
+  - make build-storybook
+  - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
+  except:
+    - tags
+  extends: .runner_tag_selection
+  only:
+    refs:
+      - branches
+      - merge_requests
+    variables:
+      - $STORYBOOK_PATH
 
 test:behat:
   stage: tests
@@ -175,10 +291,7 @@ test:behat:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
-  - ls -lah
-  - ls -lah vendor/bin/
-  - make behat
+  - BEHAT_ARGS='--colors -f pretty -o std -f junit -o features/junit' make behat
   after_script:
   - cd ${BUILD_DIR}
   - make browser_driver_stop
@@ -186,13 +299,23 @@ test:behat:
   - mkdir web/screenshots
   - mv features/*.png web/screenshots/
   - echo "- Screenshots are available here :" && cd web/screenshots && ls -h *.png | xargs -i echo "${CI_ENVIRONMENT_URL}/screenshots/{}"
+  - mv ${BUILD_DIR}/features/junit ${CI_PROJECT_DIR}
   retry:
     max: 2
     when: script_failure
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
-  allow_failure: false
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+      - junit/*.xml
+    reports:
+      junit: junit/*.xml
 
 test:cinsp:
   stage: tests
@@ -203,13 +326,15 @@ test:cinsp:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
   - make cinsp
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
-test:drupalcheck:
+test:drupalrector:
   stage: tests
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
@@ -218,12 +343,42 @@ test:drupalcheck:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
-  - ls -lah
-  - make drupalcheckval
+  - make drupalrectorval
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
+
+test:lighthouse:
+  stage: tests
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+    - echo "Starting job script in ${BUILD_DIR}"
+    - cd ${BUILD_DIR}
+    - cat lighthouserc.yml
+    - docker run --tty --rm --init -d -v `pwd`:`pwd` -w `pwd` -u $(id -u):$(id -g) --entrypoint="/bin/bash" --name "${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse" cypress/browsers:node14.15.0-chrome86-ff82
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse node -v
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse npm -v
+    - docker exec --tty -u root ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse npm install -g @lhci/cli@0.6.x
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci --version
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci healthcheck
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci collect --url=https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci assert
+  after_script:
+    - if [ -n `docker ps -f 'name=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse' --format '{{.Names}}'` ]; then echo 'Stopping container'; docker rm --force ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse; fi
+    - cd ${BUILD_DIR}
+    - if [ -d .lighthouseci ]; then mv .lighthouseci web/lighthouseci; echo "- Reports are available here :" && for i in $(find web/lighthouseci/ -name "*.html"); do basename $i;done | xargs -i echo "${CI_ENVIRONMENT_URL}/lighthouseci/{}"; fi
+  dependencies:
+  - deploy:review
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
 test:contentgen:
   stage: tests
@@ -234,12 +389,33 @@ test:contentgen:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
   - make contentgen
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
   when: manual
+
+test:patch:
+  stage: tests
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - make patchval
+  extends: .runner_tag_selection
+  except:
+    variables:
+      - $RUN_PATCHVAL_CI_JOB == "FALSE" # To use only in case of private packages and if patching upstream is not possible at all
+  only:
+    refs:
+      - branches
+      - merge_requests
 
 report:statusreportval:
   stage: reports
@@ -250,11 +426,30 @@ report:statusreportval:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
   - make statusreportval
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
+
+test:upgradestatus:
+  stage: reports
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - echo "Starting job script in ${BUILD_DIR}"
+  - cd ${BUILD_DIR}
+  - make upgradestatusval
+  dependencies:
+  - deploy:review
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
 
 report:watchdog:
   stage: reports
@@ -265,8 +460,11 @@ report:watchdog:
   script:
   - echo "Starting job script in ${BUILD_DIR}"
   - cd ${BUILD_DIR}
-  - pwd
   - make watchdogval
   dependencies:
   - deploy:review
-  <<: *ra_tags_branches
+  extends: .runner_tag_selection
+  only:
+    - branches
+    - merge_requests
+

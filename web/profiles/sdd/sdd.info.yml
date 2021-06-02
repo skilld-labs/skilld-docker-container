@@ -1,40 +1,58 @@
 name: SDD
 type: profile
 description: 'Skill drupal development installation profile for content projects'
-core: 8.x
+core_version_requirement: ^8 || ^9
 
 dependencies:
   - automated_cron
   - big_pipe
   - block
   - block_content
+  - block_content_permissions
   - breakpoint
   - ckeditor
   - color
   - config
+  - config_override_warn
   - config_translation
   - content_translation
   - contextual
+  - crop
+  - custom_pub
   - datetime
   - datetime_range
   - dblog
   - dynamic_page_cache
   - editor
   - field
-  - field_layout
   - field_ui
   - file
+  - file_mdm_exif
   - filter
+  - focal_point
+  - formblock
+  - gin_login
+  - gin_toolbar
   - google_tag
   - help
+  - honeypot
   - image
+  - imagemagick
   - language
+  - layout_builder
+  - layout_builder_modal
+  - layout_builder_restrictions
   - layout_discovery
+  - layout_library
+  - layout_paragraphs
+  - lb_ux
   - link
   - locale
+  - mailsystem
   - manage_display
   - media
   - media_library
+  - menu_admin_per_menu
   - menu_link_attributes
   - menu_link_content
   - menu_ui
@@ -43,35 +61,52 @@ dependencies:
   - page_cache
   - page_manager
   - page_manager_ui
-  - paragraphs
   - panels
   - panels_everywhere
+  - paragraphs
   - path
+  - path_alias
   - pathauto
   - quickedit
-  - redirect
+  - rabbit_hole
   - rdf
+  - redirect
+  - redirect_404
   - responsive_image
+  - rh_media
+  - rh_node
+  - rh_taxonomy
+  - rh_user
+  - role_delegation
   - shortcut
+  - sophron
+  - sophron_guesser
+  - svg_image
+  - svg_image_responsive
+  - swiftmailer
   - system
   - taxonomy
   - telephone
-  - text
   - telephone_validation
+  - text
+  - token
   - toolbar
   - update
   - user
+  - username_enumeration_prevention
+  - userprotect
   - views
-  - views_ui
   - views_bulk_edit
   - views_bulk_operations
+  - views_ui
   - webform
   - webform_ui
 
 themes:
-  - bartik
+  - claro
+  - gin
   - seven
 
 keep_english: true
 'interface translation project': sdd
-'interface translation server pattern': 'profiles/sdd/%language_custom.po'
+'interface translation server pattern': 'profiles/sdd/%language.po'

@@ -3,7 +3,7 @@ status: true
 dependencies: {  }
 id: remote_video
 label: 'Remote video'
-description: 'Allow to add videos hosted on third party services like Youtube or Vimeo'
+description: 'A remotely hosted video from YouTube or Vimeo.'
 source: 'oembed:video'
 queue_thumbnail_downloads: false
 new_revision: true

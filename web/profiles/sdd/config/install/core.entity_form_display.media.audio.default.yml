@@ -2,18 +2,11 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.audio.field_media_file
+    - field.field.media.audio.field_media_audio_file
     - media.type.audio
   module:
-    - field_layout
     - file
-    - layout_discovery
     - path
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings:
-      label: ''
 id: media.audio.default
 targetEntityType: media
 bundle: audio
@@ -25,7 +18,7 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
-  field_media_file:
+  field_media_audio_file:
     weight: 0
     settings:
       progress_indicator: throbber
@@ -38,14 +31,6 @@ content:
     region: content
     settings:
       include_locked: true
-    third_party_settings: {  }
-  name:
-    type: string_textfield
-    weight: -5
-    region: content
-    settings:
-      size: 60
-      placeholder: ''
     third_party_settings: {  }
   path:
     type: path
@@ -70,9 +55,10 @@ content:
     weight: 5
     settings:
       match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
-      match_limit: 10
     region: content
     third_party_settings: {  }
-hidden: {  }
+hidden:
+  name: true

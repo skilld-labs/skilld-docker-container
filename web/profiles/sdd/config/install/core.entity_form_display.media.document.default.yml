@@ -2,18 +2,11 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.document.field_media_file
+    - field.field.media.document.field_media_document
     - media.type.document
   module:
-    - field_layout
     - file
-    - layout_discovery
     - path
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings:
-      label: ''
 id: media.document.default
 targetEntityType: media
 bundle: document
@@ -25,12 +18,12 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
-  field_media_file:
-    weight: 0
+  field_media_document:
     settings:
       progress_indicator: throbber
     third_party_settings: {  }
     type: file_generic
+    weight: 0
     region: content
   langcode:
     type: language_select
@@ -38,14 +31,6 @@ content:
     region: content
     settings:
       include_locked: true
-    third_party_settings: {  }
-  name:
-    type: string_textfield
-    weight: -5
-    region: content
-    settings:
-      size: 60
-      placeholder: ''
     third_party_settings: {  }
   path:
     type: path
@@ -70,9 +55,10 @@ content:
     weight: 5
     settings:
       match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
-      match_limit: 10
     region: content
     third_party_settings: {  }
-hidden: {  }
+hidden:
+  name: true

@@ -8,7 +8,7 @@ id: media.remote_video.field_media_oembed_video
 field_name: field_media_oembed_video
 entity_type: media
 bundle: remote_video
-label: 'Remote video URL'
+label: 'Video URL'
 description: ''
 required: true
 translatable: true

@@ -1,12 +1,19 @@
+## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
+sniffers: | clang compval phpcs newlineeof #hookupdateval
+
+## Run all tests & validations (including sniffers)
+tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval patchval
+
+
 # Function for code sniffer images.
 phpcsexec = docker run --rm \
-	-v $(shell pwd)/web/profiles/$(PROFILE_NAME):/work/profile \
-	-v $(shell pwd)/web/modules/custom:/work/modules \
-	-v $(shell pwd)/web/themes/custom:/work/themes \
+	-v $(CURDIR)/web/profiles/$(PROFILE_NAME):/work/profile \
+	-v $(CURDIR)/web/modules/custom:/work/modules \
+	-v $(CURDIR)/web/themes/custom:/work/themes \
 	skilldlabs/docker-phpcs-drupal ${1} -s --colors \
 	--standard=Drupal,DrupalPractice \
 	--extensions=php,module,inc,install,profile,theme,yml,txt,md,js \
-	--ignore=*.css,libraries/*,dist/*,styleguide/*,README.md,README.txt,node_modules/*,work/themes/**.js \
+	--ignore=*.css,libraries/*,dist/*,styleguide/*,README.md,README.txt,node_modules/*,work/themes/**.js,work/themes/**.md \
 	.
 
 ## Validate codebase with phpcs sniffers to make sure it conforms https://www.drupal.org/docs/develop/standards
@@ -29,6 +36,7 @@ ifneq ("$(wildcard scripts/git_hooks/sniffers.sh)","")
 	$(shell ln -sf ../../scripts/git_hooks/sniffers.sh .git/hooks/pre-push)
 else
 	@echo "scripts/git_hooks/sniffers.sh file does not exist"
+	@exit 1
 endif
 else
 	@echo "No git directory found, git hooks won't be installed"
@@ -41,6 +49,7 @@ ifneq ("$(wildcard scripts/makefile/baseconfig-langcode.sh)","")
 	@/bin/sh ./scripts/makefile/baseconfig-langcode.sh
 else
 	@echo "scripts/makefile/baseconfig-langcode.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate configuration schema
@@ -51,20 +60,23 @@ ifneq ("$(wildcard scripts/makefile/config-inspector-validation.sh)","")
 	@$(call php, /bin/sh ./scripts/makefile/config-inspector-validation.sh)
 else
 	@echo "scripts/makefile/config-inspector-validation.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate composer.json file
 compval:
 	@echo "Composer.json validation..."
-	@docker run --rm -v `pwd`:`pwd` -w `pwd` $(IMAGE_PHP) composer validate --strict
+	# Can't use --strict cause we need dev versions for d9 compatibility
+	@docker run --rm -v $(CURDIR):/mnt -w /mnt $(IMAGE_PHP) composer validate
 
-## Validate hook_update_N()
+## Validate if hook_update_N() are required
 hookupdateval:
 ifneq ("$(wildcard scripts/makefile/hookupdateval.sh)","")
 	@echo "hook_update_N() validation..."
 	@/bin/sh ./scripts/makefile/hookupdateval.sh
 else
-	@echo "scripts/makefile/hookupdateval.sh.sh file does not exist"
+	@echo "scripts/makefile/hookupdateval.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate watchdog logs
@@ -74,6 +86,7 @@ ifneq ("$(wildcard scripts/makefile/watchdog-validation.sh)","")
 	@$(call php, /bin/sh ./scripts/makefile/watchdog-validation.sh)
 else
 	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate status report
@@ -83,14 +96,31 @@ ifneq ("$(wildcard scripts/makefile/status-report-validation.sh)","")
 	@$(call php, /bin/sh ./scripts/makefile/status-report-validation.sh)
 else
 	@echo "scripts/makefile/status-report-validation.sh file does not exist"
+	@exit 1
 endif
 
-## Validate drupal-check
-drupalcheckval:
-	@echo "Drupal-check validation..."
+## Validate drupal-rector
+drupalrectorval:
+ifneq ("$(wildcard rector.yml)","")
+	@echo "Drupal Rector validation..."
 	$(call php, composer install -o)
-	$(call php, vendor/bin/drupal-check -V)
-	$(call php, vendor/bin/drupal-check -ad -vv -n --no-progress web/modules/custom/)
+	$(call php, vendor/bin/rector -V)
+	$(call php, vendor/bin/rector process --dry-run --no-progress-bar web/modules/custom web/themes/custom)
+else
+	@echo "rector.yml file does not exist"
+	@exit 1
+endif
+
+## Validate upgrade-status
+upgradestatusval:
+ifneq ("$(wildcard scripts/makefile/upgrade-status-validation.sh)","")
+	@echo "Upgrade status validation..."
+	$(call php, composer install -o)
+	@$(call php, /bin/sh ./scripts/makefile/upgrade-status-validation.sh)
+else
+	@echo "scripts/makefile/upgrade-status-validation.sh file does not exist"
+	@exit 1
+endif
 
 ## Validate newline at the end of files
 newlineeof:
@@ -98,9 +128,22 @@ ifneq ("$(wildcard scripts/makefile/newlineeof.sh)","")
 	@/bin/sh ./scripts/makefile/newlineeof.sh
 else
 	@echo "scripts/makefile/newlineeof.sh file does not exist"
+	@exit 1
+endif
+
+## Validate that no custom patch is added to repo
+patchval:
+ifneq ("$(wildcard scripts/makefile/patchval.sh)","")
+	@echo "Patch validation..."
+	@$(call php-0, apk add --no-cache -q jq)
+	@$(call php, /bin/sh ./scripts/makefile/patchval.sh)
+else
+	@echo "scripts/makefile/patchval.sh file does not exist"
+	@exit 1
 endif
 
 ## Validate Behat scenarios
+BEHAT_ARGS ?= --colors
 behat:
 	@echo "Getting base url"
 ifdef REVIEW_DOMAIN
@@ -119,7 +162,7 @@ endif
 	@echo "Running Behat scenarios against http://$(BASE_URL)"
 	$(call php, composer install -o)
 	$(call php, vendor/bin/behat -V)
-	$(call php, vendor/bin/behat --colors)
+	$(call php, vendor/bin/behat $(BEHAT_ARGS)) || $(call php, vendor/bin/behat $(BEHAT_ARGS) --rerun)
 	make browser_driver_stop
 
 ## List existing behat definitions
@@ -142,7 +185,10 @@ browser_driver:
 
 ## Stop browser driver
 browser_driver_stop:
-	docker stop $(COMPOSE_PROJECT_NAME)_chrome
+	@echo 'Stopping browser driver...'
+	if [ ! -z `docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}'` ]; then \
+		docker stop $(COMPOSE_PROJECT_NAME)_chrome; \
+	fi
 
 ## Create a high number of random content
 contentgen:
@@ -151,11 +197,28 @@ ifneq ("$(wildcard scripts/makefile/contentgen.sh)","")
 	@$(call php, /bin/sh ./scripts/makefile/contentgen.sh)
 else
 	@echo "scripts/makefile/watchdog-validation.sh file does not exist"
+	@exit 1
 endif
 
-## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
-sniffers: | clang compval phpcs newlineeof
+blackfire:
+ifneq ("$(wildcard scripts/makefile/blackfire.sh)","")
+	$(call php-0, /bin/sh ./scripts/makefile/blackfire.sh)
+	$(call php-0, kill -USR2 1)
+	@echo "Blackfire extension enabled"
+else
+	@echo "scripts/makefile/blackfire.sh file does not exist"
+	@exit 1
+endif
 
-## Run all tests & validations (including sniffers)
-tests: | sniffers cinsp drupalcheckval watchdogval statusreportval behat
+newrelic:
+ifdef NEW_RELIC_LICENSE_KEY
+	$(call php-0, /bin/sh ./scripts/makefile/newrelic.sh $(NEW_RELIC_LICENSE_KEY) '$(COMPOSE_PROJECT_NAME)')
+	$(call php, sed -i -e 's/#  <<: \*service-newrelic/  <<: \*service-newrelic/g' docker/docker-compose.override.yml)
+	docker-compose up -d
+	@echo "NewRelic PHP extension enabled"
+else
+	@echo "NewRelic install skipped as NEW_RELIC_LICENSE_KEY is not set"
+endif
 
+xdebug:
+	$(call php-0, /bin/sh ./scripts/makefile/xdebug.sh $(filter-out $@, $(MAKECMDGOALS)))

@@ -1,14 +1,9 @@
 <?php
 
 use Drupal\DrupalExtension\Context\RawDrupalContext;
-use Drupal\Core\Url;
-use Drupal\node\Entity\Node;
 use Behat\Behat\Context\SnippetAcceptingContext;
-use Behat\Behat\Tester\Exception\PendingException;
-use Behat\Gherkin\Node\PyStringNode;
-use Behat\Gherkin\Node\TableNode;
-use Behat\Mink\Driver\Selenium2Driver;
-
+use Behat\Mink\Exception\ExpectationException;
+use Behat\Mink\Exception\ResponseTextException;
 
 /**
  * Defines application features from the specific context.
@@ -244,6 +239,9 @@ JS;
   public function iSelectOptionNumberInChoices($selector, $number) {
     $page = $this->getSession()->getPage();
     $element = $page->find('css', $selector);
+    if (!$element) {
+      throw new \Exception(sprintf('Element "%s" not found', $selector));
+    }
     $trigger = $element->getParent();
     $trigger->click();
     $items = $trigger->getParent()->findAll('css', '.choices__list--dropdown > .choices__list > .choices__item');

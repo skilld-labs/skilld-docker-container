@@ -1,0 +1,25 @@
+ci:
+  collect:
+    numberOfRuns: 5
+    settings:
+      chromeFlags: 
+        - "--no-sandbox"
+    url:
+      - URL_TO_TEST # Overriden by CLI argument
+  assert:
+    includePassedAssertions: true
+    # preset: lighthouse:no-pwa # lighthouse:recommended but without PWA audits
+    assertions: # Additional to preset
+      categories:performance:
+        - error
+        - minScore: 0.9
+      categories:accessibility:
+        - error
+        - minScore: 0.9
+      categories:best-practices:
+        - error
+        - minScore: 0.9
+      categories:seo:
+        - error
+        - minScore: 0.8
+

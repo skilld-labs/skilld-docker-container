@@ -1,0 +1,37 @@
+# Example of .gitlab-ci.yml jobs
+# Use with scripts/mirroring/mirror_current_branch.sh
+
+stages:
+  - mirror
+
+.mirroring_template: &mirroring_template
+  stage: mirror
+  allow_failure: true
+  retry:
+    max: 2
+
+Mirror to repo XXX:
+  <<: *mirroring_template
+  script:
+  - echo " - Start of CI script"
+  - date; pwd; ls -lah;
+  - mkdir -p ~/.ssh
+  - ls -lah ~
+  - echo "$MIRRORING_REMOTE_REPO_PRIVATE_KEY" > ~/.ssh/id_rsa
+  - chmod 0600 ~/.ssh/id_rsa
+  - ls -lah ~/.ssh
+  - apk add --no-cache openssh-client git rsync
+  - ssh-keyscan -H "$MIRRORING_REMOTE_REPO_IP" >> ~/.ssh/known_hosts
+  - git version
+  - rsync --version
+  - export MIRRORING_TARGET_GIT_REPO="${MIRRORING_REMOTE_REPO_URL_1}" # Gitlab custom variable to update for each repo to mirror
+  - echo -e "MIRRORING_TARGET_GIT_REPO = $MIRRORING_TARGET_GIT_REPO"
+  - export MIRRORING_REMOTE_REPO_TYPE="${MIRRORING_REMOTE_REPO_TYPE}"
+  - echo -e "MIRRORING_REMOTE_REPO_TYPE = $MIRRORING_REMOTE_REPO_TYPE"
+  - chmod +x scripts/mirroring/mirror_current_branch.sh
+  - ./scripts/mirroring/mirror_current_branch.sh
+  - echo " - End of CI script"
+
+Mirror to repo YYY: # Job can then be duplicated to clone to multiples repos (just use a different MIRRORING_REMOTE_REPO_URL_N variable for each)
+  ...
+

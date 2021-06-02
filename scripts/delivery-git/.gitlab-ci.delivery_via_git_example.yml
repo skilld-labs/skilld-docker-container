@@ -1,0 +1,51 @@
+# Example of .gitlab-ci.yml jobs
+# Use with scripts/delivery-git/deliver_current_tag_via_git.sh
+
+stages:
+  - deliver
+
+.delivery_via_git_template: &delivery_via_git_template
+  stage: deliver
+  dependencies:
+    - prepare:front # Where front dependencies are installed and assets are builded
+    - prepare:back # Where back dependencies are installed
+  allow_failure: true
+  retry:
+    max: 2
+  only:
+    - tags
+  except:
+    - branches
+
+Delivery to hoster:
+  <<: *delivery_via_git_template
+  script:
+  - echo " - Start of CI script"
+  - date; pwd; ls -lah;
+  - mkdir -p ~/.ssh
+  - ls -lah ~
+  - echo "$DELIVERY_REMOTE_REPO_PRIVATE_KEY" > ~/.ssh/id_rsa
+  - chmod 0600 ~/.ssh/id_rsa
+  - ls -lah ~/.ssh
+  - apk add --no-cache openssh-client git rsync
+  - ssh-keyscan -H "$DELIVERY_REMOTE_REPO_IP" >> ~/.ssh/known_hosts
+  - git version
+  - rsync --version
+  - export TARGET_GIT_REPO="${DELIVERY_REMOTE_REPO_URL_1}" # Gitlab custom variable to update for each repo to mirror
+  - echo -e "TARGET_GIT_REPO = $TARGET_GIT_REPO"
+  - export TARGET_GIT_REPO_BRANCH="${DELIVERY_REMOTE_REPO_BRANCH}" # Gitlab custom variable to update for each repo to mirror
+  - echo -e "TARGET_GIT_REPO_BRANCH = $TARGET_GIT_REPO_BRANCH"
+  - export TARGET_GIT_REPO_TYPE="${DELIVERY_REMOTE_REPO_TYPE}"
+  - echo -e "TARGET_GIT_REPO_TYPE = $TARGET_GIT_REPO_TYPE"
+  - chmod +x scripts/delivery-git/deliver_current_tag_via_git.sh
+  - ./scripts/delivery-git/deliver_current_tag_via_git.sh
+  - echo " - End of CI script"
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:delivery"
+    expire_in: 1d
+    paths:
+      - ./*
+
+Delivery to repo YYY: # Job can then be duplicated to deliver to multiples repos (just use a different DELIVERY_REMOTE_REPO_URL_N variable for each)
+  ...
+

@@ -3,30 +3,28 @@ status: true
 dependencies:
   config:
     - core.entity_form_mode.media.media_library
-    - field.field.media.document.field_media_file
+    - field.field.media.document.field_media_document
     - media.type.document
-  module:
-    - field_layout
-    - layout_discovery
-third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings:
-      label: ''
 id: media.document.media_library
 targetEntityType: media
 bundle: document
 mode: media_library
 content:
+  langcode:
+    type: language_select
+    weight: 2
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
   translation:
     weight: 10
-    region: content
     settings: {  }
     third_party_settings: {  }
+    region: content
 hidden:
   created: true
-  field_media_file: true
-  langcode: true
+  field_media_document: true
   name: true
   path: true
   status: true

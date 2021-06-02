@@ -36,8 +36,8 @@
 ## Quickstart
 
 * Install docker for <a href="https://docs.docker.com/install/" target="_blank">Linux</a>, <a href="https://docs.docker.com/docker-for-mac/install/" target="_blank">Mac</a>, <a href="https://docs.docker.com/docker-for-windows/install/" target="_blank">Windows</a>
-  *  Check <a href="https://docs.docker.com/install/linux/linux-postinstall/" target="_blank">post-installation steps for Linux</a>
-* Install <a href="https://docs.docker.com/compose/install/" target="_blank">docker compose</a>
+  *  Check <a href="https://docs.docker.com/install/linux/linux-postinstall/" target="_blank">post-installation steps for Linux</a> version 17.12.0 or later
+* Install <a href="https://docs.docker.com/compose/install/" target="_blank">docker compose</a> version 1.21.0 or later
 
 * Copy **.env.default** to **.env**, more information about enviroment file can be found <a href="https://docs.docker.com/compose/env-file/" target="_blank">docs.docker.com</a>
 * Copy **docker-compose.override.yml.default** to **docker-compose.override.yml**, update parts you want to overwrite.
@@ -54,7 +54,7 @@
 | COMPOSE_PROJECT_NAME   | Your project name | - |
 | PROFILE_NAME   | Profile used for site install | sdd |
 | MODULES   | Additional modules to enable after site install | project_default_content |
-| THEME_NAME  | Name of theme directory in /web/themes | `N/A` |
+| THEME_NAME  | Name of theme directory in /web/themes | `NA` |
 | SITE_NAME  | Site name | Example |
 | SITE_MAIL  | Site e-mail address | admin@example.com |
 | ADMIN_NAME  | Admin username | admin |
@@ -63,6 +63,7 @@
 | PROJECT_INSTALL | Way to install site - from straight or existing config | - |
 | IMAGE_PHP | Php image to use | `skilldlabs/php:72-fpm` |
 | IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.14.1` |
+| IMAGE_APACHE | Image to use for apache container | `skilldlabs/skilld-docker-apache` |
 | IMAGE_FRONT | Image to use for front tasks | `skilldlabs/frontend:zen` |
 | IMAGE_DRIVER | Image to use for automated testing webdriver | `zenika/alpine-chrome` |
 | ADD_PHP_EXT | Additional php extension to install | - |
@@ -108,6 +109,7 @@ networks:
 * `make clean` - Totally remove project build folder, files, docker containers and network.
 * `make si` - Install/reinstall site.
 * `make info` - Show project services IP addresses.
+* `make diff` - Show changes in overrides (needs local `diff` command).
 * `make exec` - `docker exec` into php container.
 * `make exec0` - `docker exec` into php container as root.
 * `make dev` - Devel + kint setup, and config for Twig debug mode, disable aggregation.
@@ -117,6 +119,9 @@ networks:
 * `make front` - Builds frontend tasks.
 * `make lint` - Runs frontend linters.
 * `make storybook` - Runs storybook in current theme.
+* `make blackfire` - Adds and enables blackfire.io php extension, needs [configuration](https://blackfire.io/docs/configuration/php) in docker-composer override.yml.
+* `make newrelic` - Adds and enables newrelic.com php extension, needs [configuration](https://docs.newrelic.com/docs/agents/php-agent/getting-started/introduction-new-relic-php#configuration) `NEW_RELIC_LICENSE_KEY` environment variable defined with valid license key.
+* `make xdebug (on|off|status)` - Enable, disable or report status of [Xdebug](https://xdebug.org/docs/) PHP extension.
 
 #### Additional goals
 

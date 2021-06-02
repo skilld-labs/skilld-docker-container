@@ -4,40 +4,64 @@ dependencies:
   config:
     - core.entity_view_mode.media.full
     - field.field.media.image.field_media_image
-    - field.field.media.image.text_short
-    - image.style.large
     - media.type.image
   module:
-    - field_layout
-    - image
+    - layout_builder
     - layout_discovery
+    - layout_library
+    - svg_image
 third_party_settings:
-  field_layout:
-    id: layout_onecol
-    settings:
-      label: ''
+  layout_builder:
+    allow_custom: false
+    enabled: true
+    sections:
+      -
+        layout_id: layout_onecol
+        layout_settings:
+          label: ''
+        components:
+          931007da-aeb6-4acd-8c36-f85d0fcd06ec:
+            uuid: 931007da-aeb6-4acd-8c36-f85d0fcd06ec
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:media:image:field_media_image'
+              formatter:
+                label: visually_hidden
+                settings:
+                  image_style: ''
+                  image_link: ''
+                  svg_render_as_image: true
+                  svg_attributes:
+                    width: null
+                    height: null
+                third_party_settings: {  }
+                type: image
+            additional: {  }
+            weight: 0
+        third_party_settings: {  }
+  layout_library:
+    enable: false
 id: media.image.full
 targetEntityType: media
 bundle: image
 mode: full
 content:
   field_media_image:
-    weight: 0
-    label: hidden
+    label: visually_hidden
     settings:
-      image_style: large
+      image_style: ''
       image_link: ''
+      svg_render_as_image: true
+      svg_attributes:
+        width: null
+        height: null
     third_party_settings: {  }
     type: image
-    region: content
-  text_short:
-    type: string
     weight: 1
     region: content
-    label: hidden
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
 hidden:
   created: true
   langcode: true

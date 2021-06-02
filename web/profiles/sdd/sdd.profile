@@ -7,15 +7,36 @@
  * Copied from https://www.drupal.org/project/multilingual_demo project.
  */
 
+use Drupal\user\Entity\User;
+use Drupal\user\RoleInterface;
 use Symfony\Component\Yaml\Parser;
 
 /**
  * Implements hook_install_tasks().
+ *
+ * @see https://www.drupal.org/project/drupal/issues/2982052
  */
 function sdd_install_tasks(&$install_state) {
   return [
+    'sdd_install_setup' => [
+      'display_name' => t('Install setup'),
+      'type' => 'normal',
+    ],
     'sdd_install_import_language_config' => [],
   ];
+}
+
+/**
+ * Performs actions to set up the site for this profile.
+ */
+function sdd_install_setup() {
+  // Assign user 1 the "sysadmin" role.
+  $user = User::load(1);
+  $user->roles[] = 'sysadmin';
+  $user->save();
+
+  // Allow authenticated users to use shortcuts.
+  user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access shortcuts']);
 }
 
 /**
