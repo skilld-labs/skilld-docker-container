@@ -183,6 +183,9 @@
       },
       "drupal/upgrade_status": {
         "Exclude node_modules from scan": "https://www.drupal.org/files/issues/2021-03-04/3162997-20.patch"
+      },
+      "drupal/custom_pub": {
+        "Duplicated config dependencies in base field overrides configuration files": "https://www.drupal.org/files/issues/2021-05-24/duplicated_config_dependencies-3215539-2.patch"
       }
     }
   }
