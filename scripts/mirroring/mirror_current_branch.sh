@@ -83,7 +83,7 @@ fi
 
 # Copying files to mirrorring dir
 echo -e "- Copying files to mirrorring dir...\n"
-rsync -av --quiet --progress ../. . --exclude .git/
+rsync -av --quiet --progress ../. . --exclude .git/ --exclude files_to_mirror/
 
 
 # Making sure everything needed will be included in commit
