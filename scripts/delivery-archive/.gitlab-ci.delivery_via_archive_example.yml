@@ -4,7 +4,7 @@ stages:
   - deliver
 
 .delivery_template: &delivery_template
-  <<: *ra_tags
+  extends: .runner_tag_selection
   stage: deliver
   dependencies:
     - prepare:front # Where front dependencies are installed and assets are builded
@@ -30,7 +30,7 @@ delivery:
   - echo ${DELIVERY_REPOSITORIES_USERNAME}
   - ls -lah
   - touch ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.tar.gz # https://stackoverflow.com/a/37993307/12961859
-  - time tar --exclude=${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.tar.gz -czf ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.tar.gz .
+  - time tar --exclude=${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.tar.gz --exclude=".git" --exclude=".gitlab" --exclude=".cache" --exclude=".env" -czf ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.tar.gz .
   - curl -v --user "${DELIVERY_REPOSITORIES_USERNAME}:${DELIVERY_REPOSITORIES_PASSWORD}" --upload-file "${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.tar.gz" https://${DELIVERY_REPOSITORIES_RAW_REGISTRY_DOMAIN_1}/repository/${CI_PROJECT_NAME}-raw/releases/${CI_PROJECT_NAME}-$CI_COMMIT_TAG.tar.gz
   - echo " - End of CI job"
   artifacts:
