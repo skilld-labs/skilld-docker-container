@@ -123,6 +123,7 @@ sniffers:sonarqube:
     -Dsonar.inclusions=settings/**,web/modules/custom/**,web/profiles/sdd/**,web/themes/custom/**
   only:
   - master
+  - main
   allow_failure: true
 
 
@@ -236,12 +237,14 @@ deploy:review:
   when: manual
   except:
   - master
+  - main
 
 deploy:master:
   <<: *deploy_template
   when: always
   only:
   - master
+  - main
 
 stop_review:
   stage: deploy
