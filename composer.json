@@ -179,9 +179,6 @@
       },
       "drupal/migrate_generator": {
         "Ability to remove config of generated migrations": "https://git.drupalcode.org/project/migrate_generator/commit/20dc65e.patch"
-      },
-      "drupal/upgrade_status": {
-        "Exclude node_modules from scan": "https://www.drupal.org/files/issues/2021-03-04/3162997-20.patch"
       }
     }
   }
