@@ -25,6 +25,7 @@ services:
 #      NEW_RELIC_APPNAME: "${COMPOSE_PROJECT_NAME}"
     volumes:
       - "./90-mail.ini:/etc/php7/conf.d/90-mail.ini:z"
+    shm_size: "${SHM_SIZE}"
 #    depends_on:
 #      - mysql
 #      - postgresql

@@ -21,6 +21,9 @@ LOCAL_GID := $(shell id -g)
 CUID ?= $(LOCAL_UID)
 CGID ?= $(LOCAL_GID)
 
+# Define shm size based on total ram on host ([Total ram on host, in kilobytes] / 4)
+SHM_SIZE = $(shell expr $(shell cat /proc/meminfo | head -1 | awk '{print $$2}') \* 256)
+
 # Define network name.
 COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 
@@ -50,6 +53,7 @@ allfast: | fast provision back front si localize hooksymlink info
 
 ## Update .env to build DB in ram (makes data NOT persistant)
 fast:
+	$(shell sed -i "s|^SHM_SIZE=64m|SHM_SIZE=$(SHM_SIZE)|g"  .env)
 	$(shell sed -i "s|^#DB_URL=sqlite:///dev/shm/d8.sqlite|DB_URL=sqlite:///dev/shm/d8.sqlite|g"  .env)
 	$(shell sed -i "s|^DB_URL=sqlite:./../.cache/d8.sqlite|#DB_URL=sqlite:./../.cache/d8.sqlite|g"  .env)
 
