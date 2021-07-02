@@ -4,6 +4,7 @@ stages:
   - deliver
 
 .delivery_template: &delivery_template
+  extends: .runner_tag_selection
   stage: deliver
   dependencies:
     - prepare:front # Where front dependencies are installed and assets are builded
@@ -23,7 +24,6 @@ stages:
 
 delivery:
   <<: *delivery_template
-  <<: *runner_tag_selection
   script:
   - echo " - Start of CI job"
   - date; pwd; ls -lah;

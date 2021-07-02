@@ -145,12 +145,11 @@
     },
     "patches": {
       "drupal/core": {
-        "Let GDToolkit support WEBP image format": "https://github.com/skilld-labs/skilld-docker-container/raw/a036dee9feee970cc2198ce9b09f81626577c37c/patches/2340699-webp-110-127.patch",
         "Translated field denormalization creates duplicate values": "https://www.drupal.org/files/issues/2019-07-02/2904423-core_8_8-72.patch",
         "Fix multilingual site's layout edit context issue": "https://www.drupal.org/files/issues/2019-12-19/3101231-19.patch",
         "SQLite database locking errors cause fatal errors": "https://www.drupal.org/files/issues/1120020-59.patch",
         "Error: Call to a member function getLabel() after enabling layout_builder": "https://www.drupal.org/files/issues/2019-11-14/2985882-entityfield-43.patch",
-        "POST /quickedit/metadata returning HTTP 503": "https://www.drupal.org/files/issues/2020-01-09/2893407-39.patch",
+        "POST /quickedit/metadata returning HTTP 503": "https://www.drupal.org/files/issues/2021-06-07/2893407-47.patch",
         "Callers of LayoutEntityHelperTrait::getEntitySections() do not account for the view mode": "https://www.drupal.org/files/issues/2019-06-20/3008924-5.patch",
         "Claro + layout builder messages display additional icon in top left corner": "https://www.drupal.org/files/issues/2020-05-28/claro_layout_builder_extra_icon-3143237-4.patch",
         "Expose Layout Builder data to REST and JSON:API" : "https://www.drupal.org/files/issues/2020-07-07/2942975-116.patch",
@@ -180,9 +179,6 @@
       },
       "drupal/migrate_generator": {
         "Ability to remove config of generated migrations": "https://git.drupalcode.org/project/migrate_generator/commit/20dc65e.patch"
-      },
-      "drupal/upgrade_status": {
-        "Exclude node_modules from scan": "https://www.drupal.org/files/issues/2021-03-04/3162997-20.patch"
       },
       "drupal/custom_pub": {
         "Duplicated config dependencies in base field overrides configuration files": "https://www.drupal.org/files/issues/2021-05-24/duplicated_config_dependencies-3215539-2.patch"

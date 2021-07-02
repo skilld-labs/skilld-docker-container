@@ -1,0 +1,44 @@
+# Example of .gitlab-ci.yml jobs
+
+stages:
+  - deliver
+
+.delivery_template: &delivery_template
+  extends: .runner_tag_selection
+  stage: deliver
+  dependencies:
+    - prepare:front # Where front dependencies are installed and assets are builded
+    - prepare:back # Where back dependencies are installed
+  allow_failure: true
+  retry:
+    max: 2
+  only:
+    - tags
+  except:
+    - branches
+  after_script:
+    - rm -f ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.tar.gz
+
+delivery:
+  <<: *delivery_template
+  script:
+  - echo " - Start of CI job"
+  - date; pwd; ls -lah;
+  - echo ${CI_PROJECT_NAME}
+  - echo ${CI_COMMIT_REF_NAME}
+  - echo ${DELIVERY_REPOSITORIES_RAW_REGISTRY_DOMAIN_1}
+  - echo ${DELIVERY_REPOSITORIES_USERNAME}
+  - ls -lah
+  - touch ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.tar.gz # https://stackoverflow.com/a/37993307/12961859
+  - time tar --exclude=${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.tar.gz --exclude=".git" --exclude=".gitlab" --exclude=".cache" --exclude=".env" -czf ${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.tar.gz .
+  - curl -v --user "${DELIVERY_REPOSITORIES_USERNAME}:${DELIVERY_REPOSITORIES_PASSWORD}" --upload-file "${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}.tar.gz" https://${DELIVERY_REPOSITORIES_RAW_REGISTRY_DOMAIN_1}/repository/${CI_PROJECT_NAME}-raw/releases/${CI_PROJECT_NAME}-$CI_COMMIT_TAG.tar.gz
+  - echo " - End of CI job"
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME:$CI_COMMIT_SHA:delivery"
+    expire_in: 1d
+    paths:
+      - ./*
+
+Delivery 2: # Job can then be duplicated to deliver to multiples registries (just use a different REPOSITORIES_DOCKER_REGISTRY_DOMAIN_N variable for each)
+  ...
+
