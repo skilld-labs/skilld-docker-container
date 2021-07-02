@@ -179,6 +179,9 @@
       },
       "drupal/migrate_generator": {
         "Ability to remove config of generated migrations": "https://git.drupalcode.org/project/migrate_generator/commit/20dc65e.patch"
+      },
+      "drupal/custom_pub": {
+        "Duplicated config dependencies in base field overrides configuration files": "https://www.drupal.org/files/issues/2021-05-24/duplicated_config_dependencies-3215539-2.patch"
       }
     }
   }
