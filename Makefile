@@ -80,20 +80,12 @@ endif
 
 ## Install backend dependencies
 back:
-	docker-compose up -d --remove-orphans --no-deps php # PHP container is required for composer
 ifneq ($(strip $(ADD_PHP_EXT)),)
 # Install additional php extensions as this goal used in CI (todo stop doing it)
 	$(call php-0, apk add --no-cache $(ADD_PHP_EXT))
 endif
-ifeq ($(INSTALL_DEV_DEPENDENCIES), TRUE)
-	@echo "INSTALL_DEV_DEPENDENCIES=$(INSTALL_DEV_DEPENDENCIES)"
-	@echo "Installing composer dependencies, including dev ones"
-	$(call php, composer install --no-interaction --prefer-dist -o)
-else
-	@echo "INSTALL_DEV_DEPENDENCIES set to FALSE or missing from .env"
 	@echo "Installing composer dependencies, without dev ones"
 	$(call php, composer install --no-interaction --prefer-dist -o --no-dev)
-endif
 	$(call php, composer create-required-files)
 
 $(eval TESTER_NAME := tester)

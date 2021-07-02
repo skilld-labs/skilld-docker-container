@@ -131,18 +131,9 @@ prepare:back:
   stage: prepare
   script:
     - docker --version
-    - docker-compose --version
     - pwd
     - ls -la
-    - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
-    - echo "CI_PROJECT_NAME=${CI_PROJECT_NAME}"
-    - echo "CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG}"
-    - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
-    - docker network prune -f # Remove unused networks (not referenced by any containers)
-    - make back
-  after_script:
-    - docker network prune -f # Remove unused networks (not referenced by any containers)
-    - docker-compose down -v --remove-orphans # PHP container was required for composer
+    - docker run -e "COMPOSER_MEMORY_LIMIT=-1" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` skilldlabs/php:74-fpm /bin/ash -c "composer2 --version && composer2 install --no-interaction --prefer-dist -o --ignore-platform-reqs && composer2 create-required-files" # Make back on the fly
   cache:
     key:
       files:
@@ -173,6 +164,7 @@ prepare:back:
     - branches
     - merge_requests
     - tags
+  retry: 2
 
 prepare:front:
   stage: prepare
@@ -212,11 +204,12 @@ prepare:front:
     - cd ${BUILD_DIR}
     - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
     - echo "MAIN_DOMAIN_NAME=${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}" >> .env.default
-    - echo "INSTALL_DEV_DEPENDENCIES=TRUE" >> .env.default
     - docker --version
     - docker-compose --version
     - make all_ci
   after_script:
+    - docker network prune -f
+    - docker container prune -f
     - echo "Started ${CI_ENVIRONMENT_URL} composition in ${BUILD_DIR} from Makefile."
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
