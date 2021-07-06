@@ -147,9 +147,9 @@ BEHAT_ARGS ?= --colors
 behat:
 	@echo "Getting base url"
 ifdef REVIEW_DOMAIN
-	$(eval BASE_URL := $(MAIN_DOMAIN_NAME))
+	$(eval BASE_URL := https:\/\/$(RA_BASIC_AUTH_USERNAME):$(RA_BASIC_AUTH_PASSWORD)@$(MAIN_DOMAIN_NAME))
 else
-	$(eval BASE_URL := $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}' $(COMPOSE_PROJECT_NAME)_web))
+	$(eval BASE_URL := http:\/\/$(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}' $(COMPOSE_PROJECT_NAME)_web))
 endif
 	echo "Base URL: " $(BASE_URL)
 	if [ -z `docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}'` ]; then \
@@ -158,7 +158,7 @@ endif
 	fi
 	@echo "Replacing URL_TO_TEST value in behat.yml with http://$(BASE_URL)"
 	$(call php, cp behat.default.yml behat.yml)
-	$(call php, sed -i "s/URL_TO_TEST/http:\/\/$(BASE_URL)/" behat.yml)
+	$(call php, sed -i "s/URL_TO_TEST/$(BASE_URL)/g" behat.yml)
 	@echo "Running Behat scenarios against http://$(BASE_URL)"
 	$(call php, composer install -o)
 	$(call php, vendor/bin/behat -V)

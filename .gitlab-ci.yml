@@ -363,7 +363,7 @@ test:lighthouse:
     - docker exec --tty -u root ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse npm install -g @lhci/cli@0.6.x
     - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci --version
     - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci healthcheck
-    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci collect --url=https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci collect --url=https://${RA_BASIC_AUTH_USERNAME}:${RA_BASIC_AUTH_PASSWORD}@${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci assert
   after_script:
     - if [ -n `docker ps -f 'name=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse' --format '{{.Names}}'` ]; then echo 'Stopping container'; docker rm --force ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse; fi

@@ -91,7 +91,10 @@ services:
       - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.rule=Host(`mail-${MAIN_DOMAIN_NAME}`)'
       - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
       - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.tls=true'
+      - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.middlewares=mailhog-${COMPOSE_PROJECT_NAME}@docker'
       - 'traefik.http.services.mailhog-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8025'
+      - 'traefik.http.middlewares.mailhog-${COMPOSE_PROJECT_NAME}.basicauth.users=${RA_BASIC_AUTH}'
+      - 'traefik.http.middlewares.mailhog-${COMPOSE_PROJECT_NAME}.basicauth.removeheader=true'
 
   nginx:
 # Uncomment for MacOS.
@@ -111,6 +114,10 @@ services:
       - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.rule=Host(`${MAIN_DOMAIN_NAME}`)'
       - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
       - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls=true'
+      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.middlewares=nginx-${COMPOSE_PROJECT_NAME}@docker'
+      - 'traefik.http.middlewares.nginx-${COMPOSE_PROJECT_NAME}.basicauth.users=${RA_BASIC_AUTH}'
+      - 'traefik.http.middlewares.nginx-${COMPOSE_PROJECT_NAME}.basicauth.removeheader=true'
+
 
 #  apache:
 #  Uncomment for MacOS.
@@ -130,6 +137,9 @@ services:
 #      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.rule=Host(`${MAIN_DOMAIN_NAME}`)'
 #      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
 #      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.tls=true'
+#      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.middlewares=apache-${COMPOSE_PROJECT_NAME}@docker'
+#      - 'traefik.http.middlewares.apache-${COMPOSE_PROJECT_NAME}.basicauth.users=${RA_BASIC_AUTH}'
+#      - 'traefik.http.middlewares.apache-${COMPOSE_PROJECT_NAME}.basicauth.removeheader=true'
 
 #  solr:
 #    labels:
@@ -143,5 +153,7 @@ services:
 #      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.rule=Host(`solr-${MAIN_DOMAIN_NAME}`)'
 #      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
 #      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.tls=true'
+#      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.middlewares=solr-${COMPOSE_PROJECT_NAME}@docker'
 #      - 'traefik.http.services.solr-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8983'
-
+#      - 'traefik.http.middlewares.solr-${COMPOSE_PROJECT_NAME}.basicauth.users=${RA_BASIC_AUTH}'
+#      - 'traefik.http.middlewares.solr-${COMPOSE_PROJECT_NAME}.basicauth.removeheader=true'
