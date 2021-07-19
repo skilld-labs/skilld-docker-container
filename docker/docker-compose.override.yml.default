@@ -24,6 +24,8 @@ services:
 #      BLACKFIRE_CLIENT_TOKEN: x
 #      NEW_RELIC_APPNAME: "${COMPOSE_PROJECT_NAME}"
     volumes:
+# Uncomment for MacOS.
+#     - 'nfsmount:/var/www/html'
       - "./90-mail.ini:/etc/php7/conf.d/90-mail.ini:z"
 #    depends_on:
 #      - mysql
@@ -157,3 +159,12 @@ services:
 #      - 'traefik.http.services.solr-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8983'
 #      - 'traefik.http.middlewares.solr-${COMPOSE_PROJECT_NAME}.basicauth.users=${RA_BASIC_AUTH}'
 #      - 'traefik.http.middlewares.solr-${COMPOSE_PROJECT_NAME}.basicauth.removeheader=true'
+
+# Uncomment for MacOS.
+#volumes:
+#  nfsmount:
+#    driver: local
+#    driver_opts:
+#      type: nfs
+#      o: addr=host.docker.internal,rw,nolock,hard,nointr,nfsvers=3
+#      device: ":${PWD}"
