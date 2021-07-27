@@ -58,8 +58,6 @@
 | SITE_NAME  | Site name | Example |
 | SITE_MAIL  | Site e-mail address | admin@example.com |
 | ADMIN_NAME  | Admin username | admin |
-| ADMIN_PW  | Admin password | admin |
-| ADMIN_MAIL  | Admin e-mail address | admin@example.com |
 | PROJECT_INSTALL | Way to install site - from straight or existing config | - |
 | IMAGE_PHP | Php image to use | `skilldlabs/php:72-fpm` |
 | IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.14.1` |

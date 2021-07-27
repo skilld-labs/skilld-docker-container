@@ -258,6 +258,22 @@ stop_review:
     - branches
     - merge_requests
 
+generate:logins:
+  stage: deploy
+  dependencies: []
+  script:
+  - cd ${BUILD_DIR}
+  - make info
+  when: manual
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  extends: .runner_tag_selection
+  only:
+  - branches
+  - merge_requests
+
 deploy:storybook:
   stage: storybook
   environment:

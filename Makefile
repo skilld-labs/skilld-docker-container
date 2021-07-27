@@ -94,15 +94,14 @@ $(eval TESTER_ROLE := contributor)
 si:
 	@echo "Installing from: $(PROJECT_INSTALL)"
 ifeq ($(PROJECT_INSTALL), config)
-	$(call php, drush si --existing-config --db-url="$(DB_URL)" --account-name="$(ADMIN_NAME)" --account-mail="$(ADMIN_MAIL)" --account-pass="$(ADMIN_PW)" -y)
+	$(call php, drush si --existing-config --db-url="$(DB_URL)" --account-name="$(ADMIN_NAME)" --account-mail="$(ADMIN_MAIL)" -y)
 	# install_import_translations() overwrites config translations so we need to reimport.
 	$(call php, drush cim -y)
 else
-	$(call php, drush si $(PROFILE_NAME) --db-url="$(DB_URL)" --account-name="$(ADMIN_NAME)" --account-mail="$(ADMIN_MAIL)" --account-pass="$(ADMIN_PW)" -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
+	$(call php, drush si $(PROFILE_NAME) --db-url="$(DB_URL)" --account-name="$(ADMIN_NAME)" --account-mail="$(ADMIN_MAIL)" -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
 endif
 	$(call php, drush user:create "$(TESTER_NAME)")
 	$(call php, drush user:role:add "$(TESTER_ROLE)" "$(TESTER_NAME)")
-	$(call php, drush user:password "$(TESTER_NAME)" "$(TESTER_PW)")
 	make content
 	make -s local-settings
 	#make -s redis-settings
@@ -150,12 +149,19 @@ localize:
 
 ## Display project's information
 info:
+	$(info )
 	$(info Containers for "$(COMPOSE_PROJECT_NAME)" info:)
 	$(eval CONTAINERS = $(shell docker ps -f name=$(COMPOSE_PROJECT_NAME) --format "{{ .ID }}" -f 'label=traefik.enable=true'))
 	$(foreach CONTAINER, $(CONTAINERS),$(info http://$(shell printf '%-19s \n'  $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "traefik.port"}} {{range $$p, $$conf := .NetworkSettings.Ports}}{{$$p}}{{end}} {{.Name}}' $(CONTAINER) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')) ))
-	@echo "$(RESULT)"
-	@echo -e "System admin role - Login : \"$(ADMIN_NAME)\" - Password : \"$(ADMIN_PW)\""
-	@echo -e "Contributor role - Login : \"$(TESTER_NAME)\" - Password : \"$(TESTER_PW)\"\n"
+	$(info )
+ifdef REVIEW_DOMAIN
+	$(eval BASE_URL := $(MAIN_DOMAIN_NAME))
+else
+	$(eval BASE_URL := $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "traefik.port"}}' $(COMPOSE_PROJECT_NAME)_web))
+endif
+	$(info Login as System Admin: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(ADMIN_NAME)" --no-browser | awk -F "default" '{print $$2}')) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')))
+	$(info Login as Contributor: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(TESTER_NAME)" --no-browser | awk -F "default" '{print $$2}')) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')))
+	$(info )
 ifneq ($(shell diff .env .env.default -q),)
 	@echo -e "\x1b[33mWARNING\x1b[0m - .env and .env.default files differ. Use 'make diff' to see details."
 endif
