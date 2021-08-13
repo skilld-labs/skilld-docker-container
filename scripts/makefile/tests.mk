@@ -101,13 +101,13 @@ endif
 
 ## Validate drupal-rector
 drupalrectorval:
-ifneq ("$(wildcard rector.yml)","")
+ifneq ("$(wildcard rector.php)","")
 	@echo "Drupal Rector validation..."
 	$(call php, composer install -o)
 	$(call php, vendor/bin/rector -V)
 	$(call php, vendor/bin/rector process --dry-run --no-progress-bar web/modules/custom web/themes/custom)
 else
-	@echo "rector.yml file does not exist"
+	@echo "rector.php file does not exist"
 	@exit 1
 endif
 
