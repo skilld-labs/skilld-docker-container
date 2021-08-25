@@ -1,5 +1,5 @@
 ## Run sniffer validations (executed as git hook, by scripts/git_hooks/sniffers.sh)
-sniffers: | clang compval phpcs newlineeof #hookupdateval
+sniffers: | clang compval phpcs newlineeof
 
 ## Run all tests & validations (including sniffers)
 tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval patchval
@@ -68,16 +68,6 @@ compval:
 	@echo "Composer.json validation..."
 	# Can't use --strict cause we need dev versions for d9 compatibility
 	@docker run --rm -v $(CURDIR):/mnt -w /mnt $(IMAGE_PHP) composer validate
-
-## Validate if hook_update_N() are required
-hookupdateval:
-ifneq ("$(wildcard scripts/makefile/hookupdateval.sh)","")
-	@echo "hook_update_N() validation..."
-	@/bin/sh ./scripts/makefile/hookupdateval.sh
-else
-	@echo "scripts/makefile/hookupdateval.sh file does not exist"
-	@exit 1
-endif
 
 ## Validate watchdog logs
 watchdogval:

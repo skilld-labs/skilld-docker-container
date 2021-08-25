@@ -2,7 +2,9 @@
 # - SONAR_HOST // Optional
 # - SONAR_TOKEN // Optional
 # - NEW_RELIC_LICENSE_KEY // Optional
-# - RUN_HOOKUPDATE_CI_JOB // Optional
+# - TEST_UPDATE_DEPLOYMENTS // Optional, enables test:deploy job
+# - GITLAB_PROJECT_ACCESS_TOKEN // Required by test:deploy job. To be created in Gitlab project UI with read_api and read_repository permissions
+# - GITLAB_PROJECT_BASIC_AUTH // Required by test:deploy job. Encoded credentials to pass Gitlab basic auth, if any
 
 variables:
   GIT_DEPTH: "10"
@@ -25,10 +27,10 @@ before_script:
 stages:
   - sniffers
   - prepare
-  - deploy
-  - storybook
+  - build
+  - update
   - tests
-  - reports
+  - more tests
 
 sniffers:clang:
   stage: sniffers
@@ -97,17 +99,6 @@ sniffers:newlineeof:
   only:
     - branches
     - merge_requests
-
-sniffers:hookupdate:
-  stage: sniffers
-  script:
-  - make hookupdateval
-  only:
-    refs:
-      - branches
-      - merge_requests
-    variables:
-      - $RUN_HOOKUPDATE_CI_JOB == "TRUE" # To enable once site is live and cannot be rebuilt anymore
 
 sniffers:sonarqube:
   stage: sniffers
@@ -189,7 +180,7 @@ prepare:front:
 
 
 .deploy_template: &deploy_template
-  stage: deploy
+  stage: build
   script:
     - echo "Deploy ${CI_ENVIRONMENT_URL} review app to ${BUILD_DIR}."
     - echo "CI_ENVIRONMENT_NAME=${CI_ENVIRONMENT_NAME}"
@@ -207,14 +198,13 @@ prepare:front:
     - docker --version
     - docker-compose --version
     - make all_ci
+    - make drush config-set system.site name '${CI_COMMIT_REF_SLUG}' -- -y
+    - echo "Copying DB and files to make them accessible to artifact creator"
+    - docker-compose exec -T --user root php ash -c "chmod -R 775 .cache/" && cp -r .cache/ ${CI_PROJECT_DIR} && cp -r web/sites/ ${CI_PROJECT_DIR}/web/ # https://gitlab.com/gitlab-org/gitlab-foss/-/issues/15530#note_533732001
   after_script:
     - docker network prune -f
     - docker container prune -f
     - echo "Started ${CI_ENVIRONMENT_URL} composition in ${BUILD_DIR} from Makefile."
-  environment:
-    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
-    name: review/$CI_COMMIT_REF_NAME
-    on_stop: stop_review
   dependencies:
     - prepare:back
     - prepare:front
@@ -223,24 +213,52 @@ prepare:front:
   only:
     - branches
     - merge_requests
+  retry: 2
 
+.deploy_template_environment_default: &deploy_template_environment_default
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
 
-deploy:review:
+.deploy_template_environment_auto_stop: &deploy_template_environment_auto_stop
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+    auto_stop_in: 12 hours
+
+build:review:
   <<: *deploy_template
+  <<: *deploy_template_environment_default
   when: manual
   except:
   - master
   - main
 
-deploy:master:
+build:master:
   <<: *deploy_template
+  <<: *deploy_template_environment_default
   when: always
   only:
   - master
   - main
 
+build:tag:
+  <<: *deploy_template
+  <<: *deploy_template_environment_auto_stop
+  when: always
+  only:
+  - tags
+  artifacts:
+    name: "$CI_PROJECT_NAME-raw_build_db_and_files-tag-artifact"
+    expire_in: 6 mos
+    paths:
+      - web/sites/*/files/
+      - .cache
+
 stop_review:
-  stage: deploy
+  stage: build
   dependencies: []
   script:
     - date; pwd; ls -lahq;
@@ -257,9 +275,10 @@ stop_review:
   only:
     - branches
     - merge_requests
+    - tags
 
 generate:logins:
-  stage: deploy
+  stage: build
   dependencies: []
   script:
   - cd ${BUILD_DIR}
@@ -274,8 +293,43 @@ generate:logins:
   - branches
   - merge_requests
 
-deploy:storybook:
-  stage: storybook
+test:deploy:
+  stage: update
+  extends: .runner_tag_selection
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+  script:
+  - cd ${BUILD_DIR}
+  - ls -lah
+  - ls -lah .cache/
+  - ls -lah web/sites/*/files/
+  - printf "\033[1m- Getting name of last tag created...\n\033[0m"
+  - export LAST_TAG=$(curl --header "Authorization:$GITLAB_PROJECT_BASIC_AUTH" --header "PRIVATE-TOKEN:$GITLAB_PROJECT_ACCESS_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/repository/tags" | jq -r '.[0] | .name')
+  - |
+    if [ -z "$LAST_TAG" ]; then printf "\033[1m- No tag was found. Nothing to do here.\n\033[0m"; else \
+    printf "\033[1m- Tag found! ($LAST_TAG) Downloading it's artifacts...\n\033[0m" && \
+    curl --location --output artifacts.zip --header "Authorization:$GITLAB_PROJECT_BASIC_AUTH" --header "PRIVATE-TOKEN:$GITLAB_PROJECT_ACCESS_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/artifacts/$LAST_TAG/download?job=build:tag" && \
+    printf "\033[1m- Artifacts were successfully downloaded from tag $LAST_TAG\n\033[0m" && \
+    printf "\033[1m- Replacing DB and files of ${CI_ENVIRONMENT_URL} from those of $LAST_TAG tag artifacts\n\033[0m" && \
+    docker-compose exec -T --user root php ash -c "chmod -R 775 .cache/ web/sites/*/files/" && \
+    rm -rf .cache/* web/sites/*/files/* && \
+    unzip -o artifacts.zip && \
+    printf "\033[1m- DB and files from ${CI_ENVIRONMENT_URL} were successfully replaced from those of the artifacts\n\033[0m" && \
+    make drush cr && \
+    printf "\033[1m- Simulating deployment against tag $LAST_TAG...\n\033[0m" && \
+    make drush deploy -- -y && \
+    printf "\033[1m- Successful deployment simulation of ${CI_COMMIT_REF_NAME} against tag $LAST_TAG using ${CI_ENVIRONMENT_URL} review app.\n\033[0m"; fi
+  only:
+    refs:
+      - branches
+      - merge_requests
+    variables:
+      - $TEST_UPDATE_DEPLOYMENTS == "TRUE"
+
+test:storybook:
+  stage: tests
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
@@ -284,8 +338,6 @@ deploy:storybook:
   - cd ${BUILD_DIR}
   - make build-storybook
   - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
-  except:
-    - tags
   extends: .runner_tag_selection
   only:
     refs:
@@ -316,7 +368,7 @@ test:behat:
     max: 2
     when: script_failure
   dependencies:
-  - deploy:review
+  - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -340,7 +392,7 @@ test:cinsp:
   - cd ${BUILD_DIR}
   - make cinsp
   dependencies:
-  - deploy:review
+  - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -357,7 +409,7 @@ test:drupalrector:
   - cd ${BUILD_DIR}
   - make drupalrectorval
   dependencies:
-  - deploy:review
+  - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -386,7 +438,7 @@ test:lighthouse:
     - cd ${BUILD_DIR}
     - if [ -d .lighthouseci ]; then mv .lighthouseci web/lighthouseci; echo "- Reports are available here :" && for i in $(find web/lighthouseci/ -name "*.html"); do basename $i;done | xargs -i echo "${CI_ENVIRONMENT_URL}/lighthouseci/{}"; fi
   dependencies:
-  - deploy:review
+  - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -403,7 +455,7 @@ test:contentgen:
   - cd ${BUILD_DIR}
   - make contentgen
   dependencies:
-  - deploy:review
+  - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -429,8 +481,8 @@ test:patch:
       - branches
       - merge_requests
 
-report:statusreportval:
-  stage: reports
+test:statusreport:
+  stage: 'more tests'
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
@@ -440,14 +492,14 @@ report:statusreportval:
   - cd ${BUILD_DIR}
   - make statusreportval
   dependencies:
-  - deploy:review
+  - build:review
   extends: .runner_tag_selection
   only:
     - branches
     - merge_requests
 
 test:upgradestatus:
-  stage: reports
+  stage: 'more tests'
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
@@ -457,14 +509,14 @@ test:upgradestatus:
   - cd ${BUILD_DIR}
   - make upgradestatusval
   dependencies:
-  - deploy:review
+  - build:review
   extends: .runner_tag_selection
   only:
     - branches
     - merge_requests
 
-report:watchdog:
-  stage: reports
+test:watchdog:
+  stage: 'more tests'
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
@@ -474,9 +526,10 @@ report:watchdog:
   - cd ${BUILD_DIR}
   - make watchdogval
   dependencies:
-  - deploy:review
+  - build:review
   extends: .runner_tag_selection
   only:
     - branches
     - merge_requests
+
 
