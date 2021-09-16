@@ -69,11 +69,13 @@
     "drupal/config_inspector": "^1",
     "drupal/devel": "^4",
     "drupal/drupal-extension": "^4",
-    "drupal/upgrade_rector": "^1",
     "drupal/upgrade_status": "^3",
     "espend/behat-placeholder-extension": "^1.1",
     "genesis/behat-fail-aid": "^2.1",
-    "phpunit/phpunit": "^9"
+    "palantirnet/drupal-rector": "^0.11.2",
+    "phpspec/prophecy-phpunit": "^2",
+    "phpunit/phpunit": "^9",
+    "symfony/phpunit-bridge": "^5.3.0"
   },
   "conflict": {
     "drupal/drupal": "*"
