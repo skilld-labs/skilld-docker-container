@@ -181,6 +181,9 @@
       },
       "drupal/migrate_generator": {
         "Ability to remove config of generated migrations": "https://git.drupalcode.org/project/migrate_generator/commit/20dc65e.patch"
+      },
+      "palantirnet/drupal-rector": {
+        "Access level must be protected": "https://github.com/palantirnet/drupal-rector/pull/183.patch"
       }
     }
   }
