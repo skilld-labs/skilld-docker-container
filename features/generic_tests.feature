@@ -31,7 +31,6 @@ Feature: Generic tests
         And I take a screenshot
         Then I should get a "200" HTTP response
 
-
 # Security tests
 
     Scenario: Submit invalid login credentials
@@ -44,7 +43,6 @@ Feature: Generic tests
         And I take a screenshot
         And the response status code should be 403 
         # See https://www.drupal.org/project/username_enumeration_prevention
-
 
 # Global behavior tests
 
@@ -78,24 +76,7 @@ Feature: Generic tests
         And I click "Edit menu" in the "Administration" row
         And I should see text matching "menu Administration"
 
-
 # User & role tests
-
-    Scenario Outline: Submit valid login credentials
-        Given I am an anonymous user
-        When I visit "/user"
-        And I fill in "edit-name" with "<username>"
-        And I fill in "edit-pass" with "<password>"
-        And I take a screenshot
-        And I press the "edit-submit" button
-        Then I am on "/admin/people"
-        And I take a screenshot
-        And the response status code should be 200
-
-        Examples:
-        | username | password |
-        |  admin   |  admin   |
-        |  tester  |  tester  |
 
     Scenario Outline: Create nodes manualy using different roles
         Given I am logged in as a user with the "<role_machine_name>" role
