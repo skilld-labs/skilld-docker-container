@@ -26,9 +26,13 @@ mysql/
 node_modules
 web/themes/custom/*/dist/
 private-files/*/
+private/*/
 *.sql
 .lighthouseci/
 web/.lighthouseci/
+*.zip
+*.tgz
+*.tar.gz
 
 # Ignore personal directories
 .idea/
