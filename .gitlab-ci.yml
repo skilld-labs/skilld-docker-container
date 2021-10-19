@@ -308,7 +308,7 @@ test:deploy:
   - printf "\033[1m- Getting name of last tag created...\n\033[0m"
   - export LAST_TAG=$(curl --header "Authorization:$GITLAB_PROJECT_BASIC_AUTH" --header "PRIVATE-TOKEN:$GITLAB_PROJECT_ACCESS_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/repository/tags" | jq -r '.[0] | .name')
   - |
-    if [ -z "$LAST_TAG" ]; then printf "\033[1m- No tag was found. Nothing to do here.\n\033[0m"; else \
+    if [ "$LAST_TAG" = "null" ]; then printf "\033[1m- No tag was found. Nothing to do here.\n\033[0m"; else \
     printf "\033[1m- Tag found! ($LAST_TAG) Downloading it's artifacts...\n\033[0m" && \
     curl --location --output artifacts.zip --header "Authorization:$GITLAB_PROJECT_BASIC_AUTH" --header "PRIVATE-TOKEN:$GITLAB_PROJECT_ACCESS_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/artifacts/$LAST_TAG/download?job=build:tag" && \
     printf "\033[1m- Artifacts were successfully downloaded from tag $LAST_TAG\n\033[0m" && \
