@@ -1,7 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-id: wysiwyg
-label: WYSIWYG
-revision: 1
-description: 'A simple formatted text field using a WYSIWYG editor'

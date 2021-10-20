@@ -111,7 +111,7 @@ sniffers:sonarqube:
     -Dsonar.login=${SONAR_TOKEN}
     -Dsonar.projectBaseDir=.
     -Dsonar.sources=.
-    -Dsonar.inclusions=settings/**,web/modules/custom/**,web/profiles/sdd/**,web/themes/custom/**
+    -Dsonar.inclusions=settings/**,web/modules/custom/**,web/profiles/**,web/themes/custom/**
   only:
   - master
   - main

@@ -1,7 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-id: site_template_block
-label: 'Site template block'
-revision: 1
-description: 'Block allowing to fill the site template with content'

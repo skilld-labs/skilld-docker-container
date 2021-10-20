@@ -81,7 +81,7 @@ mv .got .git
 # Removing local DB settings from settings.php
 sed -i -e "/$databases\['default'\]\['default'\] = array (/,/)/d" web/sites/default/settings.php
 # Adding install profile value in settings.php
-echo "\$settings['install_profile'] = 'sdd';" >> web/sites/default/settings.php
+echo "\$settings['install_profile'] = 'druxxy';" >> web/sites/default/settings.php
 # Adding settings.local.php to web dir
 cp settings/settings.local.php web/sites/default/settings.local.php
 sed -i "/settings.local.php';/s/# //g" web/sites/default/settings.php

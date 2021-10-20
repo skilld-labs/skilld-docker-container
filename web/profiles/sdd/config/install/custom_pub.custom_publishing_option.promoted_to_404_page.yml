@@ -1,7 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-id: promoted_to_404_page
-label: 'Promoted to 404 page'
-description: 'Promote this content to be displayed on pages returning 404 HTTP code (not found)'
-publish_under_promote_options: true
