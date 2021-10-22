@@ -26,6 +26,7 @@ COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 
 SDC_SERVICES=$(shell docker-compose config --services)
 # Determine database data directory if defined
+DB_MOUNT_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/
 ifeq ($(findstring mysql,$(SDC_SERVICES)),mysql)
 	DB_MOUNT_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/$(COMPOSE_PROJECT_NAME)_mysql
 endif
