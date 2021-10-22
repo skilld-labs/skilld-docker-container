@@ -160,8 +160,8 @@ ifdef REVIEW_DOMAIN
 else
 	$(eval BASE_URL := $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "traefik.port"}}' $(COMPOSE_PROJECT_NAME)_web))
 endif
-	$(info Login as System Admin: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(ADMIN_NAME)" --no-browser | awk -F "default" '{print $$2}')) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')))
-	$(info Login as Contributor: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(TESTER_NAME)" --no-browser | awk -F "default" '{print $$2}')) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')))
+	$(info Login as System Admin: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(ADMIN_NAME)" /admin/content/ | awk -F "default" '{print $$2}')) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')))
+	$(info Login as Contributor: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(TESTER_NAME)" /admin/content/ | awk -F "default" '{print $$2}')) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')))
 	$(info )
 ifneq ($(shell diff .env .env.default -q),)
 	@echo -e "\x1b[33mWARNING\x1b[0m - .env and .env.default files differ. Use 'make diff' to see details."
