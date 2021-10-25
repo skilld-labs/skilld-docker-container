@@ -1,7 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-id: media
-label: Media
-revision: 1
-description: "Access to Media Library content\t"
