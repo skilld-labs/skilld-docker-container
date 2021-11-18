@@ -42,6 +42,10 @@ php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 # Execute php container as root user
 php-0 = docker-compose exec -T --user 0:0 php ${1}
 
+ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick php7-intl #php7-redis wkhtmltopdf gnu-libiconv php7-pdo_pgsql postgresql-client postgresql-contrib
+DC_MODULES := project_default_content better_normalizers default_content hal serialization
+MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv migrate_tools
+
 ## Full site install from the scratch
 all: | provision back front si localize hooksymlink info
 # Install for CI deploy:review. Back & Front tasks are run in a dedicated previous step in order to leverage CI cache
@@ -72,7 +76,9 @@ endif
 	docker-compose up -d --remove-orphans
 	# Set composer2 as default
 	$(call php-0, ln -fs composer2 /usr/bin/composer)
-	$(call php-0, apk add --no-cache tzdata $(ADD_PHP_EXT))
+ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
+	$(call php-0, apk add --no-cache $(ADDITIONAL_PHP_PACKAGES))
+endif
 	# Set up timezone
 	$(call php-0, cp /usr/share/zoneinfo/Europe/Paris /etc/localtime)
 	# Install newrelic PHP extension if NEW_RELIC_LICENSE_KEY defined
@@ -81,9 +87,8 @@ endif
 
 ## Install backend dependencies
 back:
-ifneq ($(strip $(ADD_PHP_EXT)),)
-# Install additional php extensions as this goal used in CI (todo stop doing it)
-	$(call php-0, apk add --no-cache $(ADD_PHP_EXT))
+ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
+	$(call php-0, apk add --no-cache $(ADDITIONAL_PHP_PACKAGES))
 endif
 	@echo "Installing composer dependencies, without dev ones"
 	$(call php, composer install --no-interaction --prefer-dist -o --no-dev)
