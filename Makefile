@@ -42,7 +42,7 @@ php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 # Execute php container as root user
 php-0 = docker-compose exec -T --user 0:0 php ${1}
 
-ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick php7-intl #php7-redis wkhtmltopdf gnu-libiconv php7-pdo_pgsql postgresql-client postgresql-contrib
+ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php7-intl php7-redis wkhtmltopdf gnu-libiconv php7-pdo_pgsql postgresql-client postgresql-contrib
 DC_MODULES := project_default_content better_normalizers default_content hal serialization
 MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv migrate_tools
 
