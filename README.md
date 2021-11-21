@@ -66,7 +66,7 @@
 | IMAGE_DRIVER | Image to use for automated testing webdriver | `zenika/alpine-chrome` |
 | ADD_PHP_EXT | Additional php extension to install | - |
 | MAIN_DOMAIN_NAME | Domain name used for traefik | `docker.localhost` |
-| DB_URL | Url to connect to database | `sqlite:///dev/shm/d8.sqlite` |
+| DB_URL | Url to connect to database | `sqlite:///dev/shm/db.sqlite` |
 | DB_DATA_DIR | Full path to database storage | `/dev/shm` |
 | CLEAR_FRONT_PACKAGES | Set it to `no` to keep `/node_nodules` directory in theme after `make front` task to save build time. | yes |
 | RA_BASIC_AUTH | username:hashed-password format defining BasicAuth in Traefik. Password hashed using `htpasswd -nibB username password!` as [described here](https://doc.traefik.io/traefik/middlewares/basicauth/#general) | - |
@@ -86,7 +86,7 @@
     image: percona:5.7.22
   ...
   ```
-  * Update `.env` file, and set `DB_URL=mysql://d8:d8@mysql/d8`
+  * Update `.env` file, and set `DB_URL=mysql://db:db@mysql/db`
 
 #### Network
 

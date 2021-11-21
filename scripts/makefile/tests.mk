@@ -66,7 +66,6 @@ endif
 ## Validate composer.json file
 compval:
 	@echo "Composer.json validation..."
-	# Can't use --strict cause we need dev versions for d9 compatibility
 	@docker run --rm -v $(CURDIR):/mnt -w /mnt $(IMAGE_PHP) composer validate
 
 ## Validate watchdog logs
