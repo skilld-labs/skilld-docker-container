@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
+# set -x
+set -eu
 
 # Preparing
 echo -e "\nEnabling module..."
@@ -21,7 +23,7 @@ echo -e "\nLooking for languages..."
 	LANGUAGE_COUNT=$($($PARSING_CMD) | grep -vE "$LANGUAGES_TO_EXCLUDE" | grep -c $ENTITY_TO_PARSE)
 
 	# Find languages
-	LANGUAGES_FOUND=$($($PARSING_CMD) | grep -vE "$LANGUAGES_TO_EXCLUDE" | grep $ENTITY_TO_PARSE | awk -F "." '{print $3}' | tr '\n' ',' | sed 's/,$//')
+	LANGUAGES_FOUND=$($($PARSING_CMD) | grep -vE "$LANGUAGES_TO_EXCLUDE" | grep ^$ENTITY_TO_PARSE | awk -F "." '{print $3}' | tr '\n' ',' | sed 's/,$//')
 
 	if [ "$LANGUAGE_COUNT" -gt "1" ]; then
 		printf "- \033[1m$LANGUAGE_COUNT languages\033[0m found : "
@@ -45,13 +47,13 @@ echo -e "\nLooking for bundles..."
 	if [ "$BUNDLE_COUNT" -gt "0" ]; then
 
 		printf "- \033[1m$BUNDLE_COUNT Voc bundle(s)\033[0m found : "
-		BUNDLES_FOUND=$($($PARSING_CMD) | grep $ENTITY_TO_PARSE | awk -F "." '{print $3}' | tr '\n' ',' | sed 's/,$//')
+		BUNDLES_FOUND=$($($PARSING_CMD) | grep ^$ENTITY_TO_PARSE | awk -F "." '{print $3}' | tr '\n' ',' | sed 's/,$//')
 		echo $BUNDLES_FOUND
 
 		echo "  Generating content..."
 		VOC_GENERATE_COUNT=10
 
-		BUNDLES_FOUND=$($($PARSING_CMD) | grep $ENTITY_TO_PARSE | awk -F "." '{print $3}')
+		BUNDLES_FOUND=$($($PARSING_CMD) | grep ^$ENTITY_TO_PARSE | awk -F "." '{print $3}')
 		for voc_bundles in $BUNDLES_FOUND; do
 			drush devel-generate-terms $VOC_GENERATE_COUNT --bundles=$voc_bundles --translations=$LANGUAGES_FOUND --quiet
 			echo "  $VOC_GENERATE_COUNT terms have been created for $voc_bundles"
@@ -72,13 +74,13 @@ echo -e "\nLooking for bundles..."
 	if [ "$BUNDLE_COUNT" -gt "0" ]; then
 
 		printf "- \033[1m$BUNDLE_COUNT CT bundle(s)\033[0m found : "
-		BUNDLES_FOUND=$($($PARSING_CMD) | grep $ENTITY_TO_PARSE | awk -F "." '{print $3}' | tr '\n' ',' | sed 's/,$//')
+		BUNDLES_FOUND=$($($PARSING_CMD) | grep ^$ENTITY_TO_PARSE | awk -F "." '{print $3}' | tr '\n' ',' | sed 's/,$//')
 		echo $BUNDLES_FOUND
 
 		echo "  Generating content..."
-		CT_GENERATE_COUNT=100
+		CT_GENERATE_COUNT=30
 
-		BUNDLES_FOUND=$($($PARSING_CMD) | grep $ENTITY_TO_PARSE | awk -F "." '{print $3}')
+		BUNDLES_FOUND=$($($PARSING_CMD) | grep ^$ENTITY_TO_PARSE | awk -F "." '{print $3}')
 		for ct_bundles in $BUNDLES_FOUND; do
 			drush devel-generate-content $CT_GENERATE_COUNT --bundles=$ct_bundles --translations=$LANGUAGES_FOUND --quiet
 			echo "  $CT_GENERATE_COUNT nodes have been created for $ct_bundles"
