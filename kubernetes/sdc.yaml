@@ -1,0 +1,126 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  upstream: |
+    upstream upstream {
+      server localhost:9000;
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdc
+  labels:
+    name: sdc
+spec:
+  revisionHistoryLimit: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      name: sdc
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: sdc
+    spec:
+      volumes:
+        - name: codebase
+          hostPath:
+            path: /home/dferlay/Sources/df-sdc # TODO: Variable for relative path
+            type: Directory
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+        - name: cache-js
+          emptyDir:
+            medium: Memory
+        - name: cache-css
+          emptyDir:
+            medium: Memory
+        - name: cache-php
+          emptyDir:
+            medium: Memory
+      containers:
+        - name: php
+          image: skilldlabs/php:74-fpm
+          env:
+            - name: COMPOSER_MEMORY_LIMIT
+              value: "-1"
+          ports:
+          - containerPort: 9000
+            protocol: TCP
+          volumeMounts:
+          - mountPath: /var/www/html
+            name: codebase
+          - mountPath: /var/www/html/web/sites/default/files/css
+            name: cache-css
+          - mountPath: /var/www/html/web/sites/default/files/js
+            name: cache-js
+          - mountPath: /var/www/html/web/sites/default/files/php
+            name: cache-php
+        - name: nginx
+          image: skilldlabs/nginx:1.20
+          ports:
+          - containerPort: 80
+            protocol: TCP
+          volumeMounts:
+          - mountPath: /var/www/html
+            name: codebase
+          - mountPath: /etc/nginx/upstream
+            name: nginx-config
+            subPath: upstream
+          - mountPath: /var/www/html/web/sites/default/files/css
+            name: cache-css
+          - mountPath: /var/www/html/web/sites/default/files/js
+            name: cache-js
+        - name: mail
+          image: skilldlabs/mailhog
+      restartPolicy: Always
+      nodeSelector:
+        kubernetes.io/hostname: sdc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdc
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+  - name: mailhog
+    port: 8025
+    protocol: TCP
+  selector:
+    mrn: sdc
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: sdc
+  labels:
+    mrn: sdc
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: web-ingress
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+    # nginx.ingress.kubernetes.io/auth-url: {{ kb_ingress_auth_url }}
+    # nginx.ingress.kubernetes.io/proxy-body-size: {{ kb_ingress_proxy_body_size }}
+spec:
+  rules:
+  - host: local.skilld.cloud
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: sdc
+            servicePort: 80
+  tls:
+  - hosts:
+    - local.skilld.cloud
+    secretName: sdc-tls

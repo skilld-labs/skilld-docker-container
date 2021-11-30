@@ -1,4 +1,4 @@
-# Add utility functions and scripts to the container
+# Include utility functions and scripts
 include scripts/makefile/*.mk
 
 .PHONY: all fast allfast provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalrectorval upgradestatusval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize local-settings redis-settings content patchval diff
@@ -10,8 +10,13 @@ include scripts/makefile/*.mk
 
 # Prepare enviroment variables from defaults
 $(shell false | cp -i \.env.default \.env 2>/dev/null)
-$(shell false | cp -i \.\/docker\/docker-compose\.override\.yml\.default \.\/docker\/docker-compose\.override\.yml 2>/dev/null)
 include .env
+
+# Sanitize PROJECT_NAME input
+COMPOSE_PROJECT_NAME := $(shell echo "$(PROJECT_NAME)" | tr -cd '[a-zA-Z0-9]' | tr '[:upper:]' '[:lower:]')
+
+kk:
+	helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml --set projectName=$(COMPOSE_PROJECT_NAME) sdc ./helm/
 
 # Get user/group id to manage permissions between host and containers
 LOCAL_UID := $(shell id -u)
@@ -24,7 +29,7 @@ CGID ?= $(LOCAL_GID)
 # Define network name.
 COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 
-SDC_SERVICES=$(shell docker-compose config --services)
+# SDC_SERVICES=$(shell docker-compose config --services) # TODO: Replace or remove
 # Determine database data directory if defined
 DB_MOUNT_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/
 ifeq ($(findstring mysql,$(SDC_SERVICES)),mysql)
@@ -38,10 +43,15 @@ endif
 CURDIR=$(shell pwd)
 
 # Execute php container as regular user
-php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
+php = kubectl exec -it deploy/sdc -c php -- su -s /bin/ash www-data -c "${1}"
 # Execute php container as root user
-php-0 = docker-compose exec -T --user 0:0 php ${1}
+php-0 = kubectl exec -it deploy/sdc -c php -- ${1}
 
+killall:
+	/usr/local/bin/k3s-killall.sh
+	/usr/local/bin/k3s-uninstall.sh
+
+# Variables
 ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php7-intl php7-redis wkhtmltopdf gnu-libiconv php7-pdo_pgsql postgresql-client postgresql-contrib
 DC_MODULES := project_default_content better_normalizers default_content hal serialization
 MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv migrate_tools
@@ -63,7 +73,7 @@ provision:
 # Check if enviroment variables has been defined
 ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
 	$(info Project name can not be default, please enter project name.)
-	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "Project name: " REPLY;echo -n $$REPLY)))
+	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "Project name: " REPLY;echo -n $$REPLY))) # TODO: Sanitize lowercase/nospecialchar
 	$(shell sed -i -e '/COMPOSE_PROJECT_NAME=/ s/=.*/=$(COMPOSE_PROJECT_NAME)/' .env)
 	$(info Please review your project settings and run `make all` again.)
 	exit 1
@@ -71,9 +81,17 @@ endif
 ifdef DB_MOUNT_DIR
 	$(shell [ ! -d $(DB_MOUNT_DIR) ] && mkdir -p $(DB_MOUNT_DIR) && chmod 777 $(DB_MOUNT_DIR))
 endif
-	make -s down
+# 	make -s down
+	@echo "Downloading and installing container orchestrator..."
+	curl -sfL https://get.k3s.io | K3S_NODE_NAME=sdc K3S_KUBECONFIG_MODE="644" sh - # TODO: Check behavior if k3s already install + lock version
+	curl -sfL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sh - # TODO: rm $(which helm)
+# 	kubectl config view --raw >~/.kube/config # TODO: Simlink to /etc/rancher/k3s/k3s.yaml OR use helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml sdc ./kubernetes/sdc-chart
 	@echo "Build and run containers..."
-	docker-compose up -d --remove-orphans
+	# TODO: Rename file
+# 	kubectl apply -f kubernetes/sdc.yaml
+	helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml --set projectName=$(COMPOSE_PROJECT_NAME) sdc ./helm/
+# 	helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml sdc ./helm/ # https://github.com/k3s-io/k3s/issues/1126#issuecomment-567591888
+	for i in {1..50}; do echo "Waiting for PHP container..." && kubectl exec -it deploy/sdc -c php -- "whoami" &> /dev/null && break || sleep 1; done; echo "Container is up !"
 	# Set composer2 as default
 	$(call php-0, ln -fs composer2 /usr/bin/composer)
 ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
@@ -157,37 +175,31 @@ localize:
 info:
 	$(info )
 	$(info Containers for "$(COMPOSE_PROJECT_NAME)" info:)
-	$(eval CONTAINERS = $(shell docker ps -f name=$(COMPOSE_PROJECT_NAME) --format "{{ .ID }}" -f 'label=traefik.enable=true'))
-	$(foreach CONTAINER, $(CONTAINERS),$(info http://$(shell printf '%-19s \n'  $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "traefik.port"}} {{range $$p, $$conf := .NetworkSettings.Ports}}{{$$p}}{{end}} {{.Name}}' $(CONTAINER) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')) ))
 	$(info )
 ifdef REVIEW_DOMAIN
 	$(eval BASE_URL := $(MAIN_DOMAIN_NAME))
 else
-	$(eval BASE_URL := $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "traefik.port"}}' $(COMPOSE_PROJECT_NAME)_web))
+	$(eval BASE_URL := $(shell kubectl get pods -l name=sdc --template '{{range .items}}{{.status.podIP}}{{"\n"}}{{end}}'))
 endif
-	$(info Login as System Admin: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(ADMIN_NAME)" /admin/content/ | awk -F "default" '{print $$2}')))))
-	$(info Login as Contributor: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(TESTER_NAME)" /admin/content/ | awk -F "default" '{print $$2}')))))
+	$(info Login as System Admin: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(ADMIN_NAME)" /admin/content/ | awk -F "default" '{print \$$2}')))))
+	$(info Login as Contributor: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(TESTER_NAME)" /admin/content/ | awk -F "default" '{print \$$2}')))))
 	$(info )
 ifneq ($(shell diff .env .env.default -q),)
 	@echo -e "\x1b[33mWARNING\x1b[0m - .env and .env.default files differ. Use 'make diff' to see details."
-endif
-ifneq ($(shell diff docker/docker-compose.override.yml docker/docker-compose.override.yml.default -q),)
-	@echo -e "\x1b[33mWARNING\x1b[0m - docker/docker-compose.override.yml and docker/docker-compose.override.yml.default files differ. Use 'make diff' to see details."
 endif
 
 ## Output diff between local and versioned files
 diff:
 	diff -u0 --color .env .env.default || true; echo ""
-	diff -u0 --color docker/docker-compose.override.yml docker/docker-compose.override.yml.default || true; echo ""
 
 
 ## Run shell in PHP container as regular user
 exec:
-	docker-compose exec --user $(CUID):$(CGID) php ash
+	kubectl exec -it deploy/sdc -c php -- su -s /bin/ash www-data -c ash
 
 ## Run shell in PHP container as root
 exec0:
-	docker-compose exec --user 0:0 php ash
+	kubectl exec -it deploy/sdc -c php -- ash
 
 down:
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
@@ -232,3 +244,6 @@ dev:
 drush:
 	$(call php, $(filter-out "$@",$(MAKECMDGOALS)))
 	$(info "To pass arguments use double dash: "make drush en devel -- -y"")
+
+logs:
+	kubectl logs -f deploy/sdc --all-containers=true
