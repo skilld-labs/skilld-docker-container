@@ -72,10 +72,9 @@ fast:
 provision:
 # Check if enviroment variables has been defined
 ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
-	$(info Project name can not be default, please enter project name.)
-	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "Project name: " REPLY;echo -n $$REPLY))) # TODO: Sanitize lowercase/nospecialchar
-	$(shell sed -i -e '/COMPOSE_PROJECT_NAME=/ s/=.*/=$(COMPOSE_PROJECT_NAME)/' .env)
-	$(info Please review your project settings and run `make all` again.)
+	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "- Please enter project name: " REPLY;echo -n $$REPLY)))
+	$(shell sed -i -e '/PROJECT_NAME=/ s/=.*/=$(COMPOSE_PROJECT_NAME)/' .env)
+	$(info - Run `make all` again.)
 	exit 1
 endif
 ifdef DB_MOUNT_DIR
@@ -152,8 +151,8 @@ ifneq ("$(wildcard settings/settings.local.php)","")
 	$(call php, drush cr)
 endif
 
-REDIS_IS_INSTALLED := $(shell grep "redis.connection" web/sites/default/settings.php | tail -1 | wc -l || echo "0")
 redis-settings:
+	REDIS_IS_INSTALLED := $(shell grep "redis.connection" web/sites/default/settings.php | tail -1 | wc -l || echo "0")
 ifeq ($(REDIS_IS_INSTALLED), 1)
 	@echo "Redis settings already installed, nothing to do"
 else
