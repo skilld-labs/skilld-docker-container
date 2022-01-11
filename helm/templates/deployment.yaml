@@ -36,7 +36,7 @@ spec:
             medium: Memory
       containers:
         - name: php
-          image: skilldlabs/php:74-fpm
+          image: {{ .Values.imagePhp }}
           env:
             - name: COMPOSER_MEMORY_LIMIT
               value: "-1"
@@ -53,7 +53,7 @@ spec:
           - mountPath: /var/www/html/web/sites/default/files/php
             name: cache-php
         - name: nginx
-          image: skilldlabs/nginx:1.20
+          image: {{ .Values.imageNginx }}
           ports:
           - containerPort: 80
             protocol: TCP
