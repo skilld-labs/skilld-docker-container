@@ -177,7 +177,7 @@ info:
 ifdef REVIEW_DOMAIN
 	$(eval BASE_URL := $(MAIN_DOMAIN_NAME))
 else
-	$(eval BASE_URL := $(shell kubectl get pods -l name=sdc --template '{{range .items}}{{.status.podIP}}{{"\n"}}{{end}}'))
+	$(eval BASE_URL := $(shell kubectl get pods -l name=$(COMPOSE_PROJECT_NAME) --template '{{range .items}}{{.status.podIP}}{{"\n"}}{{end}}'))
 endif
 	$(info Login as System Admin: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(ADMIN_NAME)" /admin/content/ | awk -F "default" '{print \$$2}')))))
 	$(info Login as Contributor: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(TESTER_NAME)" /admin/content/ | awk -F "default" '{print \$$2}')))))
