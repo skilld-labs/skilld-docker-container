@@ -43,9 +43,9 @@ endif
 CURDIR=$(shell pwd)
 
 # Execute php container as regular user
-php = kubectl exec -it deploy/sdc -c php -- su -s /bin/ash www-data -c "${1}"
+php = kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- su -s /bin/ash www-data -c "${1}"
 # Execute php container as root user
-php-0 = kubectl exec -it deploy/sdc -c php -- ${1}
+php-0 = kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- ${1}
 
 killall:
 	/usr/local/bin/k3s-killall.sh
@@ -72,7 +72,7 @@ fast:
 provision:
 # Check if enviroment variables has been defined
 ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
-	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "- Please enter project name: " REPLY;echo -n $$REPLY)))
+	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "Please enter project name: " REPLY;echo -n $$REPLY)))
 	$(shell sed -i -e '/PROJECT_NAME=/ s/=.*/=$(COMPOSE_PROJECT_NAME)/' .env)
 	$(info - Run `make all` again.)
 	exit 1
@@ -88,9 +88,8 @@ endif
 	@echo "Build and run containers..."
 	# TODO: Rename file
 # 	kubectl apply -f kubernetes/sdc.yaml
-	helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml --set projectName=$(COMPOSE_PROJECT_NAME) sdc ./helm/
-# 	helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml sdc ./helm/ # https://github.com/k3s-io/k3s/issues/1126#issuecomment-567591888
-	for i in {1..50}; do echo "Waiting for PHP container..." && kubectl exec -it deploy/sdc -c php -- "whoami" &> /dev/null && break || sleep 1; done; echo "Container is up !"
+	helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml --set projectName="$(COMPOSE_PROJECT_NAME)" sdc ./helm/ # https://github.com/k3s-io/k3s/issues/1126#issuecomment-567591888
+	for i in {1..50}; do echo "Waiting for PHP container..." && kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- "whoami" &> /dev/null && break || sleep 1; done; echo "Container is up !"
 	# Set composer2 as default
 	$(call php-0, ln -fs composer2 /usr/bin/composer)
 ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
@@ -194,11 +193,11 @@ diff:
 
 ## Run shell in PHP container as regular user
 exec:
-	kubectl exec -it deploy/sdc -c php -- su -s /bin/ash www-data -c ash
+	kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- su -s /bin/ash www-data -c ash
 
 ## Run shell in PHP container as root
 exec0:
-	kubectl exec -it deploy/sdc -c php -- ash
+	kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- ash
 
 down:
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
@@ -245,4 +244,4 @@ drush:
 	$(info "To pass arguments use double dash: "make drush en devel -- -y"")
 
 logs:
-	kubectl logs -f deploy/sdc --all-containers=true
+	kubectl logs -f deploy/$(COMPOSE_PROJECT_NAME) --all-containers=true

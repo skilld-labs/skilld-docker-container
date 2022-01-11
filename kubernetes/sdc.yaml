@@ -98,7 +98,7 @@ spec:
   selector:
     mrn: sdc
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: sdc
@@ -116,10 +116,13 @@ spec:
   - host: local.skilld.cloud
     http:
       paths:
-        - path: /
-          backend:
-            serviceName: sdc
-            servicePort: 80
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: sdc
+            port:
+              number: 80
   tls:
   - hosts:
     - local.skilld.cloud
