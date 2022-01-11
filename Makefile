@@ -86,10 +86,8 @@ endif
 	curl -sfL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sh - # TODO: rm $(which helm)
 # 	kubectl config view --raw >~/.kube/config # TODO: Simlink to /etc/rancher/k3s/k3s.yaml OR use helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml sdc ./kubernetes/sdc-chart
 	@echo "Build and run containers..."
-	# TODO: Rename file
-# 	kubectl apply -f kubernetes/sdc.yaml
-	helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml --set projectName="$(COMPOSE_PROJECT_NAME)" sdc ./helm/ # https://github.com/k3s-io/k3s/issues/1126#issuecomment-567591888
-	for i in {1..50}; do echo "Waiting for PHP container..." && kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- "whoami" &> /dev/null && break || sleep 2; done; echo "Container is up !"
+	helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml --set projectName="$(COMPOSE_PROJECT_NAME)",projectPath="$(CURDIR)" sdc ./helm/ # https://github.com/k3s-io/k3s/issues/1126#issuecomment-567591888
+	for i in {1..50}; do echo "Waiting for PHP container..." && kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- "whoami" &> /dev/null && break || sleep 3; done; echo "Container is up !"
 	# Set composer2 as default
 	$(call php-0, ln -fs composer2 /usr/bin/composer)
 ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)

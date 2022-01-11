@@ -20,7 +20,7 @@ spec:
       volumes:
         - name: codebase
           hostPath:
-            path: /home/dferlay/Sources/df-sdc # TODO: Variable for relative path
+            path: {{ .Values.projectPath }}
             type: Directory
         - name: nginx-config
           configMap:
