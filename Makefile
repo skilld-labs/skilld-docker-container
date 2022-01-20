@@ -49,6 +49,25 @@ killall:
 	/usr/local/bin/k3s-uninstall.sh
 	sudo rm -f $(shell which helm)
 
+
+HELM_IS_INSTALLED := $(shell [ -e "$(shell which helm 2> /dev/null)" ] && echo true || echo false)
+h:
+ifeq ($(HELM_IS_INSTALLED), true)
+	@echo "Helm is installed"
+else
+	@echo "Helm is not installed"
+endif
+
+KUBECTL_IS_INSTALLED := $(shell [ -e "$(shell which kubectl 2> /dev/null)" ] && echo true || echo false)
+k:
+ifeq ($(KUBECTL_IS_INSTALLED), true)
+	@echo "Kubernetes is installed"
+else
+	@echo "Kubernetes is not installed"
+endif
+
+
+
 # Variables
 ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php7-intl php7-redis wkhtmltopdf gnu-libiconv php7-pdo_pgsql postgresql-client postgresql-contrib
 DC_MODULES := project_default_content better_normalizers default_content hal serialization
@@ -65,6 +84,8 @@ allfast: | fast provision back front si localize hooksymlink info
 fast:
 	$(shell sed -i "s|^#DB_URL=sqlite:///dev/shm/d8.sqlite|DB_URL=sqlite:///dev/shm/d8.sqlite|g"  .env)
 	$(shell sed -i "s|^DB_URL=sqlite:./../.cache/d8.sqlite|#DB_URL=sqlite:./../.cache/d8.sqlite|g"  .env)
+
+
 
 ## Provision enviroment
 provision:
