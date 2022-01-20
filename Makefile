@@ -15,9 +15,6 @@ include .env
 # Sanitize PROJECT_NAME input
 COMPOSE_PROJECT_NAME := $(shell echo "$(PROJECT_NAME)" | tr -cd '[a-zA-Z0-9]' | tr '[:upper:]' '[:lower:]')
 
-kk:
-	helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml --set projectName=$(COMPOSE_PROJECT_NAME) sdc ./helm/
-
 # Get user/group id to manage permissions between host and containers
 LOCAL_UID := $(shell id -u)
 LOCAL_GID := $(shell id -g)
@@ -50,6 +47,7 @@ php-0 = kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- ${1}
 killall:
 	/usr/local/bin/k3s-killall.sh
 	/usr/local/bin/k3s-uninstall.sh
+	sudo rm -f $(shell which helm)
 
 # Variables
 ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php7-intl php7-redis wkhtmltopdf gnu-libiconv php7-pdo_pgsql postgresql-client postgresql-contrib
@@ -68,13 +66,6 @@ fast:
 	$(shell sed -i "s|^#DB_URL=sqlite:///dev/shm/d8.sqlite|DB_URL=sqlite:///dev/shm/d8.sqlite|g"  .env)
 	$(shell sed -i "s|^DB_URL=sqlite:./../.cache/d8.sqlite|#DB_URL=sqlite:./../.cache/d8.sqlite|g"  .env)
 
-xx:
-	@echo "Build and \
-	run containers..."
-	helm install --kubeconfig="/etc/rancher/k3s/k3s.yaml" sdc ./helm/ --set \
-	projectName="$(COMPOSE_PROJECT_NAME)",\
-	projectPath="$(CURDIR)"
-
 ## Provision enviroment
 provision:
 # Check if enviroment variables has been defined
@@ -89,9 +80,8 @@ ifdef DB_MOUNT_DIR
 endif
 # 	make -s down
 	@echo "Downloading and installing container orchestrator..."
-	curl -sfL https://get.k3s.io | K3S_NODE_NAME=sdc K3S_KUBECONFIG_MODE="644" sh - # TODO: Check behavior if k3s already install + lock version
-	curl -sfL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sh - # TODO: rm $(which helm)
-# 	kubectl config view --raw >~/.kube/config # TODO: Simlink to /etc/rancher/k3s/k3s.yaml OR use helm install --kubeconfig=/etc/rancher/k3s/k3s.yaml sdc ./kubernetes/sdc-chart
+	curl -sfL https://get.k3s.io | K3S_NODE_NAME=sdc K3S_KUBECONFIG_MODE="644" INSTALL_K3S_VERSION="v1.22.5+k3s1" sh -
+	curl -sfL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sh -
 	@echo "Build and run containers..."
 	helm install --kubeconfig="/etc/rancher/k3s/k3s.yaml" sdc ./helm/ --set \
 	projectName="$(COMPOSE_PROJECT_NAME)",\

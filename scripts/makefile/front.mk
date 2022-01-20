@@ -1,4 +1,5 @@
 FRONT_PORT?=65200
+RANDOM_STRING = $(shell cat /dev/urandom | tr -dc 'a-fA-F0-9' | tr '[:upper:]' '[:lower:]' | fold -w 10 | head -n 1)
 
 # Execute front container function.
 frontexec = docker run \
@@ -9,25 +10,9 @@ frontexec = docker run \
 	--workdir /app \
 	$(IMAGE_FRONT) ${1}
 
-# Execute front container function on localhost:FRONT_PORT. Needed for dynamic storybook.
-frontexec-with-port = docker run \
-	--rm \
-	--init \
-	-p $(FRONT_PORT):$(FRONT_PORT) \
-	-u $(CUID):$(CGID) \
-	-v $(CURDIR)/web/themes/custom/$(THEME_NAME):/app \
-	--workdir /app \
-	$(IMAGE_FRONT) ${1}
+
 
 # Execute front container with TTY. Needed for storybook components creation.
-frontexec-with-interactive = docker run \
-	--rm \
-	--init \
-	-u $(CUID):$(CGID) \
-	-v $(CURDIR)/web/themes/custom/$(THEME_NAME):/app \
-	--workdir /app \
-	-it \
-	$(IMAGE_FRONT) ${1}
 
 clear-front:
 	@echo "Clean of node_modules and compiled dist... To skip this action please set CLEAR_FRONT_PACKAGES=no in .env file"
@@ -77,6 +62,18 @@ lint:
 		echo "- Theme directory defined in .env file was not found. Skipping theme linters with fix."; \
 	fi
 
+
+
+# Execute front container function on localhost:FRONT_PORT. Needed for dynamic storybook.
+frontexec-with-port = docker run \
+	--rm \
+	--init \
+	-p $(FRONT_PORT):$(FRONT_PORT) \
+	-u $(CUID):$(CGID) \
+	-v $(CURDIR)/web/themes/custom/$(THEME_NAME):/app \
+	--workdir /app \
+	$(IMAGE_FRONT) ${1}
+
 storybook:
 	@if [ -d $(CURDIR)/web/themes/custom/$(THEME_NAME) ]; then \
 		echo "- Theme directory found. Running dynamic storybook..."; \
@@ -88,6 +85,9 @@ storybook:
 	else \
 		echo "- Theme directory defined in .env file was not found. Skipping dynamic storybook."; \
 	fi
+
+
+
 
 build-storybook:
 	@if [ -d $(CURDIR)/web/themes/custom/$(THEME_NAME) ]; then \
@@ -101,6 +101,20 @@ build-storybook:
 		echo "- Theme directory defined in .env file was not found. Skipping dynamic storybook."; \
 	fi
 
+# Execute front container with TTY. Needed for storybook components creation.
 create-component:
 	@echo "Create component CLI dialog... It assumed that you already have 'make storybook' or 'make build-storybook' finished"
+	kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_FRONT) --rm -i --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)/web/themes/custom/$(THEME_NAME)" } } ], "containers": [ { "name": "$(RANDOM_STRING)", "image": "$(IMAGE_FRONT)", "command": [ "yarn", "cc" ], "stdin": true, "tty": true, "workingDir": "/app", "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" } ], "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "securityContext": { "runAsUser": 1000, "runAsGroup": 1000 } } }'
+
+cc:
 	$(call frontexec-with-interactive, yarn cc)
+
+
+# frontexec-with-interactive = docker run \
+# 	--rm \
+# 	-u $(CUID):$(CGID) \
+# 	-v $(CURDIR)/web/themes/custom/$(THEME_NAME):/app \
+# 	--workdir /app \
+# 	--init \
+# 	-it \
+# 	$(IMAGE_FRONT) ${1}
