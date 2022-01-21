@@ -52,7 +52,7 @@ GOJQ_IS_INSTALLED := $(shell [ -e "$(shell which gojq 2> /dev/null)" ] && echo t
 
 
 killall:
-ifeq ($(HELM_IS_INSTALLED), true)
+ifeq ($(KUBECTL_IS_INSTALLED), true)
 	/usr/local/bin/k3s-killall.sh
 	/usr/local/bin/k3s-uninstall.sh
 endif
@@ -64,11 +64,6 @@ ifeq ($(GOJQ_IS_INSTALLED), true)
 endif
 
 
-w:
-	@echo "SYSTEM_OS=$(SYSTEM_OS)"
-	@echo "SYSTEM_PROCESSOR=$(SYSTEM_PROCESSOR)"
-	@echo "UNAME_M=$(UNAME_M)"
-	@echo "UNAME_S=$(UNAME_S)"
 
 # Check if k3s is present, install it if not
 lookfork3s:
