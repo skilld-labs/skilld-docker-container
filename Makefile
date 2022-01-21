@@ -44,28 +44,38 @@ php = kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- su -s /bin/ash w
 # Execute php container as root user
 php-0 = kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- ${1}
 
-killall:
-	/usr/local/bin/k3s-killall.sh
-	/usr/local/bin/k3s-uninstall.sh
-	sudo rm -f $(shell which helm)
 
-
-HELM_IS_INSTALLED := $(shell [ -e "$(shell which helm 2> /dev/null)" ] && echo true || echo false)
-h:
-ifeq ($(HELM_IS_INSTALLED), true)
-	@echo "Helm is installed"
-else
-	@echo "Helm is not installed"
-endif
 
 KUBECTL_IS_INSTALLED := $(shell [ -e "$(shell which kubectl 2> /dev/null)" ] && echo true || echo false)
-k:
-ifeq ($(KUBECTL_IS_INSTALLED), true)
-	@echo "Kubernetes is installed"
-else
-	@echo "Kubernetes is not installed"
+HELM_IS_INSTALLED := $(shell [ -e "$(shell which helm 2> /dev/null)" ] && echo true || echo false)
+GOJQ_IS_INSTALLED := $(shell [ -e "$(shell which gojq 2> /dev/null)" ] && echo true || echo false)
+
+
+killall:
+ifeq ($(HELM_IS_INSTALLED), true)
+	/usr/local/bin/k3s-killall.sh
+	/usr/local/bin/k3s-uninstall.sh
+endif
+ifeq ($(HELM_IS_INSTALLED), true)
+	sudo rm -f $(shell which helm)
+endif
+ifeq ($(GOJQ_IS_INSTALLED), true)
+	sudo rm -f $(shell which gojq)
 endif
 
+
+w:
+	@echo "SYSTEM_OS=$(SYSTEM_OS)"
+	@echo "SYSTEM_PROCESSOR=$(SYSTEM_PROCESSOR)"
+	@echo "UNAME_M=$(UNAME_M)"
+	@echo "UNAME_S=$(UNAME_S)"
+
+# Check if k3s is present, install it if not
+lookfork3s:
+ifeq ($(KUBECTL_IS_INSTALLED), false)
+	@echo "Downloading and installing container orchestrator..."
+	curl -sfL https://get.k3s.io | K3S_NODE_NAME=sdc K3S_KUBECONFIG_MODE="644" INSTALL_K3S_VERSION="v1.22.5+k3s1" sh -
+endif
 
 
 # Variables
@@ -100,8 +110,7 @@ ifdef DB_MOUNT_DIR
 	$(shell [ ! -d $(DB_MOUNT_DIR) ] && mkdir -p $(DB_MOUNT_DIR) && chmod 777 $(DB_MOUNT_DIR))
 endif
 # 	make -s down
-	@echo "Downloading and installing container orchestrator..."
-	curl -sfL https://get.k3s.io | K3S_NODE_NAME=sdc K3S_KUBECONFIG_MODE="644" INSTALL_K3S_VERSION="v1.22.5+k3s1" sh -
+	make -s lookfork3s
 	curl -sfL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sh -
 	@echo "Build and run containers..."
 	helm install --kubeconfig="/etc/rancher/k3s/k3s.yaml" sdc ./helm/ --set \
@@ -265,3 +274,28 @@ drush:
 
 logs:
 	kubectl logs -f deploy/$(COMPOSE_PROJECT_NAME) --all-containers=true
+
+
+h:
+ifeq ($(HELM_IS_INSTALLED), true)
+	@echo "Helm is installed"
+else
+	@echo "Helm is not installed"
+endif
+
+
+k:
+ifeq ($(KUBECTL_IS_INSTALLED), true)
+	@echo "Kubernetes is installed"
+else
+	@echo "Kubernetes is not installed"
+endif
+
+
+g:
+ifeq ($(GOJQ_IS_INSTALLED), true)
+	@echo "Gojq is installed"
+else
+	@echo "Gojq is not installed"
+endif
+

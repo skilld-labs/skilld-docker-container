@@ -7,9 +7,14 @@ RANDOM_STRING := $(shell cat /dev/urandom | tr -dc 'a-fA-F0-9' | tr '[:upper:]' 
 jsonarrayconverter = echo -n "${1}" | gojq -cRs 'split(" ")'
 ## TODO: curl gojq binary according to os/arch
 
+v:
+	@echo yay
+
+x:
+	$(call frontexec,node -v)
 
 # Execute front container function
-frontexec = kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_FRONT) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)/web/themes/custom/$(THEME_NAME)" } } ], "containers": [ { "name": "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)", "image": "$(IMAGE_FRONT)", "command": $(shell $(call jsonarrayconverter,${1})), "workingDir": "/app", "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" } ], "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) } } }'
+frontexec = make -s lookfork3s; kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_FRONT) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)/web/themes/custom/$(THEME_NAME)" } } ], "containers": [ { "name": "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)", "image": "$(IMAGE_FRONT)", "command": $(shell $(call jsonarrayconverter,${1})), "workingDir": "/app", "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" } ], "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) } } }'
 
 # Execute front container function on localhost:FRONT_PORT. Needed for dynamic storybook
 frontexec-with-port = kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_FRONT) --rm -i --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)/web/themes/custom/$(THEME_NAME)" } } ], "containers": [ { "name": "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)", "image": "$(IMAGE_FRONT)", "command": $(shell $(call jsonarrayconverter,${1})), "stdin": true, "tty": true, "ports": [ { "containerPort": $(FRONT_PORT), "protocol": "TCP" } ], "workingDir": "/app", "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" } ], "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) } } }'
