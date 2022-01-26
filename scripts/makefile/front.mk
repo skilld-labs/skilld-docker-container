@@ -3,14 +3,8 @@ FRONT_PORT?=65200
 # Used to give a random name to Kubernetes pods executed on the fly by "kubectl run"
 RANDOM_STRING ?= $(shell cat /dev/urandom | tr -dc 'a-fA-F0-9' | tr '[:upper:]' '[:lower:]' | fold -w 10 | head -n 1)
 
-# Convert list of commands to json array format accepted by "kubectl run --overrides" commands
-# jsonarrayconverter = echo -n "${1}" | gojq -cRs 'split(" ")'
+# Convert list of commands to json array format expected by "kubectl run --overrides" commands
 jsonarrayconverter = if [ $(JQ_IS_INSTALLED) = false ]; then kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=stedolan/jq --restart=Never --quiet -i --rm --command -- jq -c -n --arg groups "${1}" '$$groups | split(" ")' 2> /dev/null; else jq -c -n --arg groups "${1}" '$$groups | split(" ")'; fi;
-
-
-x:
-	$(call frontexec,node -v)
-
 
 # Execute front container function
 frontexec = make -s lookfork3s; kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_FRONT) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)/web/themes/custom/$(THEME_NAME)" } } ], "containers": [ { "name": "frontexec", "image": "$(IMAGE_FRONT)", "command": $(shell $(call jsonarrayconverter,${1})), "workingDir": "/app", "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" } ], "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) } } }'

@@ -59,9 +59,6 @@ endif
 ifeq ($(HELM_IS_INSTALLED), true)
 	sudo rm -f $(shell which helm)
 endif
-ifeq ($(JQ_IS_INSTALLED), true)
-	sudo rm -f $(shell which gojq)
-endif
 
 
 
@@ -71,11 +68,9 @@ ifeq ($(KUBECTL_IS_INSTALLED), false)
 	@echo "Downloading and installing container orchestrator..."
 	curl -sfL https://get.k3s.io | K3S_NODE_NAME=sdc K3S_KUBECONFIG_MODE="644" INSTALL_K3S_VERSION="v1.22.5+k3s1" sh -
 	@echo
-	@echo "- Run make command again."
+	@echo "- If your command fail, run same make command again."
 	@echo
-	exit 1
 endif
-
 
 
 # Variables
@@ -111,7 +106,7 @@ ifdef DB_MOUNT_DIR
 endif
 # 	make -s down
 	make -s lookfork3s
-	curl -sfL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sh -
+	if [ $(HELM_IS_INSTALLED) = false ]; then curl -sfL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sh -; fi;
 	@echo "Build and run containers..."
 	helm install --kubeconfig="/etc/rancher/k3s/k3s.yaml" sdc ./helm/ --set \
 	projectName="$(COMPOSE_PROJECT_NAME)",\
