@@ -5,10 +5,8 @@ RANDOM_STRING ?= $(shell cat /dev/urandom | tr -dc 'a-fA-F0-9' | tr '[:upper:]' 
 
 # Convert list of commands to json array format accepted by "kubectl run --overrides" commands
 # jsonarrayconverter = echo -n "${1}" | gojq -cRs 'split(" ")'
-jsonarrayconverter = make -s lookfork3s; kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=stedolan/jq --restart=Never --quiet -i --rm --command -- /bin/echo -n "${1}" | jq -cRs 'split(" ")' 2> /dev/null
+jsonarrayconverter = if [ $(JQ_IS_INSTALLED) = false ]; then kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=stedolan/jq --restart=Never --quiet -i --rm --command -- jq -c -n --arg groups "${1}" '$$groups | split(" ")' 2> /dev/null; else jq -c -n --arg groups "${1}" '$$groups | split(" ")'; fi;
 
-v:
-	@echo yay
 
 x:
 	$(call frontexec,node -v)

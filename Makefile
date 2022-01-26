@@ -48,7 +48,7 @@ php-0 = kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- ${1}
 
 KUBECTL_IS_INSTALLED := $(shell [ -e "$(shell which kubectl 2> /dev/null)" ] && echo true || echo false)
 HELM_IS_INSTALLED := $(shell [ -e "$(shell which helm 2> /dev/null)" ] && echo true || echo false)
-GOJQ_IS_INSTALLED := $(shell [ -e "$(shell which gojq 2> /dev/null)" ] && echo true || echo false)
+JQ_IS_INSTALLED := $(shell [ -e "$(shell which jq 2> /dev/null)" ] || [ -e "$(shell which gojq 2> /dev/null)" ] && echo true || echo false)
 
 
 killall:
@@ -59,7 +59,7 @@ endif
 ifeq ($(HELM_IS_INSTALLED), true)
 	sudo rm -f $(shell which helm)
 endif
-ifeq ($(GOJQ_IS_INSTALLED), true)
+ifeq ($(JQ_IS_INSTALLED), true)
 	sudo rm -f $(shell which gojq)
 endif
 
@@ -70,7 +70,12 @@ lookfork3s:
 ifeq ($(KUBECTL_IS_INSTALLED), false)
 	@echo "Downloading and installing container orchestrator..."
 	curl -sfL https://get.k3s.io | K3S_NODE_NAME=sdc K3S_KUBECONFIG_MODE="644" INSTALL_K3S_VERSION="v1.22.5+k3s1" sh -
+	@echo
+	@echo "- Run make command again."
+	@echo
+	exit 1
 endif
+
 
 
 # Variables
@@ -287,10 +292,10 @@ else
 endif
 
 
-g:
-ifeq ($(GOJQ_IS_INSTALLED), true)
-	@echo "Gojq is installed"
+j:
+ifeq ($(JQ_IS_INSTALLED), true)
+	@echo "Jq is installed"
 else
-	@echo "Gojq is not installed"
+	@echo "Jq is not installed"
 endif
 
