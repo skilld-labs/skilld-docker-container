@@ -61,7 +61,6 @@ ifeq ($(HELM_IS_INSTALLED), true)
 endif
 
 
-
 # Check if k3s is present, install it if not
 lookfork3s:
 ifeq ($(KUBECTL_IS_INSTALLED), false)
@@ -91,7 +90,6 @@ fast:
 	$(shell sed -i "s|^DB_URL=sqlite:./../.cache/d8.sqlite|#DB_URL=sqlite:./../.cache/d8.sqlite|g"  .env)
 
 
-
 ## Provision enviroment
 provision:
 # Check if enviroment variables has been defined
@@ -106,13 +104,8 @@ ifdef DB_MOUNT_DIR
 endif
 # 	make -s down
 	make -s lookfork3s
-	if [ $(HELM_IS_INSTALLED) = false ]; then curl -sfL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sh -; fi;
 	@echo "Build and run containers..."
-	helm install --kubeconfig="/etc/rancher/k3s/k3s.yaml" sdc ./helm/ --set \
-	projectName="$(COMPOSE_PROJECT_NAME)",\
-	projectPath="$(CURDIR)",\
-	imagePhp="$(IMAGE_PHP)",\
-	imageNginx="$(IMAGE_NGINX)"
+	if [ $(HELM_IS_INSTALLED) = false ]; then kubectl run helm --image=alpine/helm --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "metadata": { "name": "helm", "creationTimestamp": null }, "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "/home/dferlay/Sources/df-sdc", "type": "" } }, { "name": "host-k3s-config", "hostPath": { "path": "/etc/rancher/k3s/k3s.yaml", "type": "" } } ], "containers": [ { "name": "test", "image": "alpine/helm", "command": [ "helm","upgrade","--install","--kubeconfig=/etc/rancher/k3s/k3s.yaml","sdc","./helm/","--set","projectName=$(COMPOSE_PROJECT_NAME),projectPath=$(CURDIR),imagePhp=$(IMAGE_PHP),imageNginx=$(IMAGE_NGINX)" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" }, { "name": "host-k3s-config", "mountPath": "/etc/rancher/k3s/k3s.yaml" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": 1000, "runAsGroup": 1000 }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'; else helm upgrade --install --kubeconfig="/etc/rancher/k3s/k3s.yaml" sdc ./helm/ --set projectName="$(COMPOSE_PROJECT_NAME)",projectPath="$(CURDIR)",imagePhp="$(IMAGE_PHP)",imageNginx="$(IMAGE_NGINX)"; fi;
 	for i in {1..50}; do echo "Waiting for PHP container..." && kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- "whoami" &> /dev/null && break || sleep 3; done; echo "Container is up !"
 	# Set composer2 as default
 	$(call php-0, ln -fs composer2 /usr/bin/composer)
