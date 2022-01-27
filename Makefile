@@ -56,10 +56,6 @@ ifeq ($(KUBECTL_IS_INSTALLED), true)
 	/usr/local/bin/k3s-killall.sh
 	/usr/local/bin/k3s-uninstall.sh
 endif
-ifeq ($(HELM_IS_INSTALLED), true)
-	sudo rm -f $(shell which helm)
-endif
-
 
 # Check if k3s is present, install it if not
 lookfork3s:
@@ -105,7 +101,7 @@ endif
 # 	make -s down
 	make -s lookfork3s
 	@echo "Build and run containers..."
-	if [ $(HELM_IS_INSTALLED) = false ]; then kubectl run helm --image=alpine/helm --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "metadata": { "name": "helm", "creationTimestamp": null }, "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "/home/dferlay/Sources/df-sdc", "type": "" } }, { "name": "host-k3s-config", "hostPath": { "path": "/etc/rancher/k3s/k3s.yaml", "type": "" } } ], "containers": [ { "name": "test", "image": "alpine/helm", "command": [ "helm","upgrade","--install","--kubeconfig=/etc/rancher/k3s/k3s.yaml","sdc","./helm/","--set","projectName=$(COMPOSE_PROJECT_NAME),projectPath=$(CURDIR),imagePhp=$(IMAGE_PHP),imageNginx=$(IMAGE_NGINX)" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" }, { "name": "host-k3s-config", "mountPath": "/etc/rancher/k3s/k3s.yaml" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": 1000, "runAsGroup": 1000 }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'; else helm upgrade --install --kubeconfig="/etc/rancher/k3s/k3s.yaml" sdc ./helm/ --set projectName="$(COMPOSE_PROJECT_NAME)",projectPath="$(CURDIR)",imagePhp="$(IMAGE_PHP)",imageNginx="$(IMAGE_NGINX)"; fi;
+	if [ $(HELM_IS_INSTALLED) = false ]; then kubectl run helm --image=alpine/helm --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "metadata": { "name": "helm", "creationTimestamp": null }, "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } }, { "name": "host-k3s-config", "hostPath": { "path": "/etc/rancher/k3s/k3s.yaml", "type": "" } } ], "containers": [ { "name": "test", "image": "alpine/helm", "command": [ "helm","upgrade","--install","--kubeconfig=/etc/rancher/k3s/k3s.yaml","$(COMPOSE_PROJECT_NAME)","./helm/","--set","projectName=$(COMPOSE_PROJECT_NAME),projectPath=$(CURDIR),imagePhp=$(IMAGE_PHP),imageNginx=$(IMAGE_NGINX)" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" }, { "name": "host-k3s-config", "mountPath": "/etc/rancher/k3s/k3s.yaml" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": 1000, "runAsGroup": 1000 }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'; else helm upgrade --install --kubeconfig="/etc/rancher/k3s/k3s.yaml" $(COMPOSE_PROJECT_NAME) ./helm/ --set projectName="$(COMPOSE_PROJECT_NAME)",projectPath="$(CURDIR)",imagePhp="$(IMAGE_PHP)",imageNginx="$(IMAGE_NGINX)"; fi;
 	for i in {1..50}; do echo "Waiting for PHP container..." && kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- "whoami" &> /dev/null && break || sleep 3; done; echo "Container is up !"
 	# Set composer2 as default
 	$(call php-0, ln -fs composer2 /usr/bin/composer)
@@ -218,7 +214,7 @@ exec0:
 
 down:
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
-	@docker-compose down -v --remove-orphans --rmi local
+	if [ $(HELM_IS_INSTALLED) = false ]; then kubectl run helm --image=alpine/helm --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "metadata": { "name": "helm", "creationTimestamp": null }, "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } }, { "name": "host-k3s-config", "hostPath": { "path": "/etc/rancher/k3s/k3s.yaml", "type": "" } } ], "containers": [ { "name": "test", "image": "alpine/helm", "command": [ "helm","uninstall","--wait","--kubeconfig=/etc/rancher/k3s/k3s.yaml","$(COMPOSE_PROJECT_NAME)" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" }, { "name": "host-k3s-config", "mountPath": "/etc/rancher/k3s/k3s.yaml" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": 1000, "runAsGroup": 1000 }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'; else helm uninstall --kubeconfig=/etc/rancher/k3s/k3s.yaml --wait $(COMPOSE_PROJECT_NAME); fi;
 	@if [ ! -z "$(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}')" ]; then \
 		echo 'Stoping browser driver.' && make -s browser_driver_stop; fi
 
@@ -235,6 +231,10 @@ ifdef DB_MOUNT_DIR
 endif
 ifeq ($(CLEAR_FRONT_PACKAGES), yes)
 	make clear-front
+endif
+ifeq ($(KUBECTL_IS_INSTALLED), true)
+	/usr/local/bin/k3s-killall.sh
+	/usr/local/bin/k3s-uninstall.sh
 endif
 
 ## Enable development mode and disable caching
