@@ -1,8 +1,5 @@
 FRONT_PORT?=65200
 
-# Used to give a random name to Kubernetes pods executed on the fly by "kubectl run"
-RANDOM_STRING ?= $(shell cat /dev/urandom | tr -dc 'a-fA-F0-9' | tr '[:upper:]' '[:lower:]' | fold -w 10 | head -n 1)
-
 # Convert list of commands to json array format expected by "kubectl run --overrides" commands
 jsonarrayconverter = if [ $(JQ_IS_INSTALLED) = false ]; then kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=stedolan/jq --restart=Never --quiet -i --rm --command -- jq -c -n --arg groups "${1}" '$$groups | split(" ")' 2> /dev/null; else jq -c -n --arg groups "${1}" '$$groups | split(" ")'; fi;
 
