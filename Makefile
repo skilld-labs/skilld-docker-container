@@ -100,7 +100,8 @@ endif
 ifdef DB_MOUNT_DIR
 	$(shell [ ! -d $(DB_MOUNT_DIR) ] && mkdir -p $(DB_MOUNT_DIR) && chmod 777 $(DB_MOUNT_DIR))
 endif
-	make -s down
+	make -s down 2> /dev/null
+	## TODO: run make down kubectl command only if something
 	make -s lookfork3s
 	@echo "Build and run containers..."
 	if [ $(HELM_IS_INSTALLED) = false ]; then kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_HELM) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } }, { "name": "host-k3s-config", "hostPath": { "path": "/etc/rancher/k3s/k3s.yaml", "type": "" } } ], "containers": [ { "name": "test", "image": "$(IMAGE_HELM)", "command": [ "helm","upgrade","--install","--kubeconfig=/etc/rancher/k3s/k3s.yaml","$(COMPOSE_PROJECT_NAME)","./helm/","--set","projectName=$(COMPOSE_PROJECT_NAME),projectPath=$(CURDIR),imagePhp=$(IMAGE_PHP),imageNginx=$(IMAGE_NGINX)" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" }, { "name": "host-k3s-config", "mountPath": "/etc/rancher/k3s/k3s.yaml" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'; else helm upgrade --install --kubeconfig="/etc/rancher/k3s/k3s.yaml" $(COMPOSE_PROJECT_NAME) ./helm/ --set projectName="$(COMPOSE_PROJECT_NAME)",projectPath="$(CURDIR)",imagePhp="$(IMAGE_PHP)",imageNginx="$(IMAGE_NGINX)"; fi;
