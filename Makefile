@@ -101,25 +101,25 @@ endif
 ifdef DB_MOUNT_DIR
 	$(shell [ ! -d $(DB_MOUNT_DIR) ] && mkdir -p $(DB_MOUNT_DIR) && chmod 777 $(DB_MOUNT_DIR))
 endif
-# 	make -s down 2> /dev/null
-	## TODO: run make down kubectl command only if something
+	make -s down 2> /dev/null
+	# TODO: run make down kubectl command only if something
 	make -s lookfork3s
 	@echo "Build and run containers..."
-	## TODO: Debug why this changes owner of web/sites dir to root
 	if [ $(HELM_IS_INSTALLED) = false ]; then \
 		kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_HELM) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } }, { "name": "host-k3s-config", "hostPath": { "path": "/etc/rancher/k3s/k3s.yaml", "type": "" } } ], "containers": [ { "name": "test", "image": "$(IMAGE_HELM)", "command": [ "helm","upgrade","--install","--kubeconfig=/etc/rancher/k3s/k3s.yaml","$(COMPOSE_PROJECT_NAME)","./helm/","--set","projectName=$(COMPOSE_PROJECT_NAME),projectPath=$(CURDIR),imagePhp=$(IMAGE_PHP),imageNginx=$(IMAGE_NGINX),userGroup=$(CGID)" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" }, { "name": "host-k3s-config", "mountPath": "/etc/rancher/k3s/k3s.yaml" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'; \
 		else helm upgrade --install --kubeconfig="/etc/rancher/k3s/k3s.yaml" $(COMPOSE_PROJECT_NAME) ./helm/ --set projectName="$(COMPOSE_PROJECT_NAME)",projectPath="$(CURDIR)",imagePhp="$(IMAGE_PHP)",imageNginx="$(IMAGE_NGINX)",userGroup="$(CGID)"; fi;
-# 	for i in {1..50}; do echo "Waiting for PHP container..." && kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- "whoami" &> /dev/null && break || sleep 3; done; echo "Container is up !"
-# 	# Set composer2 as default
-# 	$(call php-0, ln -fs composer2 /usr/bin/composer)
-# ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
-# 	$(call php-0, apk add --no-cache $(ADDITIONAL_PHP_PACKAGES))
-# endif
-# 	# Set up timezone
-# 	$(call php-0, cp /usr/share/zoneinfo/Europe/Paris /etc/localtime)
-# 	# Install newrelic PHP extension if NEW_RELIC_LICENSE_KEY defined
-# 	make -s newrelic
-# 	$(call php-0, kill -USR2 1)
+	for i in {1..50}; do echo "Waiting for PHP container..." && kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- "whoami" &> /dev/null && break || sleep 3; done; echo "Container is up !"
+	kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_PHP) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } } ], "containers": [ { "name": "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)", "image": "$(IMAGE_PHP)", "command": [ "chown","-R","$(CUID)","$(CGID)","." ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": 0, "runAsGroup": 0 }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'
+	# Set composer2 as default
+	$(call php-0, ln -fs composer2 /usr/bin/composer)
+ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
+	$(call php-0, apk add --no-cache $(ADDITIONAL_PHP_PACKAGES))
+endif
+	# Set up timezone
+	$(call php-0, cp /usr/share/zoneinfo/Europe/Paris /etc/localtime)
+	# Install newrelic PHP extension if NEW_RELIC_LICENSE_KEY defined
+	make -s newrelic
+	$(call php-0, kill -USR2 1)
 
 ## Install backend dependencies
 back:
@@ -220,21 +220,31 @@ exec0:
 	kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- ash
 
 down:
+ifeq ($(shell kubectl get deploy -l name=$(COMPOSE_PROJECT_NAME) --no-headers=true | tail -1 | wc -l), 1)
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
-	if [ $(HELM_IS_INSTALLED) = false ]; then kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_HELM) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } }, { "name": "host-k3s-config", "hostPath": { "path": "/etc/rancher/k3s/k3s.yaml", "type": "" } } ], "containers": [ { "name": "test", "image": "$(IMAGE_HELM)", "command": [ "helm","uninstall","--wait","--kubeconfig=/etc/rancher/k3s/k3s.yaml","$(COMPOSE_PROJECT_NAME)" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" }, { "name": "host-k3s-config", "mountPath": "/etc/rancher/k3s/k3s.yaml" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'; else helm uninstall --kubeconfig=/etc/rancher/k3s/k3s.yaml --wait $(COMPOSE_PROJECT_NAME); fi;
+	if [ $(HELM_IS_INSTALLED) = false ]; then kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_HELM) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } }, { "name": "host-k3s-config", "hostPath": { "path": "/etc/rancher/k3s/k3s.yaml", "type": "" } } ], "containers": [ { "name": "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)", "image": "$(IMAGE_HELM)", "command": [ "helm","uninstall","--wait","--kubeconfig=/etc/rancher/k3s/k3s.yaml","$(COMPOSE_PROJECT_NAME)" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" }, { "name": "host-k3s-config", "mountPath": "/etc/rancher/k3s/k3s.yaml" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'; else helm uninstall --kubeconfig=/etc/rancher/k3s/k3s.yaml --wait $(COMPOSE_PROJECT_NAME); fi;
+else
+	@echo "Deploy is not installed"
+endif
 	@if [ ! -z "$(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}')" ]; then \
 		echo 'Stoping browser driver.' && make -s browser_driver_stop; fi
 		## TODO: FIX TEST COMMANDS
 
 DIRS = web/core web/libraries web/modules/contrib web/profiles/contrib web/sites web/themes/contrib vendor
 
-v:
-	xx
+
+x:
+ifeq ($(shell kubectl get deploy -l name=$(COMPOSE_PROJECT_NAME) --no-headers=true | tail -1 | wc -l), 1)
+	@echo "Deploy is installed"
+else
+	@echo "Deploy is not installed"
+endif
+
 
 ## Totally remove project build folder, docker containers and network
 clean: info
 	make -s down
-	$(eval SCAFFOLD = $(shell kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_HELM) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } } ], "containers": [ { "name": "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)", "image": "$(IMAGE_PHP)", "command": [ "composer", "run-script", "list-scaffold-files" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }' | grep -P '^(?!>)'))
+	$(eval SCAFFOLD = $(shell kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_PHP) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } } ], "containers": [ { "name": "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)", "image": "$(IMAGE_PHP)", "command": [ "composer", "run-script", "list-scaffold-files" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }' | grep -P '^(?!>)'))
 # 	@docker run --rm --user 0:0 -v $(CURDIR):/mnt -w /mnt -e RMLIST="$(addprefix web/,$(SCAFFOLD)) $(DIRS)" $(IMAGE_PHP) sh -c 'for i in $$RMLIST; do rm -fr $$i && echo "Removed $$i"; done'
 	$(eval RMLIST = $(addprefix web/,$(SCAFFOLD)) $(DIRS))
 	for i in $(RMLIST); do rm -rf $$i && echo "Removed $$i"; done
