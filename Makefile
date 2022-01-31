@@ -188,6 +188,15 @@ localize:
 	$(call php, drush locale:import:all /var/www/html/translations/ --type=customized --override=all)
 	@echo "Localization finished"
 
+PROJECT_IS_UP := $(shell kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- "whoami" &> /dev/null && echo true || echo false)
+x:
+ifeq ($(PROJECT_IS_UP), true)
+	@echo "Up"
+else
+	@echo "Down"
+endif
+
+
 ## Display project's information
 info:
 ifdef REVIEW_DOMAIN
