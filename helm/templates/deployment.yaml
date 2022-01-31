@@ -67,7 +67,7 @@ spec:
             name: cache-css
           - mountPath: /var/www/html/web/sites/default/files/js
             name: cache-js
-        - name: mail
+        - name: mailhog
           image: skilldlabs/mailhog
       restartPolicy: Always
       nodeSelector:

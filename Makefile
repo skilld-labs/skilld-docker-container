@@ -26,7 +26,7 @@ CGID ?= $(LOCAL_GID)
 # Define network name.
 COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 
-# SDC_SERVICES=$(shell docker-compose config --services) # TODO: Replace or remove
+SDC_SERVICES=$(shell kubectl get pods -l name=$(COMPOSE_PROJECT_NAME) -o jsonpath="{.items[*].spec.containers[*].name}")
 # Determine database data directory if defined
 DB_MOUNT_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/
 ifeq ($(findstring mysql,$(SDC_SERVICES)),mysql)
@@ -233,24 +233,14 @@ endif
 DIRS = web/core web/libraries web/modules/contrib web/profiles/contrib web/sites web/themes/contrib vendor
 
 
-x:
-ifeq ($(shell kubectl get deploy -l name=$(COMPOSE_PROJECT_NAME) --no-headers=true | tail -1 | wc -l), 1)
-	@echo "Deploy is installed"
-else
-	@echo "Deploy is not installed"
-endif
-
-
 ## Totally remove project build folder, docker containers and network
 clean: info
 	make -s down
 	$(eval SCAFFOLD = $(shell kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_PHP) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } } ], "containers": [ { "name": "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)", "image": "$(IMAGE_PHP)", "command": [ "composer", "run-script", "list-scaffold-files" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }' | grep -P '^(?!>)'))
-# 	@docker run --rm --user 0:0 -v $(CURDIR):/mnt -w /mnt -e RMLIST="$(addprefix web/,$(SCAFFOLD)) $(DIRS)" $(IMAGE_PHP) sh -c 'for i in $$RMLIST; do rm -fr $$i && echo "Removed $$i"; done'
 	$(eval RMLIST = $(addprefix web/,$(SCAFFOLD)) $(DIRS))
 	for i in $(RMLIST); do rm -rf $$i && echo "Removed $$i"; done
 ifdef DB_MOUNT_DIR
 	@echo "Clean-up database data from $(DB_MOUNT_DIR) ..."
-# 	docker run --rm --user 0:0 -v $(shell dirname $(DB_MOUNT_DIR)):/mnt $(IMAGE_PHP) sh -c "rm -fr /mnt/`basename $(DB_MOUNT_DIR)`"
 	$(shell rm -fr $(DB_MOUNT_DIR))
 endif
 ifeq ($(CLEAR_FRONT_PACKAGES), yes)
