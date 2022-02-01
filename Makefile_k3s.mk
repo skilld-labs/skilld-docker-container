@@ -19,11 +19,11 @@ ifeq ($(KUBECTL_IS_INSTALLED), false)
 	@echo
 endif
 
-provision-orchestrator:
+install-orchestrator:
 	make -s lookfork3s
 	for i in {1..50}; do echo "Waiting for default service account..." && kubectl -n default get serviceaccount default -o name &> /dev/null && break || sleep 3; done; echo "Found !"
 
-spin-containers:
+up:
 	if [ $(HELM_IS_INSTALLED) = false ]; then \
 		kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_HELM) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } }, { "name": "host-k3s-config", "hostPath": { "path": "/etc/rancher/k3s/k3s.yaml", "type": "" } } ], "containers": [ { "name": "test", "image": "$(IMAGE_HELM)", "command": [ "helm","upgrade","--install","--kubeconfig=/etc/rancher/k3s/k3s.yaml","$(COMPOSE_PROJECT_NAME)","./helm/","--set","projectName=$(COMPOSE_PROJECT_NAME),projectPath=$(CURDIR),imagePhp=$(IMAGE_PHP),imageNginx=$(IMAGE_NGINX),userGroup=$(CGID)" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" }, { "name": "host-k3s-config", "mountPath": "/etc/rancher/k3s/k3s.yaml" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'; \
 		else helm upgrade --install --kubeconfig="/etc/rancher/k3s/k3s.yaml" $(COMPOSE_PROJECT_NAME) ./helm/ --set projectName="$(COMPOSE_PROJECT_NAME)",projectPath="$(CURDIR)",imagePhp="$(IMAGE_PHP)",imageNginx="$(IMAGE_NGINX)",userGroup="$(CGID)"; fi;
@@ -32,9 +32,13 @@ spin-containers:
 
 
 
-$(eval PROJECT_IS_UP := $(shell kubectl get deployment $(COMPOSE_PROJECT_NAME) -o go-template='{{ if eq .status.readyReplicas .status.replicas }}{{ "true" }}{{ end }}' 2>/dev/null))
+$(eval PROJECT_IS_UP := $(shell kubectl get deployment $(COMPOSE_PROJECT_NAME) -o go-template='{{ if eq .status.readyReplicas .status.replicas }}{{ "true" }}{{ end }}' 2>/dev/null && echo true || echo false))
+# $(eval PROJECT_IS_UP := $(shell [ -e "$(shell kubectl get deploy -l name=$(COMPOSE_PROJECT_NAME) --no-headers=true 2> /dev/null)" ] && echo true || echo false))
+
 
 SDC_SERVICES=$(shell kubectl get pods -l name=$(COMPOSE_PROJECT_NAME) -o jsonpath="{.items[*].spec.containers[*].name}" 2>/dev/null)
+
+LOCAL_IP = $(shell kubectl get pods -l name=$(COMPOSE_PROJECT_NAME) --template '{{range .items}}{{.status.podIP}}{{"\n"}}{{end}}')
 
 down-containers:
 	if [ $(HELM_IS_INSTALLED) = false ]; then kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_HELM) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } }, { "name": "host-k3s-config", "hostPath": { "path": "/etc/rancher/k3s/k3s.yaml", "type": "" } } ], "containers": [ { "name": "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)", "image": "$(IMAGE_HELM)", "command": [ "helm","uninstall","--wait","--kubeconfig=/etc/rancher/k3s/k3s.yaml","$(COMPOSE_PROJECT_NAME)" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" }, { "name": "host-k3s-config", "mountPath": "/etc/rancher/k3s/k3s.yaml" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'; else helm uninstall --kubeconfig=/etc/rancher/k3s/k3s.yaml --wait $(COMPOSE_PROJECT_NAME); fi;
@@ -98,8 +102,6 @@ else
 endif
 
 
-
-LOCAL_IP := $(shell kubectl get pods -l name=$(COMPOSE_PROJECT_NAME) --template '{{range .items}}{{.status.podIP}}{{"\n"}}{{end}}')
 
 
 xxx:

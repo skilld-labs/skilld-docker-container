@@ -79,9 +79,9 @@ ifdef DB_MOUNT_DIR
 	$(shell [ ! -d $(DB_MOUNT_DIR) ] && mkdir -p $(DB_MOUNT_DIR) && chmod 777 $(DB_MOUNT_DIR))
 endif
 	make -s down 2> /dev/null
-	make -s provision-orchestrator
+	make -s install-orchestrator
 	@echo "Build and run containers..."
-	make -s spin-containers
+	make -s up
 	# Set composer2 as default
 	$(call php-0, ln -fs composer2 /usr/bin/composer)
 ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
@@ -161,18 +161,12 @@ localize:
 	$(call php, drush locale:import:all /var/www/html/translations/ --type=customized --override=all)
 	@echo "Localization finished"
 
-
-x:
-	$(eval BASE_URL := $(LOCAL_IP))
-	echo $(BASE_URL)
-
 ## Display project's information
 info:
 ifdef REVIEW_DOMAIN
 	$(eval BASE_URL := $(MAIN_DOMAIN_NAME))
 else
-	#TODO: Generate variable elsewhere
-	$(eval BASE_URL := $(LOCAL_IP)
+	$(eval BASE_URL := $(LOCAL_IP))
 endif
 ifeq ($(PROJECT_IS_UP), true)
 	$(info )
@@ -190,17 +184,17 @@ endif
 diff:
 	diff -u0 --color .env .env.default || true; echo ""
 
+#TODO: Redefine what is means to be upé
 down:
-# ifeq ($(shell kubectl get deploy -l name=$(COMPOSE_PROJECT_NAME) --no-headers=true | wc -l), 1)
 ifeq ($(PROJECT_IS_UP), true)
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
 	make -s down-containers
 else
 	@echo "No container to down"
 endif
-	@if [ ! -z "$(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}')" ]; then \
-		echo 'Stoping browser driver.' && make -s browser_driver_stop; fi
-		## TODO: FIX TEST COMMANDS
+	make -s down-test-browser
+
+
 
 
 ## Totally remove project build folder, containers and network
@@ -245,9 +239,10 @@ drush:
 	$(info "To pass arguments use double dash: "make drush en devel -- -y"")
 
 
+## TODO: FIX TEST COMMANDS
 
 
-up:
+check:
 ifeq ($(PROJECT_IS_UP), true)
 	@echo "Up"
 else
