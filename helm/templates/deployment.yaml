@@ -34,6 +34,10 @@ spec:
         - name: cache-php
           emptyDir:
             medium: Memory
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "2"
       containers:
         - name: php
           image: {{ .Values.imagePhp }}

@@ -26,7 +26,7 @@ CGID ?= $(LOCAL_GID)
 # Define network name.
 COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 
-SDC_SERVICES=$(shell kubectl get pods -l name=$(COMPOSE_PROJECT_NAME) -o jsonpath="{.items[*].spec.containers[*].name}")
+SDC_SERVICES=$(shell kubectl get pods -l name=$(COMPOSE_PROJECT_NAME) -o jsonpath="{.items[*].spec.containers[*].name}" 2>/dev/null)
 # Determine database data directory if defined
 DB_MOUNT_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/
 ifeq ($(findstring mysql,$(SDC_SERVICES)),mysql)
@@ -47,7 +47,7 @@ php-0 = kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- ${1}
 # Used to give a random name to Kubernetes pods executed on the fly by "kubectl run"
 RANDOM_STRING ?= $(shell cat /dev/urandom | tr -dc 'a-fA-F0-9' | tr '[:upper:]' '[:lower:]' | fold -w 10 | head -n 1)
 
-IMAGE_HELM=alpine/helm
+IMAGE_HELM=alpine/helm:3.8.0
 KUBECTL_IS_INSTALLED := $(shell [ -e "$(shell which kubectl 2> /dev/null)" ] && echo true || echo false)
 HELM_IS_INSTALLED := $(shell [ -e "$(shell which helm 2> /dev/null)" ] && echo true || echo false)
 JQ_IS_INSTALLED := $(shell [ -e "$(shell which jq 2> /dev/null)" ] || [ -e "$(shell which gojq 2> /dev/null)" ] && echo true || echo false)
@@ -63,8 +63,8 @@ endif
 lookfork3s:
 ifeq ($(KUBECTL_IS_INSTALLED), false)
 	@echo "Downloading and installing container orchestrator..."
-# 	curl -sfL https://get.k3s.io | K3S_NODE_NAME=sdc K3S_KUBECONFIG_MODE="644" INSTALL_K3S_VERSION="v1.22.5+k3s1" sh -
-	curl -sfL https://get.k3s.io | K3S_NODE_NAME=sdc K3S_KUBECONFIG_MODE="644" INSTALL_K3S_VERSION="v1.23.3+k3s1" sh -
+	curl -sfL https://get.k3s.io | K3S_NODE_NAME=sdc K3S_KUBECONFIG_MODE="644" INSTALL_K3S_VERSION="v1.22.5+k3s1" sh -
+# 	curl -sfL https://get.k3s.io | K3S_NODE_NAME=sdc K3S_KUBECONFIG_MODE="644" INSTALL_K3S_VERSION="v1.23.3+k3s1" sh -
 	@echo
 	@echo "- If your command fail, run same make command again."
 	@echo
@@ -103,11 +103,13 @@ ifdef DB_MOUNT_DIR
 endif
 	make -s down 2> /dev/null
 	make -s lookfork3s
+	for i in {1..50}; do echo "Waiting for default service account..." && kubectl -n default get serviceaccount default -o name &> /dev/null && break || sleep 3; done; echo "Found !"
 	@echo "Build and run containers..."
-	@if [ $(HELM_IS_INSTALLED) = false ]; then \
+	if [ $(HELM_IS_INSTALLED) = false ]; then \
 		kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_HELM) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } }, { "name": "host-k3s-config", "hostPath": { "path": "/etc/rancher/k3s/k3s.yaml", "type": "" } } ], "containers": [ { "name": "test", "image": "$(IMAGE_HELM)", "command": [ "helm","upgrade","--install","--kubeconfig=/etc/rancher/k3s/k3s.yaml","$(COMPOSE_PROJECT_NAME)","./helm/","--set","projectName=$(COMPOSE_PROJECT_NAME),projectPath=$(CURDIR),imagePhp=$(IMAGE_PHP),imageNginx=$(IMAGE_NGINX),userGroup=$(CGID)" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" }, { "name": "host-k3s-config", "mountPath": "/etc/rancher/k3s/k3s.yaml" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }'; \
 		else helm upgrade --install --kubeconfig="/etc/rancher/k3s/k3s.yaml" $(COMPOSE_PROJECT_NAME) ./helm/ --set projectName="$(COMPOSE_PROJECT_NAME)",projectPath="$(CURDIR)",imagePhp="$(IMAGE_PHP)",imageNginx="$(IMAGE_NGINX)",userGroup="$(CGID)"; fi;
 	for i in {1..50}; do echo "Waiting for PHP container..." && kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- "whoami" &> /dev/null && break || sleep 3; done; echo "Container is up !"
+# 	for i in {1..50}; do echo "Waiting for PHP container..." && kubectl get deployment $(COMPOSE_PROJECT_NAME) -o go-template='{{ if eq .status.readyReplicas .status.replicas }}{{ "true" }}{{ end }}' &> /dev/null && break || sleep 3; done; echo "Container is up !"
 	$(call php-0, chown -R $(CUID):$(CGID) .)
 	# Set composer2 as default
 	$(call php-0, ln -fs composer2 /usr/bin/composer)
@@ -188,13 +190,15 @@ localize:
 	$(call php, drush locale:import:all /var/www/html/translations/ --type=customized --override=all)
 	@echo "Localization finished"
 
-PROJECT_IS_UP := $(shell kubectl exec -it deploy/$(COMPOSE_PROJECT_NAME) -c php -- "whoami" &> /dev/null && echo true || echo false)
+PROJECT_IS_UP := $(shell kubectl get deployment $(COMPOSE_PROJECT_NAME) -o go-template='{{ if eq .status.readyReplicas .status.replicas }}{{ "true" }}{{ end }}' 2>/dev/null)
 x:
 ifeq ($(PROJECT_IS_UP), true)
 	@echo "Up"
 else
 	@echo "Down"
 endif
+
+
 
 
 ## Display project's information
@@ -204,7 +208,7 @@ ifdef REVIEW_DOMAIN
 else
 	$(eval BASE_URL := $(shell kubectl get pods -l name=$(COMPOSE_PROJECT_NAME) --template '{{range .items}}{{.status.podIP}}{{"\n"}}{{end}}'))
 endif
-ifeq ($(shell kubectl get deploy -l name=$(COMPOSE_PROJECT_NAME) --no-headers=true | wc -l), 1)
+ifeq ($(shell kubectl get deployment $(COMPOSE_PROJECT_NAME) -o go-template='{{ if eq .status.readyReplicas .status.replicas }}{{ "true" }}{{ end }}' 2>/dev/null), true)
 	$(info )
 	$(info Containers for "$(COMPOSE_PROJECT_NAME)" info:)
 	$(info )
@@ -242,8 +246,9 @@ DIRS = web/core web/libraries web/modules/contrib web/profiles/contrib web/sites
 
 
 ## Totally remove project build folder, containers and network
-clean: info
-	make -s down 2> /dev/null
+clean:
+	$(info Cleaning project "$(COMPOSE_PROJECT_NAME)"...)
+	make -s down
 	$(eval SCAFFOLD = $(shell kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=$(IMAGE_PHP) --rm -i --quiet --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "volumes": [ { "name": "host-volume", "hostPath": { "path": "$(CURDIR)", "type": "" } } ], "containers": [ { "name": "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)", "image": "$(IMAGE_PHP)", "command": [ "composer", "run-script", "list-scaffold-files" ], "workingDir": "/app", "resources": {}, "volumeMounts": [ { "name": "host-volume", "mountPath": "/app" } ], "terminationMessagePath": "/dev/termination-log", "terminationMessagePolicy": "FallbackToLogsOnError", "imagePullPolicy": "IfNotPresent" } ], "restartPolicy": "Never", "terminationGracePeriodSeconds": 30, "dnsPolicy": "ClusterFirst", "hostNetwork": true, "securityContext": { "runAsUser": $(CUID), "runAsGroup": $(CGID) }, "schedulerName": "default-scheduler", "enableServiceLinks": true }, "status": {} }' | grep -P '^(?!>)'))
 	$(eval RMLIST = $(addprefix web/,$(SCAFFOLD)) $(DIRS))
 	for i in $(RMLIST); do rm -rf $$i && echo "Removed $$i"; done
