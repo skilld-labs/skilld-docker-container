@@ -13,7 +13,7 @@ variables:
   GIT_STRATEGY: fetch
   REVIEW_DOMAIN: "XXX.XXX.com" # Mandatory, should equal to DNS of available runner server with docker + docker-compose + traefik
 
-image: skilldlabs/php:74
+image: skilldlabs/php:8
 
 # Tags defines which runner to use (expected shell runner)
 .runner_tag_selection:
@@ -123,7 +123,7 @@ prepare:back:
     - docker --version
     - pwd
     - ls -la
-    - docker run -e "COMPOSER_MEMORY_LIMIT=-1" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` skilldlabs/php:74-fpm /bin/ash -c "composer2 --version && composer2 install --no-interaction --prefer-dist -o --ignore-platform-reqs && composer2 create-required-files" # Make back on the fly
+    - docker run -e "COMPOSER_MEMORY_LIMIT=-1" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` skilldlabs/php:8-fpm /bin/ash -c "composer2 --version && composer2 install --no-interaction --prefer-dist -o --ignore-platform-reqs && composer2 create-required-files" # Make back on the fly
   cache:
     key:
       files:
