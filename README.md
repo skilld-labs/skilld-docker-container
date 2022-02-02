@@ -59,8 +59,8 @@
 | SITE_MAIL  | Site e-mail address | admin@example.com |
 | ADMIN_NAME  | Admin username | admin |
 | PROJECT_INSTALL | Way to install site - from straight or existing config | - |
-| IMAGE_PHP | Php image to use | `skilldlabs/php:72-fpm` |
-| IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.14.1` |
+| IMAGE_PHP | Php image to use | `skilldlabs/php:8-fpm` |
+| IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.20` |
 | IMAGE_APACHE | Image to use for apache container | `skilldlabs/skilld-docker-apache` |
 | IMAGE_FRONT | Image to use for front tasks | `skilldlabs/frontend:zen` |
 | IMAGE_DRIVER | Image to use for automated testing webdriver | `zenika/alpine-chrome` |
@@ -83,7 +83,7 @@
   and update mysql container part
   ```yaml
   mysql:
-    image: percona:5.7.22
+    image: percona:5.7
   ...
   ```
   * Update `.env` file, and set `DB_URL=mysql://db:db@mysql/db`
