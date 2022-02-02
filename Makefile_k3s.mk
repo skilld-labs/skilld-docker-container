@@ -31,8 +31,9 @@ up:
 	$(call php-0, chown -R $(CUID):$(CGID) .)
 
 
-
-$(eval PROJECT_IS_UP := $(shell kubectl get deployment $(COMPOSE_PROJECT_NAME) -o go-template='{{ if eq .status.readyReplicas .status.replicas }}{{ "true" }}{{ end }}' 2>/dev/null && echo true || echo false))
+# TODO: This one works
+PROJECT_IS_UP = $(shell kubectl get deployment $(COMPOSE_PROJECT_NAME) -o go-template='{{ if eq .status.readyReplicas .status.replicas }}{{ "true" }}{{ end }}' &>/dev/null && echo true || echo false)
+# TODO: This one doesn't work
 # $(eval PROJECT_IS_UP := $(shell [ -e "$(shell kubectl get deploy -l name=$(COMPOSE_PROJECT_NAME) --no-headers=true 2> /dev/null)" ] && echo true || echo false))
 
 
@@ -111,8 +112,7 @@ xxx:
 testfront:
 	$(call frontexec,ls -lah)
 
-## TODO: Debug front commands
-## TODO: Test front clean
+## TODO: Re-test front clean
 
 # Convert list of commands to json array format expected by "kubectl run --overrides" commands
 jsonarrayconverter = if [ $(JQ_IS_INSTALLED) = false ]; then kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=stedolan/jq --restart=Never --quiet -i --rm --command -- jq -c -n --arg groups "${1}" '$$groups | split(" ")' 2> /dev/null; else jq -c -n --arg groups "${1}" '$$groups | split(" ")'; fi;
