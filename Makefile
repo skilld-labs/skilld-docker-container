@@ -184,7 +184,7 @@ endif
 diff:
 	diff -u0 --color .env .env.default || true; echo ""
 
-#TODO: Redefine what is means to be upé
+#TODO: Redefine what is means to be up > THIS FAILS NOW
 down:
 ifeq ($(PROJECT_IS_UP), true)
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"

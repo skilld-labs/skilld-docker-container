@@ -1,12 +1,11 @@
 FRONT_PORT?=65200
 
+## Install frontend dependencies & build assets
+front: | front-install front-build
 
 clear-front:
 	@echo "Clean of node_modules and compiled dist... To skip this action please set CLEAR_FRONT_PACKAGES=no in .env file"
 	$(call frontexec,rm -rf /app/node_modules /app/dist)
-
-## Install frontend dependencies & build assets
-front: | front-install front-build
 
 front-install:
 	@if [ -d $(CURDIR)/web/themes/custom/$(THEME_NAME) ]; then \

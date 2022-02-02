@@ -100,7 +100,6 @@ frontexec = docker run \
 	$(IMAGE_FRONT) ${1}
 
 
-
 # Execute front container function on localhost:FRONT_PORT. Needed for dynamic storybook.
 frontexec-with-port = docker run \
 	--rm \

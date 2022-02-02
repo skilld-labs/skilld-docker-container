@@ -108,7 +108,11 @@ xxx:
 	@echo "im in k3s.mk"
 
 
+testfront:
+	$(call frontexec,ls -lah)
 
+## TODO: Debug front commands
+## TODO: Test front clean
 
 # Convert list of commands to json array format expected by "kubectl run --overrides" commands
 jsonarrayconverter = if [ $(JQ_IS_INSTALLED) = false ]; then kubectl run "$(COMPOSE_PROJECT_NAME)-$(RANDOM_STRING)" --image=stedolan/jq --restart=Never --quiet -i --rm --command -- jq -c -n --arg groups "${1}" '$$groups | split(" ")' 2> /dev/null; else jq -c -n --arg groups "${1}" '$$groups | split(" ")'; fi;
