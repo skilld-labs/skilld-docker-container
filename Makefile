@@ -50,7 +50,7 @@ MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv migrate_
 
 
 ## Full site install from the scratch
-all: | provision back front si localize hooksymlink info
+all: | provision back front si localize hooksymlink info xx
 # Install for CI deploy:review. Back & Front tasks are run in a dedicated previous step in order to leverage CI cache
 all_ci: | provision si localize hooksymlink info
 # Full site install from the scratch with DB in ram (makes data NOT persistant)
@@ -161,6 +161,11 @@ localize:
 	$(call php, drush locale:import:all /var/www/html/translations/ --type=customized --override=all)
 	@echo "Localization finished"
 
+xx:
+ifeq ($(shell $(call PROJECT_IS_UP)),true)
+	@echo "it's up!"
+endif
+
 ## Display project's information
 info:
 ifdef REVIEW_DOMAIN
@@ -168,13 +173,11 @@ ifdef REVIEW_DOMAIN
 else
 	$(eval BASE_URL := $(LOCAL_IP))
 endif
-ifeq ($(PROJECT_IS_UP), true)
 	$(info )
 	$(info Containers for "$(COMPOSE_PROJECT_NAME)":)
 	$(info )
 	$(info Login as System Admin: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(ADMIN_NAME)" /admin/content/ | awk -F "default" '{print \$$2}')))))
 	$(info Login as Contributor: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(TESTER_NAME)" /admin/content/ | awk -F "default" '{print \$$2}')))))
-endif
 	$(info )
 ifneq ($(shell diff .env .env.default -q),)
 	@echo -e "\x1b[33mWARNING\x1b[0m - .env and .env.default files differ. Use 'make diff' to see details."
@@ -184,9 +187,9 @@ endif
 diff:
 	diff -u0 --color .env .env.default || true; echo ""
 
-#TODO: Re-test that later on
+#TODO: Re-test that later on DEFER EVALUATION
 down:
-ifeq ($(PROJECT_IS_UP), true)
+ifeq ($(shell $(call PROJECT_IS_UP)),true)
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
 	make -s down-containers
 else
@@ -240,12 +243,4 @@ drush:
 
 
 ## TODO: CHECK And FIX TEST COMMANDS
-
-
-check:
-ifeq ($(PROJECT_IS_UP), true)
-	@echo "Up"
-else
-	@echo "Down"
-endif
 

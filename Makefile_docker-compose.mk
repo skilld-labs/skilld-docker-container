@@ -9,9 +9,9 @@ COMPOSE_FILE=./docker/docker-compose.yml:./docker/docker-compose.override.yml
 # List docker-compose services
 SDC_SERVICES=$(shell docker-compose config --services)
 
+LOCAL_IP = $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "traefik.port"}}' $(COMPOSE_PROJECT_NAME)_web)
 
-xxx:
-	@echo "im in docker-compose.mk"
+PROJECT_IS_UP = 
 
 # Execute php container as regular user
 php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
@@ -28,8 +28,6 @@ exec:
 exec0:
 	docker-compose exec --user 0:0 php ash
 
-
-LOCAL_IP = $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "traefik.port"}}' $(COMPOSE_PROJECT_NAME)_web)
 
 
 ## Output diff between local and versioned files
@@ -121,4 +119,10 @@ frontexec-with-interactive = docker run \
 	$(IMAGE_FRONT) ${1}
 
 
+
+testfront:
+	$(call frontexec,ls -lah)
+
+xxx:
+	@echo "im in docker-compose.mk"
 
