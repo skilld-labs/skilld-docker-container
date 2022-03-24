@@ -215,13 +215,21 @@ prepare:front:
     - merge_requests
   retry: 2
 
-.deploy_template_environment_default: &deploy_template_environment_default
+.deploy_template_environment_ttl_mid: &deploy_template_environment_ttl_long
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
+    auto_stop_in: 4 weeks
 
-.deploy_template_environment_auto_stop: &deploy_template_environment_auto_stop
+.deploy_template_environment_ttl_mid: &deploy_template_environment_ttl_mid
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+    auto_stop_in: one week
+
+.deploy_template_environment_ttl_short: &deploy_template_environment_ttl_short
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
@@ -230,7 +238,7 @@ prepare:front:
 
 build:review:
   <<: *deploy_template
-  <<: *deploy_template_environment_default
+  <<: *deploy_template_environment_ttl_mid
   when: manual
   except:
   - master
@@ -238,7 +246,7 @@ build:review:
 
 build:master:
   <<: *deploy_template
-  <<: *deploy_template_environment_default
+  <<: *deploy_template_environment_ttl_long
   when: always
   only:
   - master
@@ -246,7 +254,7 @@ build:master:
 
 build:tag:
   <<: *deploy_template
-  <<: *deploy_template_environment_auto_stop
+  <<: *deploy_template_environment_ttl_short
   when: always
   only:
   - tags
@@ -533,5 +541,3 @@ test:watchdog:
   only:
     - branches
     - merge_requests
-
-
