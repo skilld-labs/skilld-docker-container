@@ -1,6 +1,3 @@
-# Add utility functions and scripts to the container
-include scripts/makefile/*.mk
-
 .PHONY: all fast allfast provision si exec exec0 down clean dev drush info phpcs phpcbf hooksymlink clang cinsp compval watchdogval drupalrectorval upgradestatusval behat sniffers tests front front-install front-build clear-front lintval lint storybook back behatdl behatdi browser_driver browser_driver_stop statusreportval contentgen newlineeof localize local-settings redis-settings content patchval diff
 .DEFAULT_GOAL := help
 
@@ -10,8 +7,21 @@ include scripts/makefile/*.mk
 
 # Prepare enviroment variables from defaults
 $(shell false | cp -i \.env.default \.env 2>/dev/null)
-$(shell false | cp -i \.\/docker\/docker-compose\.override\.yml\.default \.\/docker\/docker-compose\.override\.yml 2>/dev/null)
 include .env
+
+# Select orchestrator related commands
+# include Makefile_$(ORCHESTRATOR).mk
+ifeq ($(ORCHESTRATOR), k3s)
+include Makefile_k3s.mk
+else
+include Makefile_docker-compose.mk
+endif
+
+# Include utility functions and scripts
+include scripts/makefile/*.mk
+
+# Sanitize PROJECT_NAME input
+COMPOSE_PROJECT_NAME := $(shell echo "$(PROJECT_NAME)" | tr -cd '[a-zA-Z0-9]' | tr '[:upper:]' '[:lower:]')
 
 # Get user/group id to manage permissions between host and containers
 LOCAL_UID := $(shell id -u)
@@ -21,10 +31,6 @@ LOCAL_GID := $(shell id -g)
 CUID ?= $(LOCAL_UID)
 CGID ?= $(LOCAL_GID)
 
-# Define network name.
-COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
-
-SDC_SERVICES=$(shell docker-compose config --services)
 # Determine database data directory if defined
 DB_MOUNT_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/
 ifeq ($(findstring mysql,$(SDC_SERVICES)),mysql)
@@ -37,43 +43,45 @@ endif
 # Define current directory only once
 CURDIR=$(shell pwd)
 
-# Execute php container as regular user
-php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
-# Execute php container as root user
-php-0 = docker-compose exec -T --user 0:0 php ${1}
-
+# Variables
 ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php7-intl php7-redis wkhtmltopdf gnu-libiconv php7-pdo_pgsql postgresql-client postgresql-contrib
 DC_MODULES := project_default_content better_normalizers default_content hal serialization
 MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv migrate_tools
 
+
 ## Full site install from the scratch
-all: | provision back front si localize hooksymlink info
+all: | provision back front si localize hooksymlink info xx
 # Install for CI deploy:review. Back & Front tasks are run in a dedicated previous step in order to leverage CI cache
 all_ci: | provision si localize hooksymlink info
 # Full site install from the scratch with DB in ram (makes data NOT persistant)
-allfast: | fast provision back front si localize hooksymlink info
+allfast: | fast
 
 ## Update .env to build DB in ram (makes data NOT persistant)
 fast:
 	$(shell sed -i "s|^#DB_URL=sqlite:///dev/shm/d8.sqlite|DB_URL=sqlite:///dev/shm/d8.sqlite|g"  .env)
 	$(shell sed -i "s|^DB_URL=sqlite:./../.cache/d8.sqlite|#DB_URL=sqlite:./../.cache/d8.sqlite|g"  .env)
+	$(info - Your .env file was updated. Run `make all` again.)
+	exit 1
+
+enforce-project-name:
+ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
+	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "Please enter project name: " REPLY;echo -n $$REPLY)))
+	$(shell sed -i -e '/PROJECT_NAME=/ s/=.*/=$(COMPOSE_PROJECT_NAME)/' .env)
+	$(info - Run `make all` again.)
+	exit 1
+endif
 
 ## Provision enviroment
 provision:
 # Check if enviroment variables has been defined
-ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
-	$(info Project name can not be default, please enter project name.)
-	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "Project name: " REPLY;echo -n $$REPLY)))
-	$(shell sed -i -e '/COMPOSE_PROJECT_NAME=/ s/=.*/=$(COMPOSE_PROJECT_NAME)/' .env)
-	$(info Please review your project settings and run `make all` again.)
-	exit 1
-endif
+	make -s enforce-project-name
 ifdef DB_MOUNT_DIR
 	$(shell [ ! -d $(DB_MOUNT_DIR) ] && mkdir -p $(DB_MOUNT_DIR) && chmod 777 $(DB_MOUNT_DIR))
 endif
-	make -s down
+	make -s down 2> /dev/null
+	make -s install-orchestrator
 	@echo "Build and run containers..."
-	docker-compose up -d --remove-orphans
+	make -s up
 	# Set composer2 as default
 	$(call php-0, ln -fs composer2 /usr/bin/composer)
 ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
@@ -134,8 +142,8 @@ ifneq ("$(wildcard settings/settings.local.php)","")
 	$(call php, drush cr)
 endif
 
-REDIS_IS_INSTALLED := $(shell grep "redis.connection" web/sites/default/settings.php | tail -1 | wc -l || echo "0")
 redis-settings:
+	REDIS_IS_INSTALLED := $(shell grep "redis.connection" web/sites/default/settings.php | tail -1 | wc -l || echo "0")
 ifeq ($(REDIS_IS_INSTALLED), 1)
 	@echo "Redis settings already installed, nothing to do"
 else
@@ -153,62 +161,62 @@ localize:
 	$(call php, drush locale:import:all /var/www/html/translations/ --type=customized --override=all)
 	@echo "Localization finished"
 
+xx:
+ifeq ($(shell $(call PROJECT_IS_UP)),true)
+	@echo "it's up!"
+endif
+
 ## Display project's information
 info:
-	$(info )
-	$(info Containers for "$(COMPOSE_PROJECT_NAME)" info:)
-	$(eval CONTAINERS = $(shell docker ps -f name=$(COMPOSE_PROJECT_NAME) --format "{{ .ID }}" -f 'label=traefik.enable=true'))
-	$(foreach CONTAINER, $(CONTAINERS),$(info http://$(shell printf '%-19s \n'  $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "traefik.port"}} {{range $$p, $$conf := .NetworkSettings.Ports}}{{$$p}}{{end}} {{.Name}}' $(CONTAINER) | rev | sed "s/pct\//,pct:/g" | sed "s/,//" | rev | awk '{ print $0}')) ))
-	$(info )
 ifdef REVIEW_DOMAIN
 	$(eval BASE_URL := $(MAIN_DOMAIN_NAME))
 else
-	$(eval BASE_URL := $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "traefik.port"}}' $(COMPOSE_PROJECT_NAME)_web))
+	$(eval BASE_URL := $(LOCAL_IP))
 endif
-	$(info Login as System Admin: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(ADMIN_NAME)" /admin/content/ | awk -F "default" '{print $$2}')))))
-	$(info Login as Contributor: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(TESTER_NAME)" /admin/content/ | awk -F "default" '{print $$2}')))))
+	$(info )
+	$(info Containers for "$(COMPOSE_PROJECT_NAME)":)
+	$(info )
+	$(info Login as System Admin: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(ADMIN_NAME)" /admin/content/ | awk -F "default" '{print \$$2}')))))
+	$(info Login as Contributor: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(TESTER_NAME)" /admin/content/ | awk -F "default" '{print \$$2}')))))
 	$(info )
 ifneq ($(shell diff .env .env.default -q),)
 	@echo -e "\x1b[33mWARNING\x1b[0m - .env and .env.default files differ. Use 'make diff' to see details."
-endif
-ifneq ($(shell diff docker/docker-compose.override.yml docker/docker-compose.override.yml.default -q),)
-	@echo -e "\x1b[33mWARNING\x1b[0m - docker/docker-compose.override.yml and docker/docker-compose.override.yml.default files differ. Use 'make diff' to see details."
 endif
 
 ## Output diff between local and versioned files
 diff:
 	diff -u0 --color .env .env.default || true; echo ""
-	diff -u0 --color docker/docker-compose.override.yml docker/docker-compose.override.yml.default || true; echo ""
 
-
-## Run shell in PHP container as regular user
-exec:
-	docker-compose exec --user $(CUID):$(CGID) php ash
-
-## Run shell in PHP container as root
-exec0:
-	docker-compose exec --user 0:0 php ash
-
+#TODO: Re-test that later on DEFER EVALUATION
 down:
+ifeq ($(shell $(call PROJECT_IS_UP)),true)
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
-	@docker-compose down -v --remove-orphans --rmi local
-	@if [ ! -z "$(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}')" ]; then \
-		echo 'Stoping browser driver.' && make -s browser_driver_stop; fi
+	make -s down-containers
+else
+	@echo "No container to down"
+endif
+	make -s down-test-browser
 
-DIRS = web/core web/libraries web/modules/contrib web/profiles/contrib web/sites web/themes/contrib vendor
 
-## Totally remove project build folder, docker containers and network
-clean: info
+
+
+## Totally remove project build folder, containers and network
+clean:
+	$(eval DIRS = web/core web/libraries web/modules/contrib web/profiles/contrib web/sites web/themes/contrib vendor)
+	$(info Cleaning project "$(COMPOSE_PROJECT_NAME)"...)
 	make -s down
-	$(eval SCAFFOLD = $(shell docker run --rm -v $(CURDIR):/mnt -w /mnt --user $(CUID):$(CGID) $(IMAGE_PHP) composer run-script list-scaffold-files | grep -P '^(?!>)'))
-	@docker run --rm --user 0:0 -v $(CURDIR):/mnt -w /mnt -e RMLIST="$(addprefix web/,$(SCAFFOLD)) $(DIRS)" $(IMAGE_PHP) sh -c 'for i in $$RMLIST; do rm -fr $$i && echo "Removed $$i"; done'
+	make -s scaffold-list
+	$(eval RMLIST = $(addprefix web/,$(SCAFFOLD)) $(DIRS))
+	for i in $(RMLIST); do rm -rf $$i && echo "Removed $$i"; done
 ifdef DB_MOUNT_DIR
 	@echo "Clean-up database data from $(DB_MOUNT_DIR) ..."
-	docker run --rm --user 0:0 -v $(shell dirname $(DB_MOUNT_DIR)):/mnt $(IMAGE_PHP) sh -c "rm -fr /mnt/`basename $(DB_MOUNT_DIR)`"
+	$(shell rm -fr $(DB_MOUNT_DIR))
+	#TODO: what was doccomp equivalent?
 endif
 ifeq ($(CLEAR_FRONT_PACKAGES), yes)
 	make clear-front
 endif
+	make -s uninstall-orchestrator
 
 ## Enable development mode and disable caching
 dev:
@@ -232,3 +240,7 @@ dev:
 drush:
 	$(call php, $(filter-out "$@",$(MAKECMDGOALS)))
 	$(info "To pass arguments use double dash: "make drush en devel -- -y"")
+
+
+## TODO: CHECK And FIX TEST COMMANDS
+

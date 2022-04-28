@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.projectName }}
+  labels:
+    name: {{ .Values.projectName }}
+spec:
+  revisionHistoryLimit: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      name: {{ .Values.projectName }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.projectName }}
+    spec:
+      volumes:
+        - name: codebase
+          hostPath:
+            path: {{ .Values.projectPath }}
+            type: Directory
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+        - name: cache-js
+          emptyDir:
+            medium: Memory
+        - name: cache-css
+          emptyDir:
+            medium: Memory
+        - name: cache-php
+          emptyDir:
+            medium: Memory
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "2"
+      containers:
+        - name: php
+          image: {{ .Values.imagePhp }}
+          env:
+            - name: COMPOSER_MEMORY_LIMIT
+              value: "-1"
+          ports:
+          - containerPort: 9000
+            protocol: TCP
+          volumeMounts:
+          - mountPath: /var/www/html
+            name: codebase
+          - mountPath: /var/www/html/web/sites/default/files/css
+            name: cache-css
+          - mountPath: /var/www/html/web/sites/default/files/js
+            name: cache-js
+          - mountPath: /var/www/html/web/sites/default/files/php
+            name: cache-php
+        - name: nginx
+          image: {{ .Values.imageNginx }}
+          ports:
+          - containerPort: 80
+            protocol: TCP
+          volumeMounts:
+          - mountPath: /var/www/html
+            name: codebase
+          - mountPath: /etc/nginx/upstream
+            name: nginx-config
+            subPath: upstream
+          - mountPath: /var/www/html/web/sites/default/files/css
+            name: cache-css
+          - mountPath: /var/www/html/web/sites/default/files/js
+            name: cache-js
+        - name: mailhog
+          image: skilldlabs/mailhog
+      restartPolicy: Always
+      nodeSelector:
+        kubernetes.io/hostname: sdc
