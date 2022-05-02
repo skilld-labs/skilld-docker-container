@@ -44,7 +44,6 @@ sniffers:compose:
   stage: sniffers
   script:
     - composer -vvv -V
-    # Can't use --strict cause we need dev versions for d9 compatibility
     - time composer validate --profile
   only:
     - branches
