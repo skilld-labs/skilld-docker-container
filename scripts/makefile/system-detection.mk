@@ -27,7 +27,6 @@ else
         SYSTEM_OS = 'OS_X'
         CUID=1000
         CGID=1000
-        PHP_VERSION=7
         COMPOSE_HTTP_TIMEOUT=1024
     endif
     UNAME_P := $(shell uname -p)
