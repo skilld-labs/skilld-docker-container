@@ -61,10 +61,10 @@ services:
 #    volumes:
 #      - ${DB_DATA_DIR}/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:Z
 #    environment:
-#      MYSQL_DATABASE: d8
-#      MYSQL_USER: d8
-#      MYSQL_PASSWORD: d8
-#      MYSQL_ROOT_PASSWORD: d8root
+#      MYSQL_DATABASE: db
+#      MYSQL_USER: db
+#      MYSQL_PASSWORD: db
+#      MYSQL_ROOT_PASSWORD: dbroot
 
 #  postgresql:
 #    <<: *service-defaults
@@ -73,9 +73,9 @@ services:
 #    volumes:
 #      - ${DB_DATA_DIR}/${COMPOSE_PROJECT_NAME}_pgsql:/var/lib/postgresql/data:Z
 #    environment:
-#      POSTGRES_DB: d9
-#      POSTGRES_USER: d9
-#      POSTGRES_PASSWORD: d9root
+#      POSTGRES_DB: db
+#      POSTGRES_USER: db
+#      POSTGRES_PASSWORD: dbroot
 #      PGDATA: /var/lib/postgresql/data
 
   mailhog:
