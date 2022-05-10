@@ -12,6 +12,7 @@ include scripts/makefile/*.mk
 $(shell false | cp -i \.env.default \.env 2>/dev/null)
 $(shell false | cp -i \.\/docker\/docker-compose\.override\.yml\.default \.\/docker\/docker-compose\.override\.yml 2>/dev/null)
 include .env
+$(shell sed -i -e '/COMPOSE_PROJECT_NAME=/ s/=.*/=$(shell echo "$(COMPOSE_PROJECT_NAME)" | tr -cd '[a-zA-Z0-9]' | tr '[:upper:]' '[:lower:]')/' .env)
 
 # Get user/group id to manage permissions between host and containers
 LOCAL_UID := $(shell id -u)
@@ -63,10 +64,10 @@ fast:
 provision:
 # Check if enviroment variables has been defined
 ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
-	$(info Project name can not be default, please enter project name.)
-	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "Project name: " REPLY;echo -n $$REPLY)))
-	$(shell sed -i -e '/COMPOSE_PROJECT_NAME=/ s/=.*/=$(COMPOSE_PROJECT_NAME)/' .env)
-	$(info Please review your project settings and run `make all` again.)
+	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "- Please customize project name: " REPLY;echo -n $$REPLY)))
+	$(shell sed -i -e '/COMPOSE_PROJECT_NAME=/ s/=.*/=$(shell echo "$(COMPOSE_PROJECT_NAME)" | tr -cd '[a-zA-Z0-9]' | tr '[:upper:]' '[:lower:]')/' .env)
+	$(info - Run `make all` again.)
+	@echo
 	exit 1
 endif
 ifdef DB_MOUNT_DIR
