@@ -26,12 +26,13 @@ services:
     volumes:
 # Uncomment for MacOS.
 #     - 'nfsmount:/var/www/html'
-      - "./90-mail.ini:/etc/php8/conf.d/90-mail.ini:z"
+      - "./90-mail.ini:/etc/php81/conf.d/90-mail.ini:z"
 #    depends_on:
 #      - mysql
 #      - postgresql
 # Uncomment next line if you need PHP XDebug.
-#    command: php-fpm8 -F -d zend_extension=xdebug.so
+#    command: php-fpm81 -F -dzend.assertions=1 -dzend_extension=xdebug.so
+#    command: php-fpm81 -F -dzend.assertions=1 -dopcache.jit_buffer_size=20M
 
 # Get access keys from https://blackfire.io/my/profiles
 # Then download extension using "make blackfire"
