@@ -148,7 +148,7 @@ prepare:back:
     exclude:
       - web/modules/custom/
       - web/themes/custom/
-      - web/profiles/sdd/
+      - web/profiles/contrib/
   extends: .runner_tag_selection
   only:
     - branches
