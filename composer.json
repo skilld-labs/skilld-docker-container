@@ -13,8 +13,24 @@
     {
       "type": "composer",
       "url": "https://packages.drupal.org/8"
-    }
-  ],
+    },
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org/"
+    },
+    {
+       "type": "package",
+       "package": {
+         "name": "bower-asset/lazysizes",
+         "version": "5.3",
+         "type": "drupal-library",
+         "dist": {
+           "url": "https://api.github.com/repos/aFarkas/lazysizes/zipball/81cf774c6a7f4d8f7f3909e225a65d8acb10cb20",
+           "type": "zip"
+         }
+       }
+     }
+],
   "require": {
     "composer/installers": "^1.9",
     "cweagans/composer-patches": "^1.6.5",
@@ -25,8 +41,13 @@
     "drupal/imagemagick": "^3.1",
     "drupal/migrate_generator": "^1.0",
     "drush/drush": "^10.4.1",
+    "jzucco/lazy_patch_fix_social": "dev-main",
+    "npm-asset/autosize": "~4.0.2",
     "skilldlabs/drupal-cleanup": "^1",
-    "skilldlabs/druxxy": "dev-main"
+    "skilldlabs/druxxy": "dev-main",
+    "goalgorilla/open_social": "~11.2.1",
+    "php": "^7.4",
+    "monolog/monolog": "^2.3.5"
   },
   "require-dev": {
     "dmore/behat-chrome-extension": "^1.3",
@@ -57,7 +78,9 @@
       "drupal/core-composer-scaffold": true,
       "drupal/core-project-message": true,
       "drupal/core-vendor-hardening": true,
-      "skilldlabs/drupal-cleanup": true
+      "oomphinc/composer-installers-extender": true,
+      "skilldlabs/drupal-cleanup": true,
+      "zaporylie/composer-drupal-optimizations": true
     }
   },
   "autoload": {
@@ -78,13 +101,34 @@
     ]
   },
   "extra": {
+    "drupal-scaffold": {
+        "locations": {
+            "web-root": "html/"
+        }
+    },
+    "installer-types": [
+        "bower-asset",
+        "npm-asset"
+    ],
     "installer-paths": {
       "web/core": ["type:drupal-core"],
       "web/libraries/{$name}": ["type:drupal-library"],
       "web/modules/contrib/{$name}": ["type:drupal-module"],
       "web/profiles/contrib/{$name}": ["type:drupal-profile"],
       "web/themes/contrib/{$name}": ["type:drupal-theme"],
-      "drush/Commands/contrib/{$name}": ["type:drupal-drush"]
+      "drush/Commands/contrib/{$name}": ["type:drupal-drush"],
+      "html/core": ["drupal/core"
+            ],
+            "html/modules/contrib/{$name}": ["type:drupal-module"],
+            "html/profiles/contrib/social": ["goalgorilla/open_social"],
+            "html/profiles/contrib/{$name}": ["type:drupal-profile"],
+            "html/themes/contrib/{$name}": ["type:drupal-theme"],
+            "html/libraries/{$name}": ["type:drupal-library", "type:bower-asset", "type:npm-asset"],
+            "drush/contrib/{$name}": ["type:drupal-drush"]
+    },
+    "enable-patching": true,
+    "patchLevel": {
+        "drupal/core": "-p2"
     },
     "drupal-scaffold": {
       "locations": {
