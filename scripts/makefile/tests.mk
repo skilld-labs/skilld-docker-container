@@ -7,7 +7,6 @@ tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statu
 
 # Function for code sniffer images.
 phpcsexec = docker run --rm \
-	-v $(CURDIR)/web/profiles/$(PROFILE_NAME):/work/profile \
 	-v $(CURDIR)/web/modules/custom:/work/modules \
 	-v $(CURDIR)/web/themes/custom:/work/themes \
 	skilldlabs/docker-phpcs-drupal ${1} -s --colors \
