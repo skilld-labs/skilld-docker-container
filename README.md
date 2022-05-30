@@ -60,7 +60,7 @@
 | ADMIN_NAME  | Admin username | admin |
 | PROJECT_INSTALL | Way to install site - from straight or existing config | - |
 | IMAGE_PHP | Php image to use | `skilldlabs/php:8-fpm` |
-| IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.20` |
+| IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.22` |
 | IMAGE_APACHE | Image to use for apache container | `skilldlabs/skilld-docker-apache` |
 | IMAGE_FRONT | Image to use for front tasks | `skilldlabs/frontend:zen` |
 | IMAGE_DRIVER | Image to use for automated testing webdriver | `zenika/alpine-chrome` |
