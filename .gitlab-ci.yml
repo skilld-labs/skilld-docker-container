@@ -12,8 +12,9 @@ variables:
   STORYBOOK_PATH: "" # Update to enable storybook job (themes/custom/XXX/dist/storybook/index.html)
   GIT_STRATEGY: fetch
   REVIEW_DOMAIN: "XXX.XXX.com" # Mandatory, should equal to DNS of available runner server with docker + docker-compose + traefik
+  IMAGE_PHP: skilldlabs/php:8
 
-image: skilldlabs/php:8
+image: $IMAGE_PHP
 
 # Tags defines which runner to use (expected shell runner)
 .runner_tag_selection:
@@ -123,7 +124,8 @@ prepare:back:
     - docker --version
     - pwd
     - ls -la
-    - docker run -e "COMPOSER_MEMORY_LIMIT=-1" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` skilldlabs/php:8-fpm /bin/ash -c "composer2 --version && composer2 install --no-interaction --prefer-dist -o --ignore-platform-reqs && composer2 create-required-files" # Make back on the fly
+# Make back on the fly, using --ignore-platform-reqs as additional PHP-extensions could be missing
+    - docker run -e "COMPOSER_MEMORY_LIMIT=-1" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` "$IMAGE_PHP" /bin/ash -c "composer --version && composer install --no-interaction --prefer-dist -o -v --ignore-platform-reqs && composer create-required-files"
   cache:
     key:
       files:
