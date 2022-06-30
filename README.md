@@ -118,7 +118,7 @@ networks:
 * `make front` - Builds frontend tasks.
 * `make lint` - Runs frontend linters.
 * `make storybook` - Runs storybook in current theme.
-* `make blackfire` - Adds and enables blackfire.io php extension, needs [configuration](https://blackfire.io/docs/configuration/php) in docker-composer override.yml.
+* `make blackfire` - Adds and enables blackfire.io php extension, needs [configuration](https://blackfire.io/docs/configuration/php) in docker-compose.override.yml.
 * `make newrelic` - Adds and enables newrelic.com php extension, needs [configuration](https://docs.newrelic.com/docs/agents/php-agent/getting-started/introduction-new-relic-php#configuration) `NEW_RELIC_LICENSE_KEY` environment variable defined with valid license key.
 * `make xdebug (on|off|status)` - Enable, disable or report status of [Xdebug](https://xdebug.org/docs/) PHP extension.
 
