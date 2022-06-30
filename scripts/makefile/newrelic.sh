@@ -6,7 +6,7 @@
 PHP_INI_DIR=/etc/php8/conf.d
 
 # get the latest version from https://download.newrelic.com/php_agent/archive/
-NEW_RELIC_AGENT_VERSION="${NEW_RELIC_AGENT_VERSION:-9.21.0.311}"
+NEW_RELIC_AGENT_VERSION="${NEW_RELIC_AGENT_VERSION:-10.0.0.312}"
 # change it to 'linux' if docker image is not based on Alpinelinux
 NEW_RELIC_LINUX=${NEW_RELIC_LINUX:-linux-musl}
 

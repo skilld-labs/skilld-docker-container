@@ -112,7 +112,7 @@ endif
 	$(call php, drush user:role:add "$(TESTER_ROLE)" "$(TESTER_NAME)")
 	make -s local-settings
 	#make -s redis-settings
-	make content	
+	make content
 
 content:
 ifneq ($(strip $(DC_MODULES)),)
