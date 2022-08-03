@@ -12,6 +12,7 @@ include scripts/makefile/*.mk
 $(shell false | cp -i \.env.default \.env 2>/dev/null)
 $(shell false | cp -i \.\/docker\/docker-compose\.override\.yml\.default \.\/docker\/docker-compose\.override\.yml 2>/dev/null)
 include .env
+$(shell sed -i -e '/COMPOSE_PROJECT_NAME=/ s/=.*/=$(shell echo "$(COMPOSE_PROJECT_NAME)" | tr -cd '[a-zA-Z0-9]' | tr '[:upper:]' '[:lower:]')/' .env)
 
 # Get user/group id to manage permissions between host and containers
 LOCAL_UID := $(shell id -u)
@@ -21,28 +22,29 @@ LOCAL_GID := $(shell id -g)
 CUID ?= $(LOCAL_UID)
 CGID ?= $(LOCAL_GID)
 
+# Define current directory only once
+CURDIR=$(shell pwd)
+
 # Define network name.
 COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 
 SDC_SERVICES=$(shell docker-compose config --services)
 # Determine database data directory if defined
-DB_MOUNT_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/
+DB_MOUNT_DIR=$(shell echo $(CURDIR))/$(shell basename $(DB_DATA_DIR))
 ifeq ($(findstring mysql,$(SDC_SERVICES)),mysql)
-	DB_MOUNT_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/$(COMPOSE_PROJECT_NAME)_mysql
+	DB_MOUNT_DIR=$(shell echo $(CURDIR))/$(shell basename $(DB_DATA_DIR))/$(COMPOSE_PROJECT_NAME)_mysql
 endif
 ifeq ($(findstring postgresql,$(SDC_SERVICES)),postgresql)
-	DB_MOUNT_DIR=$(shell cd docker && realpath $(DB_DATA_DIR))/$(COMPOSE_PROJECT_NAME)_pgsql
+	DB_MOUNT_DIR=$(shell echo $(CURDIR))/$(shell basename $(DB_DATA_DIR))/$(COMPOSE_PROJECT_NAME)_pgsql
 endif
 
-# Define current directory only once
-CURDIR=$(shell pwd)
 
 # Execute php container as regular user
 php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 # Execute php container as root user
 php-0 = docker-compose exec -T --user 0:0 php ${1}
 
-ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php7-intl php7-redis wkhtmltopdf gnu-libiconv php7-pdo_pgsql postgresql-client postgresql-contrib
+ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php8-intl php8-redis wkhtmltopdf gnu-libiconv php8-pdo_pgsql postgresql-client postgresql-contrib
 DC_MODULES := project_default_content better_normalizers default_content hal serialization
 MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv migrate_tools
 
@@ -55,17 +57,17 @@ allfast: | fast provision back front si localize hooksymlink info
 
 ## Update .env to build DB in ram (makes data NOT persistant)
 fast:
-	$(shell sed -i "s|^#DB_URL=sqlite:///dev/shm/d8.sqlite|DB_URL=sqlite:///dev/shm/d8.sqlite|g"  .env)
-	$(shell sed -i "s|^DB_URL=sqlite:./../.cache/d8.sqlite|#DB_URL=sqlite:./../.cache/d8.sqlite|g"  .env)
+	$(shell sed -i "s|^#DB_URL=sqlite:///dev/shm/db.sqlite|DB_URL=sqlite:///dev/shm/db.sqlite|g"  .env)
+	$(shell sed -i "s|^DB_URL=sqlite:./../.cache/db.sqlite|#DB_URL=sqlite:./../.cache/db.sqlite|g"  .env)
 
 ## Provision enviroment
 provision:
 # Check if enviroment variables has been defined
 ifeq ($(strip $(COMPOSE_PROJECT_NAME)),projectname)
-	$(info Project name can not be default, please enter project name.)
-	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "Project name: " REPLY;echo -n $$REPLY)))
-	$(shell sed -i -e '/COMPOSE_PROJECT_NAME=/ s/=.*/=$(COMPOSE_PROJECT_NAME)/' .env)
-	$(info Please review your project settings and run `make all` again.)
+	$(eval COMPOSE_PROJECT_NAME = $(strip $(shell read -p "- Please customize project name: " REPLY;echo -n $$REPLY)))
+	$(shell sed -i -e '/COMPOSE_PROJECT_NAME=/ s/=.*/=$(shell echo "$(COMPOSE_PROJECT_NAME)" | tr -cd '[a-zA-Z0-9]' | tr '[:upper:]' '[:lower:]')/' .env)
+	$(info - Run `make all` again.)
+	@echo
 	exit 1
 endif
 ifdef DB_MOUNT_DIR
@@ -74,8 +76,6 @@ endif
 	make -s down
 	@echo "Build and run containers..."
 	docker-compose up -d --remove-orphans
-	# Set composer2 as default
-	$(call php-0, ln -fs composer2 /usr/bin/composer)
 ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
 	$(call php-0, apk add --no-cache $(ADDITIONAL_PHP_PACKAGES))
 endif
@@ -120,8 +120,8 @@ endif
 ifneq ($(strip $(MG_MODULES)),)
 	$(call php, drush en $(MG_MODULES) -y)
 	$(call php, drush migrate_generator:generate_migrations /var/www/html/content --update)
-	$(call php, drush migrate:import --all --group=migrate_generator_group)
-	$(call php, drush migrate_generator:clean_migrations migrate_generator_group)
+	$(call php, drush migrate:import --all --group=mgg)
+	$(call php, drush migrate_generator:clean_migrations mgg)
 	$(call php, drush pmu $(MG_MODULES) -y)
 endif
 
@@ -134,7 +134,7 @@ ifneq ("$(wildcard settings/settings.local.php)","")
 	$(call php, drush cr)
 endif
 
-REDIS_IS_INSTALLED := $(shell grep "redis.connection" web/sites/default/settings.php | tail -1 | wc -l || echo "0")
+REDIS_IS_INSTALLED := $(shell grep "redis.connection" web/sites/default/settings.php 2> /dev/null | tail -1 | wc -l || echo "0")
 redis-settings:
 ifeq ($(REDIS_IS_INSTALLED), 1)
 	@echo "Redis settings already installed, nothing to do"
@@ -200,8 +200,10 @@ DIRS = web/core web/libraries web/modules/contrib web/profiles/contrib web/sites
 ## Totally remove project build folder, docker containers and network
 clean: info
 	make -s down
+ifdef CURDIR
 	$(eval SCAFFOLD = $(shell docker run --rm -v $(CURDIR):/mnt -w /mnt --user $(CUID):$(CGID) $(IMAGE_PHP) composer run-script list-scaffold-files | grep -P '^(?!>)'))
 	@docker run --rm --user 0:0 -v $(CURDIR):/mnt -w /mnt -e RMLIST="$(addprefix web/,$(SCAFFOLD)) $(DIRS)" $(IMAGE_PHP) sh -c 'for i in $$RMLIST; do rm -fr $$i && echo "Removed $$i"; done'
+endif
 ifdef DB_MOUNT_DIR
 	@echo "Clean-up database data from $(DB_MOUNT_DIR) ..."
 	docker run --rm --user 0:0 -v $(shell dirname $(DB_MOUNT_DIR)):/mnt $(IMAGE_PHP) sh -c "rm -fr /mnt/`basename $(DB_MOUNT_DIR)`"

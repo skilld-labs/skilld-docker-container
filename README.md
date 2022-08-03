@@ -59,14 +59,14 @@
 | SITE_MAIL  | Site e-mail address | admin@example.com |
 | ADMIN_NAME  | Admin username | admin |
 | PROJECT_INSTALL | Way to install site - from straight or existing config | - |
-| IMAGE_PHP | Php image to use | `skilldlabs/php:72-fpm` |
-| IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.14.1` |
+| IMAGE_PHP | Php image to use | `skilldlabs/php:8-fpm` |
+| IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.22` |
 | IMAGE_APACHE | Image to use for apache container | `skilldlabs/skilld-docker-apache` |
 | IMAGE_FRONT | Image to use for front tasks | `skilldlabs/frontend:zen` |
 | IMAGE_DRIVER | Image to use for automated testing webdriver | `zenika/alpine-chrome` |
 | ADD_PHP_EXT | Additional php extension to install | - |
 | MAIN_DOMAIN_NAME | Domain name used for traefik | `docker.localhost` |
-| DB_URL | Url to connect to database | `sqlite:///dev/shm/d8.sqlite` |
+| DB_URL | Url to connect to database | `sqlite:///dev/shm/db.sqlite` |
 | DB_DATA_DIR | Full path to database storage | `/dev/shm` |
 | CLEAR_FRONT_PACKAGES | Set it to `no` to keep `/node_nodules` directory in theme after `make front` task to save build time. | yes |
 | RA_BASIC_AUTH | username:hashed-password format defining BasicAuth in Traefik. Password hashed using `htpasswd -nibB username password!` as [described here](https://doc.traefik.io/traefik/middlewares/basicauth/#general) | - |
@@ -83,10 +83,10 @@
   and update mysql container part
   ```yaml
   mysql:
-    image: percona:5.7.22
+    image: percona:5.7
   ...
   ```
-  * Update `.env` file, and set `DB_URL=mysql://d8:d8@mysql/d8`
+  * Update `.env` file, and set `DB_URL=mysql://db:db@mysql/db`
 
 #### Network
 
@@ -118,7 +118,7 @@ networks:
 * `make front` - Builds frontend tasks.
 * `make lint` - Runs frontend linters.
 * `make storybook` - Runs storybook in current theme.
-* `make blackfire` - Adds and enables blackfire.io php extension, needs [configuration](https://blackfire.io/docs/configuration/php) in docker-composer override.yml.
+* `make blackfire` - Adds and enables blackfire.io php extension, needs [configuration](https://blackfire.io/docs/configuration/php) in docker-compose.override.yml.
 * `make newrelic` - Adds and enables newrelic.com php extension, needs [configuration](https://docs.newrelic.com/docs/agents/php-agent/getting-started/introduction-new-relic-php#configuration) `NEW_RELIC_LICENSE_KEY` environment variable defined with valid license key.
 * `make xdebug (on|off|status)` - Enable, disable or report status of [Xdebug](https://xdebug.org/docs/) PHP extension.
 

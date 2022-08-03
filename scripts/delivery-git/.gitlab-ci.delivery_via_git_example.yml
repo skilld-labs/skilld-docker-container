@@ -45,6 +45,8 @@ Delivery to hoster:
     expire_in: 1d
     paths:
       - ./*
+    exclude:
+      - .cache/**/*
 
 Delivery to repo YYY: # Job can then be duplicated to deliver to multiples repos (just use a different DELIVERY_REMOTE_REPO_URL_N variable for each)
   ...

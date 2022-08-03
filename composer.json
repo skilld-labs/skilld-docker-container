@@ -50,6 +50,14 @@
     "sort-packages": true,
     "preferred-install": {
       "*": "dist"
+    },
+    "allow-plugins": {
+      "composer/installers": true,
+      "cweagans/composer-patches": true,
+      "drupal/core-composer-scaffold": true,
+      "drupal/core-project-message": true,
+      "drupal/core-vendor-hardening": true,
+      "skilldlabs/drupal-cleanup": true
     }
   },
   "autoload": {
@@ -115,9 +123,6 @@
       },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/do_not_reimport-2698425-56.patch"
-      },
-      "drupal/migrate_generator": {
-        "Ability to remove config of generated migrations": "https://git.drupalcode.org/project/migrate_generator/commit/20dc65e.patch"
       }
     }
   }

@@ -12,8 +12,9 @@ variables:
   STORYBOOK_PATH: "" # Update to enable storybook job (themes/custom/XXX/dist/storybook/index.html)
   GIT_STRATEGY: fetch
   REVIEW_DOMAIN: "XXX.XXX.com" # Mandatory, should equal to DNS of available runner server with docker + docker-compose + traefik
+  IMAGE_PHP: skilldlabs/php:8
 
-image: skilldlabs/php:74
+image: $IMAGE_PHP
 
 # Tags defines which runner to use (expected shell runner)
 .runner_tag_selection:
@@ -35,7 +36,7 @@ stages:
 sniffers:clang:
   stage: sniffers
   script:
-  - make clang
+    - make clang
   only:
     - branches
     - merge_requests
@@ -43,9 +44,8 @@ sniffers:clang:
 sniffers:compose:
   stage: sniffers
   script:
-  - composer -vvv -V
-  # Can't use --strict cause we need dev versions for d9 compatibility
-  - time composer validate --profile
+    - composer -vvv -V
+    - time composer validate --profile
   only:
     - branches
     - merge_requests
@@ -85,8 +85,8 @@ sniffers:phpcs:
   stage: sniffers
   image: skilldlabs/docker-phpcs-drupal
   script:
-  - docker -v
-  - make phpcs
+    - docker -v
+    - make phpcs
   extends: .runner_tag_selection
   only:
     - branches
@@ -95,7 +95,7 @@ sniffers:phpcs:
 sniffers:newlineeof:
   stage: sniffers
   script:
-  - make newlineeof
+    - make newlineeof
   only:
     - branches
     - merge_requests
@@ -104,17 +104,17 @@ sniffers:sonarqube:
   stage: sniffers
   image: skilldlabs/sonar-scanner:3.3
   script:
-  - sonar-scanner
-    -Dsonar.projectKey=$CI_PROJECT_PATH_SLUG
-    -Dsonar.projectName=$CI_PROJECT_NAME
-    -Dsonar.host.url=${SONAR_HOST}
-    -Dsonar.login=${SONAR_TOKEN}
-    -Dsonar.projectBaseDir=.
-    -Dsonar.sources=.
-    -Dsonar.inclusions=settings/**,web/modules/custom/**,web/profiles/**,web/themes/custom/**
+    - sonar-scanner
+      -Dsonar.projectKey=$CI_PROJECT_PATH_SLUG
+      -Dsonar.projectName=$CI_PROJECT_NAME
+      -Dsonar.host.url=${SONAR_HOST}
+      -Dsonar.login=${SONAR_TOKEN}
+      -Dsonar.projectBaseDir=.
+      -Dsonar.sources=.
+      -Dsonar.inclusions=settings/**,web/modules/custom/**,web/profiles/**,web/themes/custom/**
   only:
-  - master
-  - main
+    - master
+    - main
   allow_failure: true
 
 
@@ -124,7 +124,8 @@ prepare:back:
     - docker --version
     - pwd
     - ls -la
-    - docker run -e "COMPOSER_MEMORY_LIMIT=-1" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` skilldlabs/php:74-fpm /bin/ash -c "composer2 --version && composer2 install --no-interaction --prefer-dist -o --ignore-platform-reqs && composer2 create-required-files" # Make back on the fly
+# Make back on the fly, using --ignore-platform-reqs as additional PHP-extensions could be missing
+    - docker run -e "COMPOSER_MEMORY_LIMIT=-1" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` "$IMAGE_PHP" /bin/ash -c "composer --version && composer install --no-interaction --prefer-dist -o -v --ignore-platform-reqs && composer create-required-files"
   cache:
     key:
       files:
@@ -149,7 +150,7 @@ prepare:back:
     exclude:
       - web/modules/custom/
       - web/themes/custom/
-      - web/profiles/sdd/
+      - web/profiles/contrib/
   extends: .runner_tag_selection
   only:
     - branches
@@ -215,13 +216,21 @@ prepare:front:
     - merge_requests
   retry: 2
 
-.deploy_template_environment_default: &deploy_template_environment_default
+.deploy_template_environment_ttl_mid: &deploy_template_environment_ttl_long
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
+    auto_stop_in: 4 weeks
 
-.deploy_template_environment_auto_stop: &deploy_template_environment_auto_stop
+.deploy_template_environment_ttl_mid: &deploy_template_environment_ttl_mid
+  environment:
+    url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
+    name: review/$CI_COMMIT_REF_NAME
+    on_stop: stop_review
+    auto_stop_in: one week
+
+.deploy_template_environment_ttl_short: &deploy_template_environment_ttl_short
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/$CI_COMMIT_REF_NAME
@@ -230,26 +239,26 @@ prepare:front:
 
 build:review:
   <<: *deploy_template
-  <<: *deploy_template_environment_default
+  <<: *deploy_template_environment_ttl_mid
   when: manual
   except:
-  - master
-  - main
+    - master
+    - main
 
 build:master:
   <<: *deploy_template
-  <<: *deploy_template_environment_default
+  <<: *deploy_template_environment_ttl_long
   when: always
   only:
-  - master
-  - main
+    - master
+    - main
 
 build:tag:
   <<: *deploy_template
-  <<: *deploy_template_environment_auto_stop
+  <<: *deploy_template_environment_ttl_short
   when: always
   only:
-  - tags
+    - tags
   artifacts:
     name: "$CI_PROJECT_NAME-raw_build_db_and_files-tag-artifact"
     expire_in: 6 mos
@@ -281,8 +290,8 @@ generate:logins:
   stage: build
   dependencies: []
   script:
-  - cd ${BUILD_DIR}
-  - make info
+    - cd ${BUILD_DIR}
+    - make info
   when: manual
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
@@ -290,8 +299,8 @@ generate:logins:
     on_stop: stop_review
   extends: .runner_tag_selection
   only:
-  - branches
-  - merge_requests
+    - branches
+    - merge_requests
 
 test:deploy:
   stage: update
@@ -301,28 +310,28 @@ test:deploy:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
-  - cd ${BUILD_DIR}
-  - ls -lah
-  - ls -lah .cache/
-  - ls -lah web/sites/*/files/
-  - printf "\033[1m- Getting name of last tag created...\n\033[0m"
-  - export LAST_TAG=$(curl --header "Authorization:$GITLAB_PROJECT_BASIC_AUTH" --header "PRIVATE-TOKEN:$GITLAB_PROJECT_ACCESS_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/repository/tags" | jq -r '.[0] | .name')
-  - |
-    if [ "$LAST_TAG" = "null" ]; then printf "\033[1m- No tag was found. Nothing to do here.\n\033[0m"; else \
-    printf "\033[1m- Tag found! ($LAST_TAG) Downloading it's artifacts...\n\033[0m" && \
-    curl --location --output artifacts.zip --header "Authorization:$GITLAB_PROJECT_BASIC_AUTH" --header "PRIVATE-TOKEN:$GITLAB_PROJECT_ACCESS_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/artifacts/$LAST_TAG/download?job=build:tag" && \
-    printf "\033[1m- Artifacts were successfully downloaded from tag $LAST_TAG\n\033[0m" && \
-    printf "\033[1m- Replacing DB and files of ${CI_ENVIRONMENT_URL} from those of $LAST_TAG tag artifacts\n\033[0m" && \
-    docker-compose exec -T --user root php ash -c "chmod -R 775 .cache/ web/sites/*/files/" && \
-    rm -rf .cache/* web/sites/*/files/* && \
-    unzip -o artifacts.zip && \
-    printf "\033[1m- DB and files from ${CI_ENVIRONMENT_URL} were successfully replaced from those of the artifacts\n\033[0m" && \
-    make drush cr && \
-    # Disabling config_ignore so that all configs will be imported bellow
-    if [ $(docker-compose exec -T php sh -c "drush config:status --state=Any --format=list | grep config_ignore.settings | wc -l") -gt 0 ]; then make drush config:delete config_ignore.settings -- -y && make drush cr; fi && \
-    printf "\033[1m- Simulating deployment against tag $LAST_TAG...\n\033[0m" && \
-    make drush deploy -- -y && \
-    printf "\033[1m- Successful deployment simulation of ${CI_COMMIT_REF_NAME} against tag $LAST_TAG using ${CI_ENVIRONMENT_URL} review app.\n\033[0m"; fi
+    - cd ${BUILD_DIR}
+    - ls -lah
+    - ls -lah .cache/
+    - ls -lah web/sites/*/files/
+    - printf "\033[1m- Getting name of last tag created...\n\033[0m"
+    - export LAST_TAG=$(curl --header "Authorization:$GITLAB_PROJECT_BASIC_AUTH" --header "PRIVATE-TOKEN:$GITLAB_PROJECT_ACCESS_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/repository/tags" | jq -r '.[0] | .name')
+    - |
+      if [ "$LAST_TAG" = "null" ]; then printf "\033[1m- No tag was found. Nothing to do here.\n\033[0m"; else \
+      printf "\033[1m- Tag found! ($LAST_TAG) Downloading it's artifacts...\n\033[0m" && \
+      curl --location --output artifacts.zip --header "Authorization:$GITLAB_PROJECT_BASIC_AUTH" --header "PRIVATE-TOKEN:$GITLAB_PROJECT_ACCESS_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/artifacts/$LAST_TAG/download?job=build:tag" && \
+      printf "\033[1m- Artifacts were successfully downloaded from tag $LAST_TAG\n\033[0m" && \
+      printf "\033[1m- Replacing DB and files of ${CI_ENVIRONMENT_URL} from those of $LAST_TAG tag artifacts\n\033[0m" && \
+      docker-compose exec -T --user root php ash -c "chmod -R 775 .cache/ web/sites/*/files/" && \
+      rm -rf .cache/* web/sites/*/files/* && \
+      unzip -o artifacts.zip && \
+      printf "\033[1m- DB and files from ${CI_ENVIRONMENT_URL} were successfully replaced from those of the artifacts\n\033[0m" && \
+      make drush cr && \
+      # Disabling config_ignore so that all configs will be imported bellow
+      if [ $(docker-compose exec -T php sh -c "drush config:status --state=Any --format=list | grep config_ignore.settings | wc -l") -gt 0 ]; then make drush config:delete config_ignore.settings -- -y && make drush cr; fi && \
+      printf "\033[1m- Simulating deployment against tag $LAST_TAG...\n\033[0m" && \
+      make drush deploy -- -y && \
+      printf "\033[1m- Successful deployment simulation of ${CI_COMMIT_REF_NAME} against tag $LAST_TAG using ${CI_ENVIRONMENT_URL} review app.\n\033[0m"; fi
   only:
     refs:
       - branches
@@ -337,9 +346,9 @@ test:storybook:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
-  - cd ${BUILD_DIR}
-  - make build-storybook
-  - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
+    - cd ${BUILD_DIR}
+    - make build-storybook
+    - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
   extends: .runner_tag_selection
   only:
     refs:
@@ -355,22 +364,22 @@ test:behat:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
-  - echo "Starting job script in ${BUILD_DIR}"
-  - cd ${BUILD_DIR}
-  - BEHAT_ARGS='--colors -f pretty -o std -f junit -o features/junit' make behat
+    - echo "Starting job script in ${BUILD_DIR}"
+    - cd ${BUILD_DIR}
+    - BEHAT_ARGS='--colors -f pretty -o std -f junit -o features/junit' make behat
   after_script:
-  - cd ${BUILD_DIR}
-  - make browser_driver_stop
-  - rm -rf web/screenshots
-  - mkdir web/screenshots
-  - mv features/*.png web/screenshots/
-  - echo "- Screenshots are available here :" && cd web/screenshots && ls -h *.png | xargs -i echo "${CI_ENVIRONMENT_URL}/screenshots/{}"
-  - mv ${BUILD_DIR}/features/junit ${CI_PROJECT_DIR}
+    - cd ${BUILD_DIR}
+    - make browser_driver_stop
+    - rm -rf web/screenshots
+    - mkdir web/screenshots
+    - mv features/*.png web/screenshots/
+    - echo "- Screenshots are available here :" && cd web/screenshots && ls -h *.png | xargs -i echo "${CI_ENVIRONMENT_URL}/screenshots/{}"
+    - mv ${BUILD_DIR}/features/junit ${CI_PROJECT_DIR}
   retry:
     max: 2
     when: script_failure
   dependencies:
-  - build:review
+    - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -390,11 +399,11 @@ test:cinsp:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
-  - echo "Starting job script in ${BUILD_DIR}"
-  - cd ${BUILD_DIR}
-  - make cinsp
+    - echo "Starting job script in ${BUILD_DIR}"
+    - cd ${BUILD_DIR}
+    - make cinsp
   dependencies:
-  - build:review
+    - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -407,11 +416,11 @@ test:drupalrector:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
-  - echo "Starting job script in ${BUILD_DIR}"
-  - cd ${BUILD_DIR}
-  - make drupalrectorval
+    - echo "Starting job script in ${BUILD_DIR}"
+    - cd ${BUILD_DIR}
+    - make drupalrectorval
   dependencies:
-  - build:review
+    - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -440,7 +449,7 @@ test:lighthouse:
     - cd ${BUILD_DIR}
     - if [ -d .lighthouseci ]; then mv .lighthouseci web/lighthouseci; echo "- Reports are available here :" && for i in $(find web/lighthouseci/ -name "*.html"); do basename $i;done | xargs -i echo "${CI_ENVIRONMENT_URL}/lighthouseci/{}"; fi
   dependencies:
-  - build:review
+    - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -453,11 +462,11 @@ test:contentgen:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
-  - echo "Starting job script in ${BUILD_DIR}"
-  - cd ${BUILD_DIR}
-  - make contentgen
+    - echo "Starting job script in ${BUILD_DIR}"
+    - cd ${BUILD_DIR}
+    - make contentgen
   dependencies:
-  - build:review
+    - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -471,9 +480,9 @@ test:patch:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
-  - echo "Starting job script in ${BUILD_DIR}"
-  - cd ${BUILD_DIR}
-  - make patchval
+    - echo "Starting job script in ${BUILD_DIR}"
+    - cd ${BUILD_DIR}
+    - make patchval
   extends: .runner_tag_selection
   except:
     variables:
@@ -490,11 +499,11 @@ test:statusreport:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
-  - echo "Starting job script in ${BUILD_DIR}"
-  - cd ${BUILD_DIR}
-  - make statusreportval
+    - echo "Starting job script in ${BUILD_DIR}"
+    - cd ${BUILD_DIR}
+    - make statusreportval
   dependencies:
-  - build:review
+    - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -507,11 +516,11 @@ test:upgradestatus:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
-  - echo "Starting job script in ${BUILD_DIR}"
-  - cd ${BUILD_DIR}
-  - make upgradestatusval
+    - echo "Starting job script in ${BUILD_DIR}"
+    - cd ${BUILD_DIR}
+    - make upgradestatusval
   dependencies:
-  - build:review
+    - build:review
   extends: .runner_tag_selection
   only:
     - branches
@@ -524,14 +533,12 @@ test:watchdog:
     name: review/$CI_COMMIT_REF_NAME
     on_stop: stop_review
   script:
-  - echo "Starting job script in ${BUILD_DIR}"
-  - cd ${BUILD_DIR}
-  - make watchdogval
+    - echo "Starting job script in ${BUILD_DIR}"
+    - cd ${BUILD_DIR}
+    - make watchdogval
   dependencies:
-  - build:review
+    - build:review
   extends: .runner_tag_selection
   only:
     - branches
     - merge_requests
-
-

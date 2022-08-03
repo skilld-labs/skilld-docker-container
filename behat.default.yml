@@ -20,7 +20,6 @@ default:
             api_url: http://0.0.0.0:9222
             validate_certificate: false
             socket_timeout: 20
-      # goutte: ~
       # selenium2: ~
     FailAid\Extension:
       screenshot:
