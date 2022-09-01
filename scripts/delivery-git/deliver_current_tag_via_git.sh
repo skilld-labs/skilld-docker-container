@@ -93,9 +93,8 @@ if [ "$TARGET_GIT_REPO_TYPE" = "PLATFORM.SH" ]; then
 fi
 # Moving hosting env files back at project root
 if [ "$TARGET_GIT_REPO_TYPE" = "GITLAB" ]; then
-	echo -e "- Moving hosting env files back at project root...\n"
+	echo -e "- Moving CI files to avoid unexpected consequences...\n"
 	mv .gitlab-ci.yml .gitlab-ci-backup.yml
-	mv hosting/* hosting/.* .
 fi
 
 # Commiting to external repo
