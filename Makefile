@@ -99,6 +99,7 @@ $(eval TESTER_ROLE := contributor)
 ## Install drupal
 si:
 	@echo "Installing from: $(PROJECT_INSTALL)"
+	make -s local-settings
 ifeq ($(PROJECT_INSTALL), config)
 	$(call php, drush si --existing-config --db-url="$(DB_URL)" --account-name="$(ADMIN_NAME)" --account-mail="$(ADMIN_MAIL)" -y)
 	# install_import_translations() overwrites config translations so we need to reimport.
@@ -107,7 +108,6 @@ else
 	$(call php, drush si $(PROFILE_NAME) --db-url="$(DB_URL)" --account-name="$(ADMIN_NAME)" --account-mail="$(ADMIN_MAIL)" -y --site-name="$(SITE_NAME)" --site-mail="$(SITE_MAIL)" install_configure_form.site_default_country=FR install_configure_form.date_default_timezone=Europe/Paris)
 endif
 	make content
-	make -s local-settings
 	#make -s redis-settings
 	$(call php, drush user:create "$(TESTER_NAME)")
 	$(call php, drush user:role:add "$(TESTER_ROLE)" "$(TESTER_NAME)")
@@ -131,7 +131,6 @@ ifneq ("$(wildcard settings/settings.local.php)","")
 	$(call php, chmod +w web/sites/default)
 	$(call php, cp settings/settings.local.php web/sites/default/settings.local.php)
 	$(call php-0, sed -i "/settings.local.php';/s/# //g" web/sites/default/settings.php)
-	$(call php, drush cr)
 endif
 
 REDIS_IS_INSTALLED := $(shell grep "redis.connection" web/sites/default/settings.php 2> /dev/null | tail -1 | wc -l || echo "0")
