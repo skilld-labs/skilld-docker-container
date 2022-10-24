@@ -30,6 +30,8 @@ services:
 #    depends_on:
 #      - mysql
 #      - postgresql
+# Catch code assertions "development" mode. https://www.php.net/manual/en/function.assert.php
+    command: php-fpm7 -F -d zend.assertions=1
 # Uncomment next line if you need PHP XDebug.
 #    command: php-fpm81 -F -dzend.assertions=1 -dzend_extension=xdebug.so
 #    command: php-fpm81 -F -dzend.assertions=1 -dopcache.jit_buffer_size=20M
