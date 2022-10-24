@@ -3,10 +3,9 @@ description: Creates default content fixtures for the project. This module comes
 package: Custom
 
 type: module
-core_version_requirement: ^8.7.7 || ^9
+core_version_requirement: ^9 || ^10
 
 dependencies:
   - default_content:default_content
-  - better_normalizers:better_normalizers
   - drupal:block_content
   - drupal:content_translation
