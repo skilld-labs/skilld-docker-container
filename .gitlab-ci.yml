@@ -1,6 +1,4 @@
 # Variables to add in Gitalb UI : Settings > CI/CD
-# - SONAR_HOST // Optional
-# - SONAR_TOKEN // Optional
 # - NEW_RELIC_LICENSE_KEY // Optional
 # - TEST_UPDATE_DEPLOYMENTS // Optional, enables test:deploy job
 # - GITLAB_PROJECT_ACCESS_TOKEN // Required by test:deploy job. To be created in Gitlab project UI with read_api and read_repository permissions
@@ -99,23 +97,6 @@ sniffers:newlineeof:
   only:
     - branches
     - merge_requests
-
-sniffers:sonarqube:
-  stage: sniffers
-  image: skilldlabs/sonar-scanner:3.3
-  script:
-    - sonar-scanner
-      -Dsonar.projectKey=${CI_PROJECT_PATH_SLUG}
-      -Dsonar.projectName=${CI_PROJECT_NAME}
-      -Dsonar.host.url=${SONAR_HOST}
-      -Dsonar.login=${SONAR_TOKEN}
-      -Dsonar.projectBaseDir=.
-      -Dsonar.sources=.
-      -Dsonar.inclusions=settings/**,web/modules/custom/**,web/profiles/**,web/themes/custom/**
-  only:
-    - master
-    - main
-  allow_failure: true
 
 
 prepare:back:
