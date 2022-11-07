@@ -197,7 +197,7 @@ prepare:front:
     - merge_requests
   retry: 2
 
-.deploy_template_environment_ttl_mid: &deploy_template_environment_ttl_long
+.deploy_template_environment_ttl_long: &deploy_template_environment_ttl_long
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/${CI_COMMIT_REF_NAME}
