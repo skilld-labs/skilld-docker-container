@@ -22,6 +22,7 @@ image: $IMAGE_PHP
 before_script:
   - date
   - pwd
+  - ls -lah
 
 stages:
   - sniffers
@@ -50,9 +51,6 @@ sniffers:compose:
 
 sniffers:front:
   stage: sniffers
-  before_script:
-    - date
-    - pwd
   script:
     - make front-install # Dependencies are required for js imports to pass linters
     - make lintval
@@ -103,10 +101,7 @@ prepare:back:
   stage: prepare
   script:
     - docker --version
-    - pwd
-    - ls -la
-# Make back on the fly, using --ignore-platform-reqs as additional PHP-extensions could be missing
-    - docker run -e "COMPOSER_MEMORY_LIMIT=-1" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` "$IMAGE_PHP" /bin/ash -c "composer --version && composer install --no-interaction --prefer-dist -o -v && composer create-required-files"
+    - docker run -e "COMPOSER_MEMORY_LIMIT=-1" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` "$IMAGE_PHP" /bin/ash -c "composer --version && composer install --no-interaction --prefer-dist -o -v && composer create-required-files" # Make back on the fly, using --ignore-platform-reqs as additional PHP-extensions could be missing
   cache:
     key:
       files:
@@ -251,7 +246,6 @@ stop_review:
   stage: build
   dependencies: []
   script:
-    - date; pwd; ls -lahq;
     - echo "Clean-up build dir ${BUILD_DIR}"
     - (if [ -d ${BUILD_DIR} ]; then date; cd ${BUILD_DIR}; pwd; make clean; cd -; rm -rf ${BUILD_DIR}; fi)
     - echo "Removed previous review app ${CI_ENVIRONMENT_URL} from ${BUILD_DIR}."
