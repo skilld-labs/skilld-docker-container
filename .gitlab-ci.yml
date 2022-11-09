@@ -426,7 +426,7 @@ test:lighthouse:
     - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci collect --url=https://${RA_BASIC_AUTH_USERNAME}:${RA_BASIC_AUTH_PASSWORD}@${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     - docker exec --tty ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse lhci assert
   after_script:
-    - if [ -n `docker ps -f 'name=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse' --format '{{.Names}}'` ]; then echo 'Stopping container'; docker rm --force ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse; fi
+    - if [ -n `docker ps -f 'name=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse' -q` ]; then echo 'Stopping container'; docker rm --force ${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}_lighthouse; fi
     - cd ${BUILD_DIR}
     - if [ -d .lighthouseci ]; then mv .lighthouseci web/lighthouseci; echo "- Reports are available here :" && for i in $(find web/lighthouseci/ -name "*.html"); do basename $i;done | xargs -i echo "${CI_ENVIRONMENT_URL}/lighthouseci/{}"; fi
   dependencies:
