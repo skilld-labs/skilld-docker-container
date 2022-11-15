@@ -177,7 +177,8 @@ prepare:front:
     - make all_ci
     - make drush config-set system.site name '${CI_COMMIT_REF_SLUG}' -- -y
     - echo "Copying DB and files to make them accessible to artifact creator"
-    - docker-compose exec -T --user root php ash -c "chmod -R 775 .cache/" && cp -r .cache/ ${CI_PROJECT_DIR} && cp -r web/sites/ ${CI_PROJECT_DIR}/web/ # https://gitlab.com/gitlab-org/gitlab-foss/-/issues/15530#note_533732001
+    - docker-compose exec -T --user root php ash -c "chmod -R 775 .cache/ web/sites/"
+    - cp -r .cache/ ${CI_PROJECT_DIR} && cp -r web/sites/ ${CI_PROJECT_DIR}/web/ # https://gitlab.com/gitlab-org/gitlab-foss/-/issues/15530#note_533732001
   after_script:
     - docker network prune -f
     - docker container prune -f
