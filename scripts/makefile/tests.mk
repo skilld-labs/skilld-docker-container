@@ -191,7 +191,7 @@ endif
 blackfire:
 ifneq ("$(wildcard scripts/makefile/blackfire.sh)","")
 	$(call php-0, /bin/sh ./scripts/makefile/blackfire.sh)
-	$(call php-0, kill -USR2 1)
+	$(call php-0, /bin/sh ./scripts/makefile/reload.sh)
 	@echo "Blackfire extension enabled"
 else
 	@echo "scripts/makefile/blackfire.sh file does not exist"

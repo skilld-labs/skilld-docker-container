@@ -11,7 +11,7 @@ services:
   php:
     <<: *service-defaults
     image: ${IMAGE_PHP}
-    container_name: "${COMPOSE_PROJECT_NAME}_php"
+    container_name: "${COMPOSE_PROJECT_NAME}_web"
     volumes:
       - ../:/var/www/html:z
       - ../drush/.drushrc.php:/home/www-data/.drushrc.php:z
@@ -24,14 +24,14 @@ services:
 #    links:
 #      - redis:redis
 
-  nginx:
-    <<: *service-defaults
-    image: ${IMAGE_NGINX}
-    container_name: "${COMPOSE_PROJECT_NAME}_web"
-    depends_on:
-      - php
-    volumes_from:
-      - php
+#  nginx:
+#    <<: *service-defaults
+#    image: ${IMAGE_NGINX}
+#    container_name: "${COMPOSE_PROJECT_NAME}_web"
+#    depends_on:
+#      - php
+#    volumes_from:
+#      - php
 
 #  apache:
 #    <<: *service-defaults
