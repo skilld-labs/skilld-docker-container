@@ -27,14 +27,23 @@ services:
 # Uncomment for MacOS.
 #     - 'nfsmount:/var/www/html'
       - "./90-mail.ini:/etc/php81/conf.d/90-mail.ini:z"
+      - "./xx-php.ini:/etc/php81/conf.d/xx-php.ini:z"
 #    depends_on:
 #      - mysql
 #      - postgresql
-# Catch code assertions "development" mode. https://www.php.net/manual/en/function.assert.php
-    command: php-fpm81 -F -d zend.assertions=1
-# Uncomment next line if you need PHP XDebug.
-#    command: php-fpm81 -F -dzend.assertions=1 -dzend_extension=xdebug.so
-#    command: php-fpm81 -F -dzend.assertions=1 -dopcache.jit_buffer_size=20M
+# Uncomment for MacOS.
+#    ports:
+#    - "8088:80"
+    labels:
+      - 'sdc.port=80'
+      - 'traefik.enable=true'
+      # Treafik 2.x
+      - 'traefik.http.routers.web-${COMPOSE_PROJECT_NAME}.rule=Host(`${MAIN_DOMAIN_NAME}`)'
+      - 'traefik.http.routers.web-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
+      - 'traefik.http.routers.web-${COMPOSE_PROJECT_NAME}.tls=true'
+      - 'traefik.http.routers.web-${COMPOSE_PROJECT_NAME}.middlewares=web-${COMPOSE_PROJECT_NAME}@docker'
+      - 'traefik.http.middlewares.web-${COMPOSE_PROJECT_NAME}.basicauth.users=${RA_BASIC_AUTH}'
+      - 'traefik.http.middlewares.web-${COMPOSE_PROJECT_NAME}.basicauth.removeheader=true'
 
 # Get access keys from https://blackfire.io/my/profiles
 # Then download extension using "make blackfire"
@@ -97,24 +106,23 @@ services:
       - 'traefik.http.middlewares.mailhog-${COMPOSE_PROJECT_NAME}.basicauth.users=${RA_BASIC_AUTH}'
       - 'traefik.http.middlewares.mailhog-${COMPOSE_PROJECT_NAME}.basicauth.removeheader=true'
 
-  nginx:
-# Uncomment for MacOS.
-#    ports:
-#    - "8088:80"
-# Mount local folder with ssl keys.
-#    volumes:
-#     - ./nginx/ssl:/etc/nginx/ssl:Z
-    labels:
-      - 'sdc.port=80'
-      - 'traefik.enable=true'
-      # Treafik 2.x
-      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.rule=Host(`${MAIN_DOMAIN_NAME}`)'
-      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
-      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls=true'
-      - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.middlewares=nginx-${COMPOSE_PROJECT_NAME}@docker'
-      - 'traefik.http.middlewares.nginx-${COMPOSE_PROJECT_NAME}.basicauth.users=${RA_BASIC_AUTH}'
-      - 'traefik.http.middlewares.nginx-${COMPOSE_PROJECT_NAME}.basicauth.removeheader=true'
-
+#  nginx:
+## Uncomment for MacOS.
+##    ports:
+##    - "8088:80"
+## Mount local folder with ssl keys.
+##    volumes:
+##     - ./nginx/ssl:/etc/nginx/ssl:Z
+#    labels:
+#      - 'sdc.port=80'
+#      - 'traefik.enable=true'
+#      # Treafik 2.x
+#      - 'traefik.http.routers.web-${COMPOSE_PROJECT_NAME}.rule=Host(`${MAIN_DOMAIN_NAME}`)'
+#      - 'traefik.http.routers.web-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
+#      - 'traefik.http.routers.web-${COMPOSE_PROJECT_NAME}.tls=true'
+#      - 'traefik.http.routers.web-${COMPOSE_PROJECT_NAME}.middlewares=web-${COMPOSE_PROJECT_NAME}@docker'
+#      - 'traefik.http.middlewares.web-${COMPOSE_PROJECT_NAME}.basicauth.users=${RA_BASIC_AUTH}'
+#      - 'traefik.http.middlewares.web-${COMPOSE_PROJECT_NAME}.basicauth.removeheader=true'
 
 #  apache:
 #  Uncomment for MacOS.

@@ -83,7 +83,7 @@ endif
 	$(call php-0, cp /usr/share/zoneinfo/Europe/Paris /etc/localtime)
 	# Install newrelic PHP extension if NEW_RELIC_LICENSE_KEY defined
 	make -s newrelic
-	$(call php-0, kill -USR2 1)
+	$(call php-0, /bin/sh ./scripts/makefile/reload.sh)
 
 ## Install backend dependencies
 back:
@@ -233,3 +233,8 @@ dev:
 drush:
 	$(call php, $(filter-out "$@",$(MAKECMDGOALS)))
 	$(info "To pass arguments use double dash: "make drush en devel -- -y"")
+
+## Reconfigure unit https://unit.nginx.org/configuration/#process-management
+unit:
+	$(call php-0, curl -s -X PUT --data-binary @/var/lib/unit/conf.json  --unix-socket /run/control.unit.sock http://localhost/config)
+	$(call php-0, curl -s --unix-socket /run/control.unit.sock http://localhost/control/applications/drupal/restart)
