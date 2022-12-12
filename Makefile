@@ -45,7 +45,7 @@ php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
 php-0 = docker-compose exec -T --user 0:0 php ${1}
 
 ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php81-intl php81-redis wkhtmltopdf gnu-libiconv php81-pdo_pgsql postgresql-client postgresql-contrib
-DC_MODULES := project_default_content better_normalizers default_content hal serialization
+DC_MODULES := project_default_content default_content serialization
 MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv migrate_tools
 
 ## Full site install from the scratch
