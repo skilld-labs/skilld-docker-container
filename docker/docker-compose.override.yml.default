@@ -86,12 +86,8 @@ services:
     image: skilldlabs/mailhog
     container_name: "${COMPOSE_PROJECT_NAME}_mail"
     labels:
+      - 'sdc.port=8025'
       - 'traefik.enable=true'
-      # Treafik 1.x
-      - 'traefik.backend=${MAIN_DOMAIN_NAME}_mail'
-      - 'traefik.frontend.rule=Host:mail-${MAIN_DOMAIN_NAME}'
-      - 'traefik.frontend.redirect.entryPoint=https'
-      - 'traefik.port=8025'
       # Treafik 2.x
       - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.rule=Host(`mail-${MAIN_DOMAIN_NAME}`)'
       - 'traefik.http.routers.mailhog-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
@@ -109,12 +105,8 @@ services:
 #    volumes:
 #     - ./nginx/ssl:/etc/nginx/ssl:Z
     labels:
+      - 'sdc.port=80'
       - 'traefik.enable=true'
-      # Treafik 1.x
-      - 'traefik.backend=${MAIN_DOMAIN_NAME}_web'
-      - 'traefik.frontend.rule=Host:${MAIN_DOMAIN_NAME}'
-      - 'traefik.frontend.redirect.entryPoint=https'
-      - 'traefik.port=80'
       # Treafik 2.x
       - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.rule=Host(`${MAIN_DOMAIN_NAME}`)'
       - 'traefik.http.routers.nginx-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
@@ -132,12 +124,8 @@ services:
 #     volumes:
 #      - ./apache/ssl:/etc/apache2/ssl:Z
 #    labels:
+#      - 'sdc.port=80'
 #      - 'traefik.enable=true'
-#      # Treafik 1.x
-#      - 'traefik.backend=${MAIN_DOMAIN_NAME}_web'
-#      - 'traefik.frontend.rule=Host:${MAIN_DOMAIN_NAME}'
-#      - 'traefik.frontend.redirect.entryPoint=https'
-#      - 'traefik.port=80'
 #      # Treafik 2.x
 #      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.rule=Host(`${MAIN_DOMAIN_NAME}`)'
 #      - 'traefik.http.routers.apache-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
@@ -148,12 +136,8 @@ services:
 
 #  solr:
 #    labels:
+#      - 'sdc.port=8983'
 #      - 'traefik.enable=true'
-#      # Treafik 1.x
-#      - 'traefik.backend=${MAIN_DOMAIN_NAME}_solr'
-#      - 'traefik.frontend.rule=Host:solr-${MAIN_DOMAIN_NAME}'
-#      - 'traefik.frontend.redirect.entryPoint=https'
-#      - 'traefik.port=8983'
 #      # Treafik 2.x
 #      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.rule=Host(`solr-${MAIN_DOMAIN_NAME}`)'
 #      - 'traefik.http.routers.solr-${COMPOSE_PROJECT_NAME}.tls.certresolver=dns'
