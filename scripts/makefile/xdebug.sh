@@ -16,12 +16,14 @@ xdebug_status() {
 }
 
 xdebug_find_file() {
-	if [ -f /etc/php8/conf.d/50_xdebug.ini ]; then
-		echo /etc/php8/conf.d/50_xdebug.ini
-	elif [ -f /etc/php81/conf.d/50_xdebug.ini ]; then
+	if [ -f /etc/php81/conf.d/50_xdebug.ini ]; then
 		echo /etc/php81/conf.d/50_xdebug.ini
+	elif [ -f /etc/php82/conf.d/50_xdebug.ini ]; then
+		echo /etc/php82/conf.d/50_xdebug.ini
+	elif [ -f /etc/php8/conf.d/50_xdebug.ini ]; then
+		echo /etc/php8/conf.d/50_xdebug.ini
 	else
-	  printf "%bXdebug ini file not found%b\n" "${RED}" "${NC}" && exit 1
+		printf "%bXdebug ini file not found%b\n" "${RED}" "${NC}" && exit 1
 	fi
 }
 
