@@ -20,6 +20,7 @@ services:
   php:
     environment:
       COMPOSER_MEMORY_LIMIT: "-1"
+      COMPOSER_CACHE_DIR: /var/www/html/.cache/composer/cache
 #      BLACKFIRE_CLIENT_ID: x
 #      BLACKFIRE_CLIENT_TOKEN: x
 #      NEW_RELIC_APPNAME: "${COMPOSE_PROJECT_NAME}"
