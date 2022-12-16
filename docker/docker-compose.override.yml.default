@@ -80,10 +80,11 @@ services:
 
 #  postgresql:
 #    <<: *service-defaults
-#    image: postgres:12.2-alpine
+#    image: postgres:14-alpine
 #    container_name: "${COMPOSE_PROJECT_NAME}_pgsql"
 #    volumes:
 #      - ${DB_DATA_DIR}/${COMPOSE_PROJECT_NAME}_pgsql:/var/lib/postgresql/data:Z
+#      - ./load-extension.sh:/docker-entrypoint-initdb.d/load-extension.sh
 #    environment:
 #      POSTGRES_DB: db
 #      POSTGRES_USER: db
