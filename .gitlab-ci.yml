@@ -101,7 +101,7 @@ prepare:back:
   stage: prepare
   script:
     - docker --version
-    - docker run -e "COMPOSER_MEMORY_LIMIT=-1" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` "$IMAGE_PHP" /bin/ash -c "composer --version && composer install --no-interaction --prefer-dist -o -v && composer create-required-files" # Make back on the fly, using --ignore-platform-reqs as additional PHP-extensions could be missing
+    - docker run -e "COMPOSER_MEMORY_LIMIT=1G" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` "$IMAGE_PHP" /bin/ash -c "composer --version && composer install --no-interaction --prefer-dist -o -v && composer create-required-files" # Make back on the fly, using --ignore-platform-reqs as additional PHP-extensions could be missing
   cache:
     key:
       files:

@@ -19,7 +19,7 @@ services:
 # Override base service.
   php:
     environment:
-      COMPOSER_MEMORY_LIMIT: "-1"
+      COMPOSER_MEMORY_LIMIT: "1G"
 #      BLACKFIRE_CLIENT_ID: x
 #      BLACKFIRE_CLIENT_TOKEN: x
 #      NEW_RELIC_APPNAME: "${COMPOSE_PROJECT_NAME}"
