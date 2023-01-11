@@ -3,7 +3,7 @@
 # installs backfire/io probe extension
 
 # use `php -i | grep "additional .ini"` to get it
-PHP_INI_DIR=/etc/php81/conf.d
+PHP_INI_DIR=/etc/php82/conf.d
 
 set -e
 
