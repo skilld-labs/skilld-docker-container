@@ -28,7 +28,7 @@ CURDIR=$(shell pwd)
 # Define network name.
 COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 
-SDC_SERVICES=$(shell docker-compose config --services)
+SDC_SERVICES=$(shell docker compose config --services)
 # Determine database data directory if defined
 DB_MOUNT_DIR=$(shell echo $(CURDIR))/$(shell basename $(DB_DATA_DIR))
 ifeq ($(findstring mysql,$(SDC_SERVICES)),mysql)
@@ -40,9 +40,9 @@ endif
 
 
 # Execute php container as regular user
-php = docker-compose exec -T --user $(CUID):$(CGID) php ${1}
+php = docker compose exec -T --user $(CUID):$(CGID) php ${1}
 # Execute php container as root user
-php-0 = docker-compose exec -T --user 0:0 php ${1}
+php-0 = docker compose exec -T --user 0:0 php ${1}
 
 ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php81-intl php81-redis php81-pdo_pgsql postgresql-client
 DC_MODULES := project_default_content default_content serialization
@@ -75,7 +75,7 @@ ifdef DB_MOUNT_DIR
 endif
 	make -s down
 	@echo "Build and run containers..."
-	docker-compose up -d --remove-orphans
+	docker compose up -d --remove-orphans
 ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
 	$(call php-0, apk add --no-cache $(ADDITIONAL_PHP_PACKAGES))
 endif
@@ -181,15 +181,15 @@ diff:
 
 ## Run shell in PHP container as regular user
 exec:
-	docker-compose exec --user $(CUID):$(CGID) php ash
+	docker compose exec --user $(CUID):$(CGID) php ash
 
 ## Run shell in PHP container as root
 exec0:
-	docker-compose exec --user 0:0 php ash
+	docker compose exec --user 0:0 php ash
 
 down:
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
-	@docker-compose down -v --remove-orphans --rmi local
+	@docker compose down -v --remove-orphans --rmi local
 	@if [ ! -z "$(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}')" ]; then \
 		echo 'Stoping browser driver.' && make -s browser_driver_stop; fi
 
