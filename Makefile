@@ -87,12 +87,11 @@ endif
 
 ## Install backend dependencies
 back:
-ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
-	$(call php-0, apk add --no-cache $(ADDITIONAL_PHP_PACKAGES))
-endif
 	@echo "Installing composer dependencies, without dev ones"
 	$(call php, composer install --no-interaction --prefer-dist -o --no-dev)
 	$(call php, composer create-required-files)
+	@echo "Restarting web-server after getting new source"
+	$(call php-0, /bin/sh ./scripts/makefile/reload.sh)
 
 $(eval TESTER_NAME := tester)
 $(eval TESTER_ROLE := contributor)
