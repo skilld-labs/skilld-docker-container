@@ -3,6 +3,7 @@
 # These empty lines above are required for import to work
 msgid ""
 msgstr ""
+"Plural-Forms: nplurals=2; plural=(n>1);\n"
 
 # https://www.drupal.org/project/block_content_permissions/issues/2920739#comment-13406815
 msgid ""
