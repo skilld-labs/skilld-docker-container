@@ -9,7 +9,7 @@ stages:
 # Tags defines which runner to use (expected shell runner)
 .ra_tags: &ra_tags
   tags:
-    - XXX # Mandatory, should equal to tag of available runner server with docker + docker-compose + traefik
+    - XXX # Mandatory, should equal to tag of available runner server with docker + compose + traefik
 
 .ra_only: &ra_only
   only:
