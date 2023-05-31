@@ -119,7 +119,7 @@ endif
 ifneq ($(strip $(MG_MODULES)),)
 	$(call php, drush en $(MG_MODULES) -y)
 	$(call php, drush migrate_generator:generate_migrations /var/www/html/content --update)
-	$(call php, drush migrate:import --all --group=mgg)
+	$(call php, drush migrate:import --tag=migrate_generator)
 	$(call php, drush migrate_generator:clean_migrations mgg)
 	$(call php, drush pmu $(MG_MODULES) -y)
 endif
