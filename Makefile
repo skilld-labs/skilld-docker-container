@@ -46,7 +46,7 @@ php-0 = docker-compose exec -T --user 0:0 php ${1}
 
 ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php81-intl php81-redis php81-pdo_pgsql postgresql-client
 DC_MODULES := project_default_content default_content serialization
-MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv migrate_tools
+MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv
 
 ## Full site install from the scratch
 all: | provision back front si localize hooksymlink info
@@ -119,7 +119,7 @@ endif
 ifneq ($(strip $(MG_MODULES)),)
 	$(call php, drush en $(MG_MODULES) -y)
 	$(call php, drush migrate_generator:generate_migrations /var/www/html/content --update)
-	$(call php, drush migrate:import --tag=migrate_generator)
+	$(call php, drush migrate:import --tag=mgg)
 	$(call php, drush migrate_generator:clean_migrations mgg)
 	$(call php, drush pmu $(MG_MODULES) -y)
 endif

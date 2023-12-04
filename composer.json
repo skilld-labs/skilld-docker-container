@@ -24,7 +24,7 @@
     "drupal/core-vendor-hardening": "^10.0.9",
     "drupal/default_content": "^2",
     "drupal/imagemagick": "^3.4",
-    "drupal/migrate_generator": "^1.5",
+    "drupal/migrate_generator": "^2.0",
     "drupal/seven": "^1.0",
     "drush/drush": "^12.0",
     "skilldlabs/drupal-cleanup": "^1",
