@@ -93,7 +93,7 @@ services:
 
   mailhog:
     <<: *service-defaults
-    image: skilldlabs/mailhog
+    image: axllent/mailpit
     container_name: "${COMPOSE_PROJECT_NAME}_mail"
     labels:
       - 'sdc.port=8025'
