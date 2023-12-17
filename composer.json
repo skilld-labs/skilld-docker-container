@@ -26,7 +26,7 @@
     "drupal/imagemagick": "^3.4",
     "drupal/migrate_generator": "^2.0",
     "drupal/seven": "^1.0",
-    "drush/drush": "^12.0",
+    "drush/drush": "^12.2",
     "skilldlabs/drupal-cleanup": "^1",
     "skilldlabs/druxxy": "dev-main"
   },
@@ -120,9 +120,6 @@
       ]
     },
     "patches": {
-      "drush/drush": {
-        "Import multiple custom translation po files": "https://github.com/drush-ops/drush/pull/5569.patch"
-      },
       "drupal/default_content": {
         "Do not reimport existing entities": "https://www.drupal.org/files/issues/2022-07-29/default_content-fix-uuid-duplicate-entry-2698425.patch"
       }
