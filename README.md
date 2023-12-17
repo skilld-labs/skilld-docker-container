@@ -83,7 +83,7 @@
   and update mysql container part
   ```yaml
   mysql:
-    image: percona:5.7
+    image: mysql:8.0-oraclelinux8
   ...
   ```
   * Update `.env` file, and set `DB_URL=mysql://db:db@mysql/db`

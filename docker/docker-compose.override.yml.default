@@ -68,7 +68,7 @@ services:
 
 #  mysql:
 #    <<: *service-defaults
-#    image: percona:5.7
+#    image: mysql:8.0-oraclelinux8
 #    container_name: "${COMPOSE_PROJECT_NAME}_mysql"
 #    volumes:
 #      - ${DB_DATA_DIR}/${COMPOSE_PROJECT_NAME}_mysql:/var/lib/mysql:Z
