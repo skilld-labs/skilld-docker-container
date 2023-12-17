@@ -36,7 +36,7 @@
 ## Quickstart
 
 * Install docker for <a href="https://docs.docker.com/install/" target="_blank">Linux</a>, <a href="https://docs.docker.com/docker-for-mac/install/" target="_blank">Mac</a>, <a href="https://docs.docker.com/docker-for-windows/install/" target="_blank">Windows</a>
-  *  Check <a href="https://docs.docker.com/install/linux/linux-postinstall/" target="_blank">post-installation steps for Linux</a> version 17.12.0 or later
+  *  Check <a href="https://docs.docker.com/install/linux/linux-postinstall/" target="_blank">post-installation steps for Linux</a> version 18.06.0 or later
 * Install <a href="https://docs.docker.com/compose/install/" target="_blank">docker compose</a> version 1.21.0 or later
 
 * Copy **.env.default** to **.env**, more information about enviroment file can be found <a href="https://docs.docker.com/compose/env-file/" target="_blank">docs.docker.com</a>
