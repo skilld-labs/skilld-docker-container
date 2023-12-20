@@ -5,12 +5,12 @@
 # - GITLAB_PROJECT_BASIC_AUTH // Required by test:deploy job. Encoded credentials to pass Gitlab basic auth, if any
 
 variables:
-  GIT_DEPTH: "10"
+  GIT_DEPTH: "1"
   THEME_PATH: "" # Update to enable front jobs (web/themes/custom/XXX)
   STORYBOOK_PATH: "" # Update to enable storybook job (themes/custom/XXX/dist/storybook/index.html)
   GIT_STRATEGY: fetch
   REVIEW_DOMAIN: "XXX.XXX.com" # Mandatory, should equal to DNS of available runner server with docker + compose + traefik
-  IMAGE_PHP: skilldlabs/php:81
+  IMAGE_PHP: skilldlabs/php:82
 
 image: $IMAGE_PHP
 
@@ -23,6 +23,11 @@ before_script:
   - date
   - pwd
   - ls -lah
+  - whoami
+  - id
+  - cat /etc/os-release
+  - env
+  - echo $CI_PIPELINE_SOURCE
 
 stages:
   - sniffers
@@ -36,18 +41,32 @@ sniffers:clang:
   stage: sniffers
   script:
     - make clang
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
 
 sniffers:compose:
   stage: sniffers
   script:
     - composer -vvv -V
     - time composer validate --profile
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
 
 sniffers:front:
   stage: sniffers
@@ -68,14 +87,17 @@ sniffers:front:
     paths:
       - ${THEME_PATH}/node_modules/ # Populated during yarn install
   extends: .runner_tag_selection
-  only:
-    refs:
-      - branches
-      - merge_requests
-      - tags
-    variables:
-      - $THEME_PATH
-
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline' && $THEME_PATH
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $THEME_PATH
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $THEME_PATH
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_TAG && $THEME_PATH
 
 sniffers:phpcs:
   stage: sniffers
@@ -84,24 +106,38 @@ sniffers:phpcs:
     - docker -v
     - make phpcs
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
 
 sniffers:newlineeof:
   stage: sniffers
   script:
     - make newlineeof
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
 
 
 prepare:back:
   stage: prepare
   script:
     - docker --version
-    - docker run -e "COMPOSER_MEMORY_LIMIT=1G" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` "$IMAGE_PHP" /bin/ash -c "composer --version && composer install --no-interaction --prefer-dist -o -v && composer create-required-files" # Make back on the fly, using --ignore-platform-reqs as additional PHP-extensions could be missing
+    - docker run -e "COMPOSER_MEMORY_LIMIT=1G" --user 1000:1000 --rm --init -v `pwd`:`pwd` -w `pwd` "$IMAGE_PHP" /bin/ash -c "composer --version && composer install --no-interaction --prefer-dist -o -v --ignore-platform-reqs && composer create-required-files" # Make back on the fly, using --ignore-platform-reqs as additional PHP-extensions could be missing
   cache:
     key:
       files:
@@ -118,7 +154,7 @@ prepare:back:
   dependencies: []
   artifacts:
     name: "${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA}:back"
-    expire_in: 12 hrs
+    expire_in: 1d
     paths:
       - vendor/
       - web/
@@ -128,11 +164,17 @@ prepare:back:
       - web/themes/custom/
       - web/profiles/contrib/
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
-    - tags
-  retry: 2
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_TAG
 
 prepare:front:
   stage: prepare
@@ -143,17 +185,21 @@ prepare:front:
     - sniffers:front
   artifacts:
     name: "${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA}:front"
-    expire_in: 12 hrs
+    expire_in: 1d
     paths:
       - ${THEME_PATH}/dist/ # Populated during yarn build
   extends: .runner_tag_selection
-  only:
-    refs:
-      - branches
-      - merge_requests
-      - tags
-    variables:
-      - $THEME_PATH
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline' && $THEME_PATH
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $THEME_PATH
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $THEME_PATH
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_TAG && $THEME_PATH
 
 
 .deploy_template: &deploy_template
@@ -188,79 +234,84 @@ prepare:front:
     - prepare:front
   allow_failure: false # https://gitlab.com/gitlab-org/gitlab-foss/-/issues/25892#note_26909808
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
-  retry: 2
 
 .deploy_template_environment_ttl_long: &deploy_template_environment_ttl_long
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/${CI_COMMIT_REF_NAME}
     on_stop: stop_review
-    auto_stop_in: 4 weeks
+    auto_stop_in: 1 month
 
 .deploy_template_environment_ttl_mid: &deploy_template_environment_ttl_mid
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/${CI_COMMIT_REF_NAME}
     on_stop: stop_review
-    auto_stop_in: one week
+    auto_stop_in: 1 week
 
 .deploy_template_environment_ttl_short: &deploy_template_environment_ttl_short
   environment:
     url: https://${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}
     name: review/${CI_COMMIT_REF_NAME}
     on_stop: stop_review
-    auto_stop_in: 12 hours
+    auto_stop_in: 1 day
 
 build:review:
   <<: *deploy_template
   <<: *deploy_template_environment_ttl_mid
   when: manual
-  except:
-    - master
-    - main
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline' && $CI_MERGE_REQUEST_IID
+      changes:
+        - {{ project.path }}/**/*
 
 build:master:
   <<: *deploy_template
   <<: *deploy_template_environment_ttl_long
   when: always
-  only:
-    - master
-    - main
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline' && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
 
 build:tag:
   <<: *deploy_template
   <<: *deploy_template_environment_ttl_short
-  when: always
-  only:
-    - tags
+  when: manual
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline' && $CI_COMMIT_TAG
   artifacts:
     name: "${CI_PROJECT_NAME}-raw_build_db_and_files-tag-artifact"
-    expire_in: 6 mos
+    expire_in: 1 week
     paths:
       - web/sites/*/files/
       - .cache
 
 stop_review:
   stage: build
+  variables:
+    GIT_STRATEGY: none
   dependencies: []
   script:
     - echo "Clean-up build dir ${BUILD_DIR}"
     - (if [ -d ${BUILD_DIR} ]; then date; cd ${BUILD_DIR}; pwd; make clean; cd -; rm -rf ${BUILD_DIR}; fi)
     - echo "Removed previous review app ${CI_ENVIRONMENT_URL} from ${BUILD_DIR}."
-  variables:
-    GIT_STRATEGY: none
   when: manual
   environment:
     name: review/${CI_COMMIT_REF_NAME}
     action: stop
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
-    - tags
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_TAG
 
 generate:logins:
   stage: build
@@ -274,9 +325,16 @@ generate:logins:
     name: review/${CI_COMMIT_REF_NAME}
     on_stop: stop_review
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
 
 test:deploy:
   stage: update
@@ -308,12 +366,16 @@ test:deploy:
       printf "\033[1m- Simulating deployment against tag ${LAST_TAG}...\n\033[0m" && \
       make drush deploy -- -y && \
       printf "\033[1m- Successful deployment simulation of ${CI_COMMIT_REF_NAME} against tag ${LAST_TAG} using ${CI_ENVIRONMENT_URL} review app.\n\033[0m"; fi
-  only:
-    refs:
-      - branches
-      - merge_requests
-    variables:
-      - $TEST_UPDATE_DEPLOYMENTS == "TRUE"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline' && $TEST_UPDATE_DEPLOYMENTS == "TRUE"
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $TEST_UPDATE_DEPLOYMENTS == "TRUE"
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $TEST_UPDATE_DEPLOYMENTS == "TRUE"
+      changes:
+        - {{ project.path }}/**/*
 
 test:storybook:
   stage: tests
@@ -326,12 +388,16 @@ test:storybook:
     - make build-storybook
     - echo "- Storybook is accessible here :" && echo "${CI_ENVIRONMENT_URL}/${STORYBOOK_PATH}"
   extends: .runner_tag_selection
-  only:
-    refs:
-      - branches
-      - merge_requests
-    variables:
-      - $STORYBOOK_PATH
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline' && $STORYBOOK_PATH
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $STORYBOOK_PATH
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $STORYBOOK_PATH
+      changes:
+        - {{ project.path }}/**/*
 
 test:behat:
   stage: tests
@@ -357,9 +423,16 @@ test:behat:
   dependencies:
     - build:review
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
   artifacts:
     expire_in: 1 week
     when: always
@@ -381,9 +454,16 @@ test:cinsp:
   dependencies:
     - build:review
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
 
 test:drupalrector:
   stage: tests
@@ -398,9 +478,16 @@ test:drupalrector:
   dependencies:
     - build:review
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
 
 test:lighthouse:
   stage: tests
@@ -427,9 +514,16 @@ test:lighthouse:
   dependencies:
     - build:review
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
 
 test:contentgen:
   stage: tests
@@ -444,9 +538,16 @@ test:contentgen:
   dependencies:
     - build:review
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
   when: manual
 
 test:patch:
@@ -460,13 +561,17 @@ test:patch:
     - cd ${BUILD_DIR}
     - make patchval
   extends: .runner_tag_selection
-  except:
-    variables:
-      - $RUN_PATCHVAL_CI_JOB == "FALSE" # To use only in case of private packages and if patching upstream is not possible at all
-  only:
-    refs:
-      - branches
-      - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline' && $RUN_PATCHVAL_CI_JOB != "FALSE"
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $RUN_PATCHVAL_CI_JOB != "FALSE"
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $RUN_PATCHVAL_CI_JOB != "FALSE"
+      changes:
+        - {{ project.path }}/**/*
+    # Use $RUN_PATCHVAL_CI_JOB=TRUE only in case patching upstream is not possible at all, like private packages
 
 test:statusreport:
   stage: 'more tests'
@@ -481,9 +586,16 @@ test:statusreport:
   dependencies:
     - build:review
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
 
 test:upgradestatus:
   stage: 'more tests'
@@ -498,9 +610,16 @@ test:upgradestatus:
   dependencies:
     - build:review
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
 
 test:watchdog:
   stage: 'more tests'
@@ -515,6 +634,14 @@ test:watchdog:
   dependencies:
     - build:review
   extends: .runner_tag_selection
-  only:
-    - branches
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
+
