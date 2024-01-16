@@ -165,9 +165,10 @@ behatdi:
 browser_driver:
 	docker run -d --init --rm --name $(COMPOSE_PROJECT_NAME)_chrome \
 	--network container:$(COMPOSE_PROJECT_NAME)_php \
+	--entrypoint "" \
 	$(IMAGE_DRIVER) \
+	chromium-browser --headless --disable-gpu \
 	--remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --no-sandbox \
-	--entrypoint "" chromium-browser --headless --disable-gpu \
 	--window-size=1200,2080 \
 	--disable-web-security --w3c=false
 
