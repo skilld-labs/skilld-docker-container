@@ -3,7 +3,7 @@
 # installs newrelic.com agent extension
 
 # use `php -i | grep "additional .ini"` to get it
-PHP_INI_DIR=/etc/php81/conf.d
+PHP_INI_DIR=/etc/php83/conf.d
 
 # get the latest version from https://download.newrelic.com/php_agent/archive/
 NEW_RELIC_AGENT_VERSION="${NEW_RELIC_AGENT_VERSION:-10.19.0.9}"

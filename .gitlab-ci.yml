@@ -10,7 +10,7 @@ variables:
   STORYBOOK_PATH: "" # Update to enable storybook job (themes/custom/XXX/dist/storybook/index.html)
   GIT_STRATEGY: fetch
   REVIEW_DOMAIN: "XXX.XXX.com" # Mandatory, should equal to DNS of available runner server with docker + compose + traefik
-  IMAGE_PHP: skilldlabs/php:82
+  IMAGE_PHP: skilldlabs/php:83
 
 image: $IMAGE_PHP
 
