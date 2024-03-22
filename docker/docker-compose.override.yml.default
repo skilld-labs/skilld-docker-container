@@ -26,8 +26,8 @@ services:
     volumes:
 # Uncomment for MacOS.
 #     - 'nfsmount:/var/www/html'
-      - "./90-mail.ini:/etc/php81/conf.d/90-mail.ini:z"
-      - "./xx-php.ini:/etc/php81/conf.d/xx-php.ini:z"
+      - "./90-mail.ini:/etc/php83/conf.d/90-mail.ini:z"
+      - "./xx-php.ini:/etc/php83/conf.d/xx-php.ini:z"
 #    depends_on:
 #      - mysql
 #      - postgresql
