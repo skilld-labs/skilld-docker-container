@@ -28,7 +28,7 @@
     "drupal/seven": "^1.0",
     "drush/drush": "^12.2",
     "skilldlabs/drupal-cleanup": "^1",
-    "skilldlabs/druxxy": "dev-main"
+    "skilldlabs/druxxy": "^1.1"
   },
   "require-dev": {
     "dmore/behat-chrome-extension": "^1.3",
