@@ -203,7 +203,7 @@ newrelic:
 ifdef NEW_RELIC_LICENSE_KEY
 	$(call php-0, /bin/sh ./scripts/makefile/newrelic.sh $(NEW_RELIC_LICENSE_KEY) '$(COMPOSE_PROJECT_NAME)')
 	$(call php, sed -i -e 's/#  <<: \*service-newrelic/  <<: \*service-newrelic/g' docker/docker-compose.override.yml)
-	docker compose up -d
+	$(call php-0, /bin/sh ./scripts/makefile/reload.sh)
 	@echo "NewRelic PHP extension enabled"
 else
 	@echo "NewRelic install skipped as NEW_RELIC_LICENSE_KEY is not set"

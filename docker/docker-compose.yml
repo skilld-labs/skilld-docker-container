@@ -1,5 +1,3 @@
-version: "3.7"
-
 x-service-defaults:
   &service-defaults
   restart: always

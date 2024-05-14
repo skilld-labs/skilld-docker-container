@@ -28,7 +28,9 @@ CURDIR=$(shell pwd)
 # Define network name.
 COMPOSE_NET_NAME := $(COMPOSE_PROJECT_NAME)_front
 
-SDC_SERVICES=$(shell docker compose config --services)
+compose = docker compose --env-file .env ${1}
+
+SDC_SERVICES=$(call compose, config --services)
 # Determine database data directory if defined
 DB_MOUNT_DIR=$(shell echo $(CURDIR))/$(shell basename $(DB_DATA_DIR))
 ifeq ($(findstring mysql,$(SDC_SERVICES)),mysql)
@@ -40,9 +42,9 @@ endif
 
 
 # Execute php container as regular user
-php = docker compose exec -T --user $(CUID):$(CGID) php ${1}
+php = docker compose --env-file .env exec -T --user $(CUID):$(CGID) php ${1}
 # Execute php container as root user
-php-0 = docker compose exec -T --user 0:0 php ${1}
+php-0 = docker compose --env-file .env exec -T --user 0:0 php ${1}
 
 ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php81-intl php81-redis php81-pdo_pgsql postgresql-client
 DC_MODULES := project_default_content default_content serialization
@@ -75,15 +77,14 @@ ifdef DB_MOUNT_DIR
 endif
 	make -s down
 	@echo "Build and run containers..."
-	docker compose up -d --remove-orphans
+	$(call compose, up -d --remove-orphans)
 ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
 	$(call php-0, apk add --no-cache $(ADDITIONAL_PHP_PACKAGES))
 endif
 	# Set up timezone
 	$(call php-0, cp /usr/share/zoneinfo/Europe/Paris /etc/localtime)
 	# Install newrelic PHP extension if NEW_RELIC_LICENSE_KEY defined
-	make -s newrelic
-	$(call php-0, /bin/sh ./scripts/makefile/reload.sh)
+	make -s newrelic reload
 
 ## Install backend dependencies
 back:
@@ -181,15 +182,15 @@ diff:
 
 ## Run shell in PHP container as regular user
 exec:
-	docker compose exec --user $(CUID):$(CGID) php ash
+	$(call compose, exec --user $(CUID):$(CGID) php ash)
 
 ## Run shell in PHP container as root
 exec0:
-	docker compose exec --user 0:0 php ash
+	$(call compose, exec --user 0:0 php ash)
 
 down:
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
-	@docker compose down -v --remove-orphans --rmi local
+	$(call compose, down -v --remove-orphans --rmi local)
 	@if [ ! -z "$(shell docker ps -f 'name=$(COMPOSE_PROJECT_NAME)_chrome' --format '{{.Names}}')" ]; then \
 		echo 'Stoping browser driver.' && make -s browser_driver_stop; fi
 
@@ -234,6 +235,5 @@ drush:
 	$(info "To pass arguments use double dash: "make drush en devel -- -y"")
 
 ## Reconfigure unit https://unit.nginx.org/configuration/#process-management
-unit:
-	$(call php-0, curl -s -X PUT --data-binary @/var/lib/unit/conf.json  --unix-socket /run/control.unit.sock http://localhost/config)
-	$(call php-0, curl -s --unix-socket /run/control.unit.sock http://localhost/control/applications/drupal/restart)
+reload:
+	$(call php-0, /bin/sh ./scripts/makefile/reload.sh /var/www/html/docker/unit.json)
