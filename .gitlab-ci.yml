@@ -219,7 +219,7 @@ prepare:front:
     - echo "COMPOSE_PROJECT_NAME=${CI_PROJECT_NAME}-review-${CI_COMMIT_REF_SLUG}" >> .env.default
     - echo "MAIN_DOMAIN_NAME=${CI_ENVIRONMENT_SLUG}-${CI_PROJECT_PATH_SLUG}.${REVIEW_DOMAIN}" >> .env.default
     - docker --version
-    - docker compose --version
+    - docker compose version
     - make all_ci
     - make drush config-set system.site name '${CI_COMMIT_REF_SLUG}' -- -y
     - echo "Copying DB and files to make them accessible to artifact creator"

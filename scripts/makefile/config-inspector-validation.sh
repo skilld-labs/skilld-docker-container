@@ -3,7 +3,7 @@
 drush pm:enable config_inspector -y
 
 # Get count of config inspector errors
-ERROR_COUNT=$(drush config:inspect --only-error --format=string | wc -l)
+ERROR_COUNT=$(drush config:inspect --only-error --format=string | tail -n +3 | wc -l)
 
 # Exit1 and alert if logs
 if [ "$ERROR_COUNT" -gt "0" ]; then
