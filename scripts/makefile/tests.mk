@@ -4,12 +4,12 @@ sniffers: | clang compval phpcs newlineeof
 ## Run all tests & validations (including sniffers)
 tests: | sniffers cinsp drupalrectorval upgradestatusval behat watchdogval statusreportval patchval
 
-
+IMAGE_PHPCS ?= skilldlabs/docker-phpcs-drupal:10
 # Function for code sniffer images.
 phpcsexec = docker run --rm \
 	-v $(CURDIR)/web/modules/custom:/work/modules \
 	-v $(CURDIR)/web/themes/custom:/work/themes \
-	skilldlabs/docker-phpcs-drupal:10 ${1} -s --colors \
+	$(IMAGE_PHPCS) ${1} -s --colors -v \
 	--standard=Drupal,DrupalPractice \
 	--extensions=php,module,inc,install,profile,theme,yml,txt,md,js \
 	--ignore=*.min.js,*.css,libraries/*,dist/*,styleguide/*,README.md,README.txt,node_modules/*,work/themes/**.js,work/themes/**.md \
