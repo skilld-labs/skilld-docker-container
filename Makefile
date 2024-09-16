@@ -179,14 +179,14 @@ diff:
 	diff -u0 --color .env .env.default || true; echo ""
 	diff -u0 --color docker/docker-compose.override.yml docker/docker-compose.override.yml.default || true; echo ""
 
-
+SHELL?=ash
 ## Run shell in PHP container as regular user
 exec:
-	$(call compose, exec --user $(CUID):$(CGID) php ash)
+	$(call compose, exec --user $(CUID):$(CGID) php $(SHELL))
 
 ## Run shell in PHP container as root
 exec0:
-	$(call compose, exec --user 0:0 php ash)
+	$(call compose, exec --user 0:0 php $(SHELL))
 
 down:
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
