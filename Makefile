@@ -46,9 +46,14 @@ php = docker compose --env-file .env exec -T --user $(CUID):$(CGID) php ${1}
 # Execute php container as root user
 php-0 = docker compose --env-file .env exec -T --user 0:0 php ${1}
 
-ADDITIONAL_PHP_PACKAGES := tzdata graphicsmagick # php81-intl php81-redis php81-pdo_pgsql postgresql-client
+ADDITIONAL_PHP_PACKAGES := #tzdata graphicsmagick # php81-intl php81-redis php81-pdo_pgsql postgresql-client
 DC_MODULES := project_default_content default_content serialization
 MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv
+
+EXEC_SHELL?=ash
+apk = apk add --no-cache $(1)
+apt = $(EXEC_SHELL) -c "DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -qy $(1) && rm -rf /var/lib/apt/lists/*"
+pkgs=apt
 
 ## Full site install from the scratch
 all: | provision back front si localize hooksymlink info
@@ -79,10 +84,8 @@ endif
 	@echo "Build and run containers..."
 	$(call compose, up -d --remove-orphans)
 ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
-	$(call php-0, apk add --no-cache $(ADDITIONAL_PHP_PACKAGES))
+	$(call php-0, $(call $(pkgs),$(ADDITIONAL_PHP_PACKAGES)))
 endif
-	# Set up timezone
-	$(call php-0, cp /usr/share/zoneinfo/Europe/Paris /etc/localtime)
 	# Install newrelic PHP extension if NEW_RELIC_LICENSE_KEY defined
 	make -s newrelic reload
 
@@ -128,7 +131,7 @@ endif
 local-settings:
 ifneq ("$(wildcard settings/settings.local.php)","")
 	@echo "Turn on settings.local"
-	$(call php, chmod +w web/sites/default)
+	$(call php-0, chmod ug+w web/sites/default web/sites/default/settings.local.php || true)
 	$(call php, cp settings/settings.local.php web/sites/default/settings.local.php)
 	$(call php-0, sed -i "/settings.local.php';/s/# //g" web/sites/default/settings.php)
 endif
@@ -179,14 +182,13 @@ diff:
 	diff -u0 --color .env .env.default || true; echo ""
 	diff -u0 --color docker/docker-compose.override.yml docker/docker-compose.override.yml.default || true; echo ""
 
-SHELL?=ash
 ## Run shell in PHP container as regular user
 exec:
-	$(call compose, exec --user $(CUID):$(CGID) php $(SHELL))
+	$(call compose, exec --user $(CUID):$(CGID) php $(EXEC_SHELL))
 
 ## Run shell in PHP container as root
 exec0:
-	$(call compose, exec --user 0:0 php $(SHELL))
+	$(call compose, exec --user 0:0 php $(EXEC_SHELL))
 
 down:
 	@echo "Removing network & containers for $(COMPOSE_PROJECT_NAME)"
@@ -234,6 +236,8 @@ drush:
 	$(call php, $(filter-out "$@",$(MAKECMDGOALS)))
 	$(info "To pass arguments use double dash: "make drush en devel -- -y"")
 
-## Reconfigure unit https://unit.nginx.org/configuration/#process-management
+## Reconfigure app-server via directory with config file
+# unit https://unit.nginx.org/configuration/#process-management
+# frankenphp/caddy https://caddyserver.com/docs/api
 reload:
-	$(call php-0, /bin/sh ./scripts/makefile/reload.sh /var/www/html/docker/unit.json)
+	$(call php-0, /bin/sh ./scripts/makefile/reload.sh /var/www/html/docker)
