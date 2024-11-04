@@ -65,7 +65,7 @@ allfast: | fast provision back front si localize hooksymlink info
 ## Update .env to build DB in ram (makes data NOT persistant)
 fast:
 	$(shell sed -i "s|^#DB_URL=sqlite:///dev/shm/db.sqlite|DB_URL=sqlite:///dev/shm/db.sqlite|g"  .env)
-	$(shell sed -i "s|^DB_URL=sqlite:./../.cache/db.sqlite|#DB_URL=sqlite:./../.cache/db.sqlite|g"  .env)
+	$(shell sed -i "s|^DB_URL=sqlite://./../.cache/db.sqlite|#DB_URL=sqlite://./../.cache/db.sqlite|g"  .env)
 
 ## Provision enviroment
 provision:
