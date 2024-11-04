@@ -46,14 +46,14 @@ php = docker compose --env-file .env exec -T --user $(CUID):$(CGID) php ${1}
 # Execute php container as root user
 php-0 = docker compose --env-file .env exec -T --user 0:0 php ${1}
 
-ADDITIONAL_PHP_PACKAGES := #tzdata graphicsmagick # php81-intl php81-redis php81-pdo_pgsql postgresql-client
+ADDITIONAL_PHP_PACKAGES ?= #tzdata graphicsmagick # php81-intl php81-redis php81-pdo_pgsql postgresql-client
 DC_MODULES := project_default_content default_content serialization
 MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv
 
 EXEC_SHELL?=ash
+PKGMAN?=apk
 apk = apk add --no-cache $(1)
 apt = $(EXEC_SHELL) -c "DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -qy $(1) && rm -rf /var/lib/apt/lists/*"
-pkgs=apt
 
 ## Full site install from the scratch
 all: | provision back front si localize hooksymlink info
@@ -84,7 +84,7 @@ endif
 	@echo "Build and run containers..."
 	$(call compose, up -d --remove-orphans)
 ifneq ($(strip $(ADDITIONAL_PHP_PACKAGES)),)
-	$(call php-0, $(call $(pkgs),$(ADDITIONAL_PHP_PACKAGES)))
+	$(call php-0, $(call $(PKGMAN),$(ADDITIONAL_PHP_PACKAGES)))
 endif
 	# Install newrelic PHP extension if NEW_RELIC_LICENSE_KEY defined
 	make -s newrelic reload

@@ -15,7 +15,7 @@ if [ $sapi = "unitd" ]; then
 		# just reload as no new config passed
 		curl -s -o /dev/null $socket http://localhost/control/applications/drupal/restart
 	else
-		file=${1}/conf.json
+		file=${1}/unit.json
 		curl -s -o /dev/null -X PUT --data-binary @$file $socket http://localhost/config
 	fi
 elif [ $sapi = "frankenphp" ]; then
