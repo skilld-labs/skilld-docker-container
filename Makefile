@@ -241,3 +241,4 @@ drush:
 # frankenphp/caddy https://caddyserver.com/docs/api
 reload:
 	$(call php-0, /bin/sh ./scripts/makefile/reload.sh /var/www/html/docker)
+	$(call php-0, /bin/sh ./scripts/makefile/reload.sh)
