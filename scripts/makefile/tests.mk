@@ -65,7 +65,7 @@ endif
 ## Validate composer.json file
 compval:
 	@echo "Composer.json validation..."
-	@docker run --rm -v $(CURDIR):/mnt -w /mnt $(IMAGE_PHP) composer validate
+	@docker run --rm -v $(CURDIR):/mnt -w /mnt $(IMAGE_PHP) sh -c "git config --global --add safe.directory /mnt && composer validate"
 
 ## Validate watchdog logs
 watchdogval:

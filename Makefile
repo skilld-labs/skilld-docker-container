@@ -46,11 +46,11 @@ php = docker compose --env-file .env exec -T --user $(CUID):$(CGID) php ${1}
 # Execute php container as root user
 php-0 = docker compose --env-file .env exec -T --user 0:0 php ${1}
 
-ADDITIONAL_PHP_PACKAGES ?= #tzdata graphicsmagick # php81-intl php81-redis php81-pdo_pgsql postgresql-client
+ADDITIONAL_PHP_PACKAGES ?= # php83-intl php83-redis php83-pdo_pgsql postgresql-client
 DC_MODULES := project_default_content default_content serialization
 MG_MODULES := migrate_generator migrate migrate_plus migrate_source_csv
 
-EXEC_SHELL?=ash
+EXEC_SHELL?=/bin/ash
 PKGMAN?=apk
 apk = apk add --no-cache $(1)
 apt = $(EXEC_SHELL) -c "DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -qy $(1) && rm -rf /var/lib/apt/lists/*"
@@ -155,6 +155,9 @@ localize:
 	$(call php, drush locale:import:all /var/www/html/translations/ --type=customized --override=all)
 	@echo "Localization finished"
 
+define get_login_url
+$(shell $(call php, drush user:login --name="$(1)" /admin/content/) | grep -v ERROR | head -n1 | sed 's|http://default||')
+endef
 ## Display project's information
 info:
 	$(info )
@@ -167,8 +170,8 @@ ifdef REVIEW_DOMAIN
 else
 	$(eval BASE_URL := $(shell docker inspect --format='{{(index .NetworkSettings.Networks "$(COMPOSE_NET_NAME)").IPAddress}}:{{index .Config.Labels "sdc.port"}}' $(COMPOSE_PROJECT_NAME)_web))
 endif
-	$(info Login as System Admin: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(ADMIN_NAME)" /admin/content/ | awk -F "default" '{print $$2}')))))
-	$(info Login as Contributor: http://$(shell printf '%-19s \n'  $(shell echo "$(BASE_URL)"$(shell $(call php, drush user:login --name="$(TESTER_NAME)" /admin/content/ | awk -F "default" '{print $$2}')))))
+	$(info Login as System Admin: http://$(BASE_URL)$(call get_login_url,$(ADMIN_NAME)))
+	$(info Login as Contributor: http://$(BASE_URL)$(call get_login_url,$(TESTER_NAME)))
 	$(info )
 ifneq ($(shell diff .env .env.default -q),)
 	@echo -e "\x1b[33mWARNING\x1b[0m - .env and .env.default files differ. Use 'make diff' to see details."

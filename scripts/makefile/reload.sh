@@ -11,7 +11,7 @@ sapi=$(cat /proc/1/comm)
 
 if [ $sapi = "unitd" ]; then
 	socket='--unix-socket /run/control.unit.sock'
-	if [ -z "$1" ]; then
+	if [ -z "${1-}" ]; then
 		# just reload as no new config passed
 		curl -s -o /dev/null $socket http://localhost/control/applications/drupal/restart
 	else
