@@ -1,0 +1,61 @@
+name: Validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  harness:
+    name: Harness static gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Validate docs and agent harness
+        run: node scripts/ci/validate-harness.mjs
+
+  sniffers:
+    name: Makefile sniffers
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_PHP: skilldlabs/php:83
+      IMAGE_PHPCS: skilldlabs/docker-phpcs-drupal:10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker diagnostics
+        run: |
+          docker --version
+          docker compose version
+
+      - name: Validate base config langcode
+        run: make clang
+
+      - name: Validate composer.json
+        run: make compval
+
+      - name: Validate coding standards
+        run: make phpcs
+
+      - name: Validate trailing newline
+        run: make newlineeof

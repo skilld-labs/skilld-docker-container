@@ -132,6 +132,25 @@ sniffers:newlineeof:
       changes:
         - {{ project.path }}/**/*
 
+# Static gate for docs + the .claude/ agent harness (Tier 0 of docs/testing.md).
+# Node-only: runs in node:lts-alpine, no Drupal stack needed. Locally: `make harnessval`.
+sniffers:harness:
+  stage: sniffers
+  image: node:lts-alpine
+  script:
+    - node --version
+    - node scripts/ci/validate-harness.mjs
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - {{ project.path }}/**/*
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - {{ project.path }}/**/*
+
 
 prepare:back:
   stage: prepare
