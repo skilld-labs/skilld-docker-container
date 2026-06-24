@@ -59,7 +59,7 @@
 | SITE_MAIL  | Site e-mail address | admin@example.com |
 | ADMIN_NAME  | Admin username | admin |
 | PROJECT_INSTALL | Way to install site - from straight or existing config | - |
-| IMAGE_PHP | Php image to use | `skilldlabs/php:83-unit` |
+| IMAGE_PHP | Php image to use | `ghcr.io/skilld-labs/php:83-unit` |
 | EXEC_SHELL | Shell to use in PHP-container (`ash`/`bash`) | `/bin/ash` |
 | PKGMAN | Package manager to use in PHP-container (`apk`/`apt`) | `apk` |
 | ADDITIONAL_PHP_PACKAGES | Additional php extensions and tools to install | `graphicsmagick` |
