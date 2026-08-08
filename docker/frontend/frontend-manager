@@ -1,0 +1,64 @@
+#!/bin/sh
+
+#####
+##### Frontend image for Skilld.
+#####
+##### This image supports multiple theme folders.
+##### To make available a theme, just place it as volume into the path "/frontend/themes" inside container. Example: /frontend/themes/my_theme.
+#####
+
+##### Let's define useful functions.
+function front_build {
+  cd $BASE_THEMES_PATH
+  for THEME_FOLDER in */ ; do
+    if [ -e $BASE_THEMES_PATH/$THEME_FOLDER/package.json ]
+    then
+      echo "Building front tasks in folder \"$THEME_FOLDER\"..."
+      cd "$BASE_THEMES_PATH/$THEME_FOLDER"
+      yarn install --prod --ignore-optional --check-files
+      yarn build --verbose
+    else
+      echo "Folder \"$THEME_FOLDER\" doesn't contain a \"package.json\" file. Skip."
+    fi
+  done
+}
+
+function front_lint {
+  cd $BASE_THEMES_PATH
+  for THEME_FOLDER in */ ; do
+    if [ -e $BASE_THEMES_PATH/$THEME_FOLDER/package.json ]
+    then
+      echo "Executing linters in folder \"$THEME_FOLDER\"..."
+      cd "$BASE_THEMES_PATH/$THEME_FOLDER"
+      yarn install --prod --ignore-optional --check-files
+      yarn lint-fix
+    else
+      echo "Folder \"$THEME_FOLDER\" doesn't contain a \"package.json\" file. Skip."
+    fi
+  done
+}
+
+function front_clear {
+  cd $BASE_THEMES_PATH
+  for THEME_FOLDER in */ ; do
+    echo "Clearing folder $THEME_FOLDER..."
+    rm -rf "$THEME_FOLDER/node_modules"
+    rm -rf "$THEME_FOLDER/dist"
+  done
+}
+
+##### Let's process requested option.
+case $1 in
+  "build")
+    front_build
+    ;;
+  "lint")
+    front_lint
+    ;;
+  "clear")
+    front_clear
+    ;;
+  *)
+    echo "Invalid option \"$1\". Skip."
+    ;;
+esac
