@@ -23,6 +23,16 @@
 
 **Skilld docker container** is a developer starterkit for your Drupal project.
 
+## Documentation
+
+Full guides live in [`docs/`](docs/README.md):
+
+* [Review apps](docs/review-apps.md) — how GitLab CI builds ephemeral per-MR environments.
+* [CI pipeline](docs/ci-pipeline.md) — every stage/job and the `make`-target mapping.
+* [Architecture](docs/architecture.md) · [Local development](docs/local-development.md) · [Parallel environments](docs/parallel-environments.md)
+* [Upgrading (D10→11→12)](docs/upgrading.md) · [Observability](docs/observability.md) · [Delivery & ops](docs/delivery-and-ops.md)
+* [Contributing](CONTRIBUTING.md) · [Agent harness](.claude/README.md) · [Backlog](docs/backlog.md)
+
 ## What is this?
 
 * This is a developer starterkit which can be used for local drupal development or/and integration into your CI/CD processes.
@@ -39,9 +49,9 @@
   *  Check <a href="https://docs.docker.com/install/linux/linux-postinstall/" target="_blank">post-installation steps for Linux</a> version 18.06.0 or later
 * Install <a href="https://docs.docker.com/compose/install/" target="_blank">Docker Compose V2</a> version **2.0** or later
 
-* Copy **.env.default** to **.env**, more information about enviroment file can be found <a href="https://docs.docker.com/compose/env-file/" target="_blank">docs.docker.com</a>
-* Copy **docker-compose.override.yml.default** to **docker-compose.override.yml**, update parts you want to overwrite.
-  * **docker-compose.yml** contains the base requirements of a working Drupal site. It should not be updated.
+* Copy **.env.default** to **.env**, more information about environment files can be found <a href="https://docs.docker.com/compose/env-file/" target="_blank">docs.docker.com</a>
+* Copy **docker/docker-compose.override.yml.default** to **docker/docker-compose.override.yml**, update parts you want to overwrite.
+  * **docker/docker-compose.yml** contains the base requirements of a working Drupal site. It should not be updated.
 * Update **.gitlab-ci.yml** `variables` section THEME_PATH to make front gitlab CI works.
 * Run `make all`
 
@@ -65,18 +75,18 @@
 | ADDITIONAL_PHP_PACKAGES | Additional php extensions and tools to install | `graphicsmagick` |
 | IMAGE_NGINX | Image to use for nginx container | `skilldlabs/nginx:1.24` |
 | IMAGE_APACHE | Image to use for apache container | `skilldlabs/skilld-docker-apache` |
-| IMAGE_FRONT | Image to use for front tasks | `skilldlabs/frontend:zen` |
+| IMAGE_FRONT | Image to use for front tasks | `node:lts-alpine` |
 | IMAGE_DRIVER | Image to use for automated testing webdriver | `zenika/alpine-chrome` |
 | MAIN_DOMAIN_NAME | Domain name used for traefik | `docker.localhost` |
-| DB_URL | Url to connect to database | `sqlite:///dev/shm/db.sqlite` |
-| DB_DATA_DIR | Full path to database storage | `/dev/shm` |
-| CLEAR_FRONT_PACKAGES | Set it to `no` to keep `/node_nodules` directory in theme after `make front` task to save build time. | yes |
+| DB_URL | URL to connect to database | `sqlite://./../.cache/db.sqlite` |
+| DB_DATA_DIR | Full path to database storage | `../.cache` |
+| CLEAR_FRONT_PACKAGES | Set to `yes` to remove theme `node_modules` and `dist` during `make clean`; `no` keeps frontend packages between runs. | no |
 | RA_BASIC_AUTH | username:hashed-password format defining BasicAuth in Traefik. Password hashed using `htpasswd -nibB username password!` as [described here](https://doc.traefik.io/traefik/middlewares/basicauth/#general) | - |
 
 #### Persistent Mysql
 
 * By default sqlite storage used, which is created inside php container, if you need persistent data to be saved:
-  * Update `docker-compose.override.yml`, set
+  * Update `docker/docker-compose.override.yml`, set
   ```yaml
   php:
      depends_on:
@@ -92,7 +102,7 @@
 
 #### Network
 
-* Every time project built, it take new available IP address, if you want to have persistent IP, uncomment lines from  `docker-compose.override.yml`
+* Every time project is built, it takes a new available IP address. If you want to have a persistent IP, uncomment lines from `docker/docker-compose.override.yml`
 ```yaml
 networks:
   front:
@@ -120,7 +130,7 @@ networks:
 * `make front` - Builds frontend tasks.
 * `make lint` - Runs frontend linters.
 * `make storybook` - Runs storybook in current theme.
-* `make blackfire` - Adds and enables blackfire.io php extension, needs [configuration](https://blackfire.io/docs/configuration/php) in docker-compose.override.yml.
+* `make blackfire` - Adds and enables blackfire.io php extension, needs [configuration](https://blackfire.io/docs/configuration/php) in `docker/docker-compose.override.yml`.
 * `make newrelic` - Adds and enables newrelic.com php extension, needs [configuration](https://docs.newrelic.com/docs/agents/php-agent/getting-started/introduction-new-relic-php#configuration) `NEW_RELIC_LICENSE_KEY` environment variable defined with valid license key.
 * `make xdebug (on|off|status)` - Enable, disable or report status of [Xdebug](https://xdebug.org/docs/) PHP extension.
 
